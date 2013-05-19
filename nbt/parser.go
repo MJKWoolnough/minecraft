@@ -77,7 +77,7 @@ type Tag interface {
 	io.WriterTo
 	equaler.Equaler
 	Data() Data
-	Name() String
+	Name() string
 	String() string
 	Tag() TagId
 	Copy() Tag
@@ -182,8 +182,8 @@ func (n namedTag) Data() Data {
 	return n.d
 }
 
-func (n namedTag) Name() String {
-	return n.name
+func (n namedTag) Name() string {
+	return string(n.name)
 }
 
 func (n namedTag) Tag() TagId {
@@ -637,6 +637,54 @@ func (n List) String() string {
 	return s + "\n}"
 }
 
+func (n *List) Set(i int32, d Data) {
+	if i < 0 || i >= len(n.d) {
+		return
+	}
+	tagType, err := idFromData(d)
+	if !n.valid(d) {
+		return
+	}
+	n.d[i] = d
+	
+}
+
+func (n List) Get(n int32) Data {
+	if i >= 0 && i < len(n.d) {
+		return n.d[i]
+	}
+	return nil
+}
+
+func (n *List) Append(d ...Data) {
+	if n.valid(d...) {
+		n.d = append(n.d, d...)
+	}
+}
+
+func (n *List) Insert(i int32, d ...Data) {
+	if n.valid(d...) {
+		n.d = append(n.d[:i], append(d, n.d[i:]...)...)
+	}
+}
+
+func (n *List) Remove(i int32) {
+	if i >= 0 && i < len(n.d) {
+		copy(n.d[i:], n.d[i+1:])
+		n.d[len(n.d)-1] = nil
+		n.d = n.d[:len(n.d)-1]
+	}
+}
+
+func (n List) valid(d ...Data) bool {
+	for _, e := range d {
+		if idFromData(e) != n.tagType {
+			return false
+		}
+	}
+	return true
+}
+
 type Compound []Tag
 
 func NewCompound(d []Tag) *Compound {
@@ -704,6 +752,25 @@ func (n Compound) String() string {
 		s += "\n	" + indent(d.String())
 	}
 	return s + "\n}"
+}
+
+func (n Compound) Get(name string) Tag {
+	for _, t := range n {
+		if t.Name() == name {
+			return t
+		}
+	}
+	return nil
+}
+
+func (n *Compound) Set(name string, t Tag) {
+	for i, t := range n {
+		if t.Name() == name {
+			(*n)[i] = t
+			return
+		}
+	}
+	*n = append(*n, t)
 }
 
 type IntArray []int32
