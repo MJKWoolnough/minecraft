@@ -37,7 +37,7 @@ func (n NoLock) Error() string {
 
 type path struct {
 	dirname string
-	lock bool
+	lock    bool
 }
 
 // NewPath constructs a new directory based path to read from.
@@ -46,7 +46,7 @@ func NewPath(dirname string) (Path, error) {
 	if err := os.MkdirAll(dirname, 0755); err != nil {
 		return nil, err
 	}
-	p := &path {
+	p := &path{
 		dirname,
 		false,
 	}
@@ -72,7 +72,7 @@ func (p *path) writeRegion(x, z int32) (writeSeekCloser, error) {
 	if err := os.MkdirAll(path.Join(p.dirname, "region"), 0755); err != nil {
 		return nil, err
 	}
-	return os.OpenFile(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x, z)), os.O_WRONLY | os.O_CREATE, 0666)
+	return os.OpenFile(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x, z)), os.O_WRONLY|os.O_CREATE, 0666)
 }
 
 func (p *path) readLevelDat() (io.ReadCloser, error) {
@@ -90,7 +90,7 @@ func (p *path) writeLevelDat() (io.WriteCloser, error) {
 	if !p.lock {
 		return nil, &NoLock{}
 	}
-	os.OpenFile(path.Join(p.dirname, "level.dat"), os.O_WRONLY | os.O_CREATE, 0666)
+	os.OpenFile(path.Join(p.dirname, "level.dat"), os.O_WRONLY|os.O_CREATE, 0666)
 }
 
 // Update tracks the lock file for updates to remove the lock.
@@ -109,13 +109,12 @@ func (p path) GetRegions() [][2]int32 {
 			if nums := filename.FindStringSubmatch(file.Name()); nums != nil {
 				fmt.Sscan(nums[0], &x)
 				fmt.Sscan(nums[1], &z)
-				toRet = append(toRet, [2]{ x, z })
+				toRet = append(toRet, [2]int32{x, z})
 			}
 		}
 	}
 	return toRet
 }
-
 
 // Lock will retake the lock file if it has been lost. May cause corruption.
 func (p *path) Lock() {
