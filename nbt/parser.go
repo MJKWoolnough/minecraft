@@ -30,6 +30,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"github.com/MJKWoolnough/equaler"
+	"github.com/MJKWoolnough/rwcount"
 	"io"
 )
 
@@ -119,7 +120,7 @@ func NewTag(name string, d Data) (n Tag) {
 }
 
 func (n *namedTag) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &countReader{Reader: f}
+	c := &rwcount.CountReader{Reader: f}
 	defer c.BytesRead(&total)
 	if err = binary.Read(c, binary.BigEndian, &n.tagType); err != nil {
 		err = &readError{"named TagId", err}
@@ -145,7 +146,7 @@ func (n *namedTag) ReadFrom(f io.Reader) (total int64, err error) {
 }
 
 func (n *namedTag) WriteTo(f io.Writer) (total int64, err error) {
-	c := &countWriter{Writer: f}
+	c := &rwcount.CountWriter{Writer: f}
 	defer c.BytesWritten(&total)
 	if err = binary.Write(c, binary.BigEndian, n.tagType); err != nil {
 		err = &writeError{"named TagId", err}
@@ -225,14 +226,14 @@ func NewByte(d byte) *Byte {
 }
 
 func (n *Byte) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &countReader{Reader: f}
+	c := &rwcount.CountReader{Reader: f}
 	defer c.BytesRead(&total)
 	err = binary.Read(c, binary.BigEndian, n)
 	return
 }
 
 func (n *Byte) WriteTo(f io.Writer) (total int64, err error) {
-	c := &countWriter{Writer: f}
+	c := &rwcount.CountWriter{Writer: f}
 	defer c.BytesWritten(&total)
 	err = binary.Write(c, binary.BigEndian, n)
 	return
@@ -261,14 +262,14 @@ func NewShort(d int16) *Short {
 }
 
 func (n *Short) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &countReader{Reader: f}
+	c := &rwcount.CountReader{Reader: f}
 	defer c.BytesRead(&total)
 	err = binary.Read(c, binary.BigEndian, n)
 	return
 }
 
 func (n *Short) WriteTo(f io.Writer) (total int64, err error) {
-	c := &countWriter{Writer: f}
+	c := &rwcount.CountWriter{Writer: f}
 	defer c.BytesWritten(&total)
 	err = binary.Write(c, binary.BigEndian, n)
 	return
@@ -297,14 +298,14 @@ func NewInt(d int32) *Int {
 }
 
 func (n *Int) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &countReader{Reader: f}
+	c := &rwcount.CountReader{Reader: f}
 	defer c.BytesRead(&total)
 	err = binary.Read(c, binary.BigEndian, n)
 	return
 }
 
 func (n *Int) WriteTo(f io.Writer) (total int64, err error) {
-	c := &countWriter{Writer: f}
+	c := &rwcount.CountWriter{Writer: f}
 	defer c.BytesWritten(&total)
 	err = binary.Write(c, binary.BigEndian, n)
 	return
@@ -333,14 +334,14 @@ func NewLong(d int64) *Long {
 }
 
 func (n *Long) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &countReader{Reader: f}
+	c := &rwcount.CountReader{Reader: f}
 	defer c.BytesRead(&total)
 	err = binary.Read(c, binary.BigEndian, n)
 	return
 }
 
 func (n *Long) WriteTo(f io.Writer) (total int64, err error) {
-	c := &countWriter{Writer: f}
+	c := &rwcount.CountWriter{Writer: f}
 	defer c.BytesWritten(&total)
 	err = binary.Write(c, binary.BigEndian, n)
 	return
@@ -369,14 +370,14 @@ func NewFloat(d float32) *Float {
 }
 
 func (n *Float) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &countReader{Reader: f}
+	c := &rwcount.CountReader{Reader: f}
 	defer c.BytesRead(&total)
 	err = binary.Read(c, binary.BigEndian, n)
 	return
 }
 
 func (n *Float) WriteTo(f io.Writer) (total int64, err error) {
-	c := &countWriter{Writer: f}
+	c := &rwcount.CountWriter{Writer: f}
 	defer c.BytesWritten(&total)
 	err = binary.Write(c, binary.BigEndian, n)
 	return
@@ -405,14 +406,14 @@ func NewDouble(d float64) *Double {
 }
 
 func (n *Double) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &countReader{Reader: f}
+	c := &rwcount.CountReader{Reader: f}
 	defer c.BytesRead(&total)
 	err = binary.Read(c, binary.BigEndian, n)
 	return
 }
 
 func (n *Double) WriteTo(f io.Writer) (total int64, err error) {
-	c := &countWriter{Writer: f}
+	c := &rwcount.CountWriter{Writer: f}
 	defer c.BytesWritten(&total)
 	err = binary.Write(c, binary.BigEndian, n)
 	return
@@ -441,7 +442,7 @@ func NewByteArray(d []byte) *ByteArray {
 }
 
 func (n *ByteArray) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &countReader{Reader: f}
+	c := &rwcount.CountReader{Reader: f}
 	defer c.BytesRead(&total)
 	var length uint32
 	if err = binary.Read(c, binary.BigEndian, &length); err != nil {
@@ -453,7 +454,7 @@ func (n *ByteArray) ReadFrom(f io.Reader) (total int64, err error) {
 }
 
 func (n *ByteArray) WriteTo(f io.Writer) (total int64, err error) {
-	c := &countWriter{Writer: f}
+	c := &rwcount.CountWriter{Writer: f}
 	defer c.BytesWritten(&total)
 	if err = binary.Write(c, binary.BigEndian, uint32(len(*n))); err != nil {
 		return
@@ -494,7 +495,7 @@ func NewString(d string) *String {
 }
 
 func (n *String) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &countReader{Reader: f}
+	c := &rwcount.CountReader{Reader: f}
 	defer c.BytesRead(&total)
 	var (
 		length uint16
@@ -512,7 +513,7 @@ func (n *String) ReadFrom(f io.Reader) (total int64, err error) {
 }
 
 func (n *String) WriteTo(f io.Writer) (total int64, err error) {
-	c := &countWriter{Writer: f}
+	c := &rwcount.CountWriter{Writer: f}
 	defer c.BytesWritten(&total)
 	Data := []byte(*n)
 	length := uint16(len(Data))
@@ -563,7 +564,7 @@ func NewList(d []Data) *List {
 }
 
 func (n *List) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &countReader{Reader: f}
+	c := &rwcount.CountReader{Reader: f}
 	defer c.BytesRead(&total)
 	if err = binary.Read(c, binary.BigEndian, &n.tagType); err != nil {
 		return
@@ -589,7 +590,7 @@ func (n *List) ReadFrom(f io.Reader) (total int64, err error) {
 }
 
 func (n *List) WriteTo(f io.Writer) (total int64, err error) {
-	c := &countWriter{Writer: f}
+	c := &rwcount.CountWriter{Writer: f}
 	defer c.BytesWritten(&total)
 	if err = binary.Write(c, binary.BigEndian, n.tagType); err != nil {
 		return
@@ -646,7 +647,7 @@ func (n *List) Set(i int32, d Data) {
 		return
 	}
 	n.d[i] = d
-	
+
 }
 
 func (n List) Get(n int32) Data {
@@ -693,7 +694,7 @@ func NewCompound(d []Tag) *Compound {
 }
 
 func (n *Compound) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &countReader{Reader: f}
+	c := &rwcount.CountReader{Reader: f}
 	defer c.BytesRead(&total)
 	*n = Compound(make([]Tag, 0))
 	for {
@@ -710,7 +711,7 @@ func (n *Compound) ReadFrom(f io.Reader) (total int64, err error) {
 }
 
 func (n *Compound) WriteTo(f io.Writer) (total int64, err error) {
-	c := &countWriter{Writer: f}
+	c := &rwcount.CountWriter{Writer: f}
 	defer c.BytesWritten(&total)
 	for _, d := range *n {
 		if _, err = d.WriteTo(c); err != nil {
@@ -781,7 +782,7 @@ func NewIntArray(d []int32) *IntArray {
 }
 
 func (n *IntArray) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &countReader{Reader: f}
+	c := &rwcount.CountReader{Reader: f}
 	defer c.BytesRead(&total)
 	var length int32
 	if err = binary.Read(c, binary.BigEndian, &length); err != nil {
@@ -793,7 +794,7 @@ func (n *IntArray) ReadFrom(f io.Reader) (total int64, err error) {
 }
 
 func (n *IntArray) WriteTo(f io.Writer) (total int64, err error) {
-	c := &countWriter{Writer: f}
+	c := &rwcount.CountWriter{Writer: f}
 	defer c.BytesWritten(&total)
 	if err = binary.Write(c, binary.BigEndian, int32(len(*n))); err != nil {
 		return
