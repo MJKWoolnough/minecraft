@@ -639,7 +639,7 @@ func (n List) String() string {
 }
 
 func (n *List) Set(i int32, d Data) {
-	if i < 0 || i >= len(n.d) {
+	if i < 0 || i >= int32(len(n.d)) {
 		return
 	}
 	tagType, err := idFromData(d)
@@ -650,8 +650,8 @@ func (n *List) Set(i int32, d Data) {
 
 }
 
-func (n List) Get(n int32) Data {
-	if i >= 0 && i < len(n.d) {
+func (n List) Get(i int32) Data {
+	if i >= 0 && i < int32(len(n.d)) {
 		return n.d[i]
 	}
 	return nil
@@ -670,7 +670,7 @@ func (n *List) Insert(i int32, d ...Data) {
 }
 
 func (n *List) Remove(i int32) {
-	if i >= 0 && i < len(n.d) {
+	if i >= 0 && i < int32(len(n.d)) {
 		copy(n.d[i:], n.d[i+1:])
 		n.d[len(n.d)-1] = nil
 		n.d = n.d[:len(n.d)-1]
@@ -679,7 +679,7 @@ func (n *List) Remove(i int32) {
 
 func (n List) valid(d ...Data) bool {
 	for _, e := range d {
-		if idFromData(e) != n.tagType {
+		if t, _ := idFromData(e); t != n.tagType {
 			return false
 		}
 	}
@@ -765,7 +765,7 @@ func (n Compound) Get(name string) Tag {
 }
 
 func (n *Compound) Set(name string, t Tag) {
-	for i, t := range n {
+	for i, t := range *n {
 		if t.Name() == name {
 			(*n)[i] = t
 			return
