@@ -1,16 +1,16 @@
 // Copyright (c) 2013 - Michael Woolnough <michael.woolnough@gmail.com>
-// 
+//
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met: 
-// 
+// modification, are permitted provided that the following conditions are met:
+//
 // 1. Redistributions of source code must retain the above copyright notice, this
-//    list of conditions and the following disclaimer. 
+//    list of conditions and the following disclaimer.
 // 2. Redistributions in binary form must reproduce the above copyright notice,
 //    this list of conditions and the following disclaimer in the documentation
-//    and/or other materials provided with the distribution. 
-// 
+//    and/or other materials provided with the distribution.
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -29,17 +29,17 @@ import (
 	"fmt"
 	"github.com/MJKWoolnough/io-watcher"
 	"github.com/MJKWoolnough/minecraft/nbt"
+	"math/rand"
 	"os"
-	"rand"
 	"time"
 )
 
 var (
-	required = map[string]nbt.TagId {
+	levelRequired = map[string]nbt.TagId{
 		"LevelName": nbt.Tag_String,
-		"SpawnX": nbt.Tag_Int,
-		"SpawnY": nbt.Tag_Int,
-		"SpawnZ": nbt.Tag_Int,
+		"SpawnX":    nbt.Tag_Int,
+		"SpawnY":    nbt.Tag_Int,
+		"SpawnZ":    nbt.Tag_Int,
 	}
 )
 
@@ -52,7 +52,7 @@ func (m MissingTagError) Error() {
 }
 
 type WrongTypeError struct {
-	tagName string
+	tagName        string
 	expecting, got nbt.TagId
 }
 
@@ -61,10 +61,10 @@ func (m MissingTagError) Error() {
 }
 
 type Level struct {
-	location Path
-	regions map[int32]map[int32]Region
+	location  Path
+	regions   map[int32]map[int32]Region
 	levelData nbt.Tag
-	changed bool
+	changed   bool
 }
 
 func NewLevel(location Path) (*Level, error) {
@@ -90,26 +90,26 @@ func NewLevel(location Path) (*Level, error) {
 		}
 	}
 	if d := t.Get("Data"); d != nil {
-		if d.Tag() == nbt.Tag_Compound {
+		if d.TagId() == nbt.Tag_Compound {
 			data = d.Data().(*nbt.Compound)
 		} else {
-			return nil, WrongTypeError { "Data", nbt.Tag_Compound, d.Tag() }
+			return nil, WrongTypeError{"Data", nbt.Tag_Compound, d.TagId()}
 		}
 	} else {
-		return nil, &MissingTagError { "Data" }
+		return nil, &MissingTagError{"Data"}
 	}
-	for name, tagType := range required {
+	for name, tagType := range levelRequired {
 		if x := data.Get(name); x == nil {
-			return nil, &MissingTagError { name }
-		} else if x.Tag() != tagType {
-			return nil, &WrongTypeError { name, tagType, x.Tag() }
+			return nil, &MissingTagError{name}
+		} else if x.TagId() != tagType {
+			return nil, &WrongTypeError{name, tagType, x.TagId()}
 		}
 	}
-	return &Level {
+	return &Level{
 		location,
 		make(map[int32]map[int32]Region),
 		t,
-		false
+		false,
 	}, nil
 }
 
@@ -198,21 +198,12 @@ func (l *Level) GetRegion(x, z) (*Region, error) {
 			return r, nil
 		}
 	}
-	if !l.haveLock {
-		return nil, &NoLock{}
-	}
-	path := fmt.Sprintf("%d/region/r.%d.%d.mca", l.dirname, x, z)
-	f, err := os.Open(path)
-	if IsNotExist(err) {
-		return nil, nil
-	}
-	defer f.Close()
 	if _, ok := l.regions[x]; !ok {
 		l.regions[x] = make(map[int32]*Region)
 	}
-	r := LoadRegion(f)
+	r, err := newRegion(x, z)
 	l.regions[x][z] = r
-	return r, nil
+	return r, err
 }
 
 func (l *Level) Save() error {
@@ -232,25 +223,25 @@ func (l *Level) Save() error {
 		}
 		l.change = false
 	}
-// 	for _, x := range l.regions {
-// 		for _, z := range x {
-// 			
-// 		}
-// 	}
+	// 	for _, x := range l.regions {
+	// 		for _, z := range x {
+	//
+	// 		}
+	// 	}
 	return nil
 }
 
 func (l *Level) Close() {
 	l.change = false
-// 	for _, x := range l.regions {
-// 		for _, z := range x {
-// 			
-// 		}
-// 	}
+	// 	for _, x := range l.regions {
+	// 		for _, z := range x {
+	//
+	// 		}
+	// 	}
 }
 
 func newLevelDat() nbt.Tag {
-	return nbt.NewTag("", nbt.NewCompound([]Tag {
+	return nbt.NewTag("", nbt.NewCompound([]Tag{
 		nbt.NewTag("GameType", nbt.NewInt(1)),
 		nbt.NewTag("generatorName", nbt.NewString("flat")),
 		nbt.NewTag("generatorVersion", nbt.NewInt(0)),
@@ -278,5 +269,5 @@ func CoordsToRegion(x, z int32) (int32, int32) {
 }
 
 func timestampMS() int64 {
-	return time.Now().Unix()*1000
+	return time.Now().Unix() * 1000
 }
