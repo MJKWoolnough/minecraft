@@ -123,7 +123,7 @@ func (n *namedTag) ReadFrom(f io.Reader) (total int64, err error) {
 	c := &rwcount.CountReader{Reader: f}
 	defer c.BytesRead(&total)
 	if err = binary.Read(c, binary.BigEndian, &n.tagType); err != nil {
-		err = &readError{"named TagId", err}
+		err = &ReadError{"named TagId", err}
 		return
 	}
 	if n.tagType == Tag_End {
@@ -133,12 +133,12 @@ func (n *namedTag) ReadFrom(f io.Reader) (total int64, err error) {
 			return
 		}
 		if _, err = n.name.ReadFrom(c); err != nil {
-			err = &readError{"name", err}
+			err = &ReadError{"name", err}
 			return
 		}
 		if _, err = n.d.ReadFrom(c); err != nil {
-			if _, ok := err.(*readError); !ok {
-				err = &readError{n.tagType.String(), err}
+			if _, ok := err.(*ReadError); !ok {
+				err = &ReadError{n.tagType.String(), err}
 			}
 		}
 	}
@@ -149,7 +149,7 @@ func (n *namedTag) WriteTo(f io.Writer) (total int64, err error) {
 	c := &rwcount.CountWriter{Writer: f}
 	defer c.BytesWritten(&total)
 	if err = binary.Write(c, binary.BigEndian, n.tagType); err != nil {
-		err = &writeError{"named TagId", err}
+		err = &WriteError{"named TagId", err}
 		return
 	}
 	if n.tagType == Tag_End {
@@ -640,7 +640,7 @@ func (n List) String() string {
 
 func (n *List) Set(i int32, d Data) error {
 	if i < 0 || i >= int32(len(n.d)) {
-		return &badRange{}
+		return &BadRange{}
 	}
 	if err := n.valid(d); err != nil {
 		return err
@@ -683,7 +683,7 @@ func (n *List) Remove(i int32) {
 func (n List) valid(d ...Data) error {
 	for _, e := range d {
 		if t, _ := idFromData(e); t != n.tagType {
-			return &wrongTag { n.tagType, t }
+			return &WrongTag{n.tagType, t}
 		}
 	}
 	return nil

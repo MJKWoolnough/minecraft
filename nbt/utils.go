@@ -28,43 +28,43 @@ import (
 	"fmt"
 )
 
-type readError struct {
+type ReadError struct {
 	where string
 	err   error
 }
 
-func (r readError) Error() string {
+func (r ReadError) Error() string {
 	return fmt.Sprintf("encountered an error while trying to read a %s: %s", r.where, r.err)
 }
 
-type writeError struct {
+type WriteError struct {
 	where string
 	err   error
 }
 
-func (w writeError) Error() string {
+func (w WriteError) Error() string {
 	return fmt.Sprintf("encountered an error while trying to write a %s: %s", w.where, w.err)
 }
 
-type unknownTag struct {
+type UnknownTag struct {
 	TagId
 }
 
-func (u unknownTag) Error() string {
+func (u UnknownTag) Error() string {
 	return fmt.Sprintf("discovered unknown TagId with id %d", u.TagId)
 }
 
-type wrongTag struct {
+type WrongTag struct {
 	expecting, got TagId
 }
 
-func (w wrongTag) Error() string {
+func (w WrongTag) Error() string {
 	return fmt.Sprintf("expecting tag id %d, got %d", w.expecting, w.got)
 }
 
-type badRange struct{}
+type BadRange struct{}
 
-func (b badRange) Error() string {
+func (b BadRange) Error() string {
 	return "given index was out-of-range"
 }
 
@@ -93,7 +93,7 @@ func newFromTag(id TagId) (d Data, err error) {
 	case Tag_IntArray:
 		d = new(IntArray)
 	default:
-		err = &unknownTag{id}
+		err = &UnknownTag{id}
 	}
 	return
 }
