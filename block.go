@@ -1,16 +1,16 @@
 // Copyright (c) 2013 - Michael Woolnough <michael.woolnough@gmail.com>
-// 
+//
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met: 
-// 
+// modification, are permitted provided that the following conditions are met:
+//
 // 1. Redistributions of source code must retain the above copyright notice, this
-//    list of conditions and the following disclaimer. 
+//    list of conditions and the following disclaimer.
 // 2. Redistributions in binary form must reproduce the above copyright notice,
 //    this list of conditions and the following disclaimer in the documentation
-//    and/or other materials provided with the distribution. 
-// 
+//    and/or other materials provided with the distribution.
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,63 +25,24 @@
 package minecraft
 
 import (
+	"fmt"
 	"github.com/MJKWoolnough/equaler"
-	"github.com/MJKWoolnough/minecraft/nbtparser"
-	"strconv"
+	"github.com/MJKWoolnough/minecraft/nbt"
 )
 
-// Block allows access to the data of a minecraft block.
-type Block interface {
-	BlockId() uint8
-	Add() uint8
-	Data() uint8
-	Opacity() uint8
-	IsLiquid() bool
-	HasMetadata() bool
-	GetMetadata() []nbtparser.NBTTag
-	SetMetadata([]nbtparser.NBTTag)
-	Tick(bool)
-	ToTick() bool
-	equaler.Equaler
+type Block struct {
+	BlockId  uint16
+	Data     uint8
+	metadata []nbt.Tag
+	Tick     bool
 }
 
-type block struct {
-	blockId  uint8
-	add      uint8
-	data     uint8
-	metadata []nbtparser.NBTTag
-	tick     bool
-}
-
-func (b *block) BlockId() uint8 {
-	if b == nil {
-		return 0
-	}
-	return b.blockId
-}
-
-// Add returns the extended block Id data
-func (b *block) Add() uint8 {
-	if b == nil {
-		return 0
-	}
-	return b.add
-}
-
-// Data returns the additional data, also known as damage.
-func (b *block) Data() uint8 {
-	if b == nil {
-		return 0
-	}
-	return b.data
-}
-
-func (b *block) Equal(e equaler.Equaler) bool {
-	if c, ok := e.(*block); ok {
-		if b.blockId == c.blockId && b.add == c.add && b.data == c.data && b.tick == c.tick {
-			if len(b.metadata) > 0 {
-				if len(c.metadata) > 0 {
-					for _, v := range b.metadata {
+func (b Block) Equal(e equaler.Equaler) bool {
+	if c, ok := e.(*Block); ok {
+		if b.BlockId == c.BlockId && b.Data == c.Data && b.Tick == c.Tick {
+			if len(b.Metadata) > 0 {
+				if len(c.Metadata) > 0 {
+					for _, v := range b.Metadata {
 						name := v.Name()
 						found := false
 						for _, w := range c.metadata {
@@ -107,52 +68,51 @@ func (b *block) Equal(e equaler.Equaler) bool {
 }
 
 // Opacity returns how much light is blocked by this block.
-func (b *block) Opacity() uint8 {
-	if b == nil {
-		return 0
-	}
-	if b.blockId == 8 || b.blockId == 9 {
+func (b Block) Opacity() uint8 {
+	if b.BlockId == 8 || b.BlockId == 9 {
 		return 3
 	}
-	blockId := uint16(b.blockId) | (uint16(b.add) << 8)
+	// 	blockId := uint16(b.BlockId) | (uint16(b.add) << 8)
 	for i := 0; i < len(transparentBlocks); i++ {
-		if transparentBlocks[i] == blockId {
+		if transparentBlocks[i] == b.BlockId {
 			return 1
 		}
 	}
 	return 16
 }
 
-func (b *block) IsLiquid() bool {
-	return b.blockId == 8 || b.blockId == 9 || b.blockId == 10 || b.blockId == 11
+func (b Block) IsLiquid() bool {
+	return b.BlockId == 8 || b.BlockId == 9 || b.BlockId == 10 || b.BlockId == 11
 }
 
-func (b *block) HasMetadata() bool {
-	if b == nil || b.metadata == nil || len(b.metadata) == 0 {
+func (b Block) HasMetadata() bool {
+	if b.Metadata == nil || len(b.Metadata) == 0 {
 		return false
 	}
 	return true
 }
 
-func (b *block) GetMetadata() []nbtparser.NBTTag {
-	if b == nil || b.metadata == nil {
+func (b Block) GetMetadata() []nbt.Tag {
+	if b.metadata == nil {
 		return nil
 	}
-	a := make([]nbtparser.NBTTag, len(b.metadata))
+	a := make([]nbt.Tag, len(b.metadata))
 	for i, j := range b.metadata {
 		a[i] = j.Copy()
 	}
 	return a
 }
 
-func (b *block) SetMetadata(data []nbtparser.NBTTag) {
-	metadata := make([]nbtparser.NBTTag, 0)
+func (b *Block) SetMetadata(data []nbt.Tag) {
+	metadata := make([]nbt.Tag, 0)
 	for i := 0; i < len(data); i++ {
 		name := data[i].Name()
-		if name == "x" || name == "y" || name == "z" || data[i].TagEnd() != nil {
+		if name == "x" || name == "y" || name == "z" {
 			continue
+		} else if data[i].TagId() == nbt.Tag_End {
+			break
 		}
-		metadata = append(metadata, data[i])
+		metadata = append(metadata, data[i].Copy())
 	}
 	if len(metadata) > 0 {
 		b.metadata = metadata
@@ -161,10 +121,8 @@ func (b *block) SetMetadata(data []nbtparser.NBTTag) {
 	}
 }
 
-func (b *block) String() string {
-	toRet := "Block ID: " + strconv.Itoa(int(b.blockId)) + "\n"
-	toRet += "Add Data: " + strconv.Itoa(int(b.add)) + "\n"
-	toRet += "Data: " + strconv.Itoa(int(b.data)) + "\n"
+func (b Block) String() string {
+	toRet := fmt.Sprintf("Block ID: %d\nData: %d\n", b.BlockId, b.Data)
 	if b.metadata != nil && len(b.metadata) != 0 {
 		toRet += "Metadata:\n"
 		for i := 0; i < len(b.metadata); i++ {
@@ -173,17 +131,4 @@ func (b *block) String() string {
 	}
 
 	return toRet
-}
-
-// Tick sets the block to be updated, useful for growing planted saplings.
-func (b *block) Tick(t bool) {
-	b.tick = t
-}
-
-func (b *block) ToTick() bool {
-	return b.tick
-}
-
-func NewBlock(blockId, add, data uint8) Block {
-	return &block{blockId, add, data, make([]nbtparser.NBTTag, 0), false}
 }
