@@ -26,7 +26,6 @@ package nbt
 
 import (
 	"fmt"
-	"io"
 )
 
 type readError struct {
@@ -53,6 +52,20 @@ type unknownTag struct {
 
 func (u unknownTag) Error() string {
 	return fmt.Sprintf("discovered unknown TagId with id %d", u.TagId)
+}
+
+type wrongTag struct {
+	expecting, got TagId
+}
+
+func (w wrongTag) Error() string {
+	return fmt.Sprintf("expecting tag id %d, got %d", w.expecting, w.got)
+}
+
+type badRange struct{}
+
+func (b badRange) Error() string {
+	return "given index was out-of-range"
 }
 
 func newFromTag(id TagId) (d Data, err error) {

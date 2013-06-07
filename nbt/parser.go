@@ -638,18 +638,15 @@ func (n List) String() string {
 	return s + "\n}"
 }
 
-func (n *List) Set(i int32, d Data) {
+func (n *List) Set(i int32, d Data) error {
 	if i < 0 || i >= int32(len(n.d)) {
-		return
+		return &badRange{}
 	}
-	if t, _ := idFromData(d); t != n.tagType {
-		return
-	}
-	if !n.valid(d) {
-		return
+	if err := n.valid(d); err != nil {
+		return err
 	}
 	n.d[i] = d
-
+	return nil
 }
 
 func (n List) Get(i int32) Data {
@@ -659,16 +656,20 @@ func (n List) Get(i int32) Data {
 	return nil
 }
 
-func (n *List) Append(d ...Data) {
-	if n.valid(d...) {
-		n.d = append(n.d, d...)
+func (n *List) Append(d ...Data) error {
+	if err := n.valid(d...); err != nil {
+		return err
 	}
+	n.d = append(n.d, d...)
+	return nil
 }
 
-func (n *List) Insert(i int32, d ...Data) {
-	if n.valid(d...) {
-		n.d = append(n.d[:i], append(d, n.d[i:]...)...)
+func (n *List) Insert(i int32, d ...Data) error {
+	if err := n.valid(d...); err != nil {
+		return err
 	}
+	n.d = append(n.d[:i], append(d, n.d[i:]...)...)
+	return nil
 }
 
 func (n *List) Remove(i int32) {
@@ -679,13 +680,13 @@ func (n *List) Remove(i int32) {
 	}
 }
 
-func (n List) valid(d ...Data) bool {
+func (n List) valid(d ...Data) error {
 	for _, e := range d {
 		if t, _ := idFromData(e); t != n.tagType {
-			return false
+			return &wrongTag { n.tagType, t }
 		}
 	}
-	return true
+	return nil
 }
 
 type Compound []Tag
