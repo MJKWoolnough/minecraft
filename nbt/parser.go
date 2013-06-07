@@ -642,7 +642,9 @@ func (n *List) Set(i int32, d Data) {
 	if i < 0 || i >= int32(len(n.d)) {
 		return
 	}
-	tagType, err := idFromData(d)
+	if t, _ := idFromData(d); t != n.tagType {
+		return
+	}
 	if !n.valid(d) {
 		return
 	}
