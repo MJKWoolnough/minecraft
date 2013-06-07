@@ -80,7 +80,7 @@ type Tag interface {
 	Data() Data
 	Name() string
 	String() string
-	Tag() TagId
+	TagId() TagId
 	Copy() Tag
 }
 
@@ -187,7 +187,7 @@ func (n namedTag) Name() string {
 	return string(n.name)
 }
 
-func (n namedTag) Tag() TagId {
+func (n namedTag) TagId() TagId {
 	return n.tagType
 }
 
@@ -717,7 +717,7 @@ func (n *Compound) WriteTo(f io.Writer) (total int64, err error) {
 		if _, err = d.WriteTo(c); err != nil {
 			return
 		}
-		if d.Tag() == Tag_End {
+		if d.TagId() == Tag_End {
 			return
 		}
 	}

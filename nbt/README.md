@@ -118,10 +118,22 @@ func (n Compound) Copy() Data
 func (n Compound) Equal(e equaler.Equaler) bool
 ```
 
+#### func (Compound) Get
+
+```go
+func (n Compound) Get(name string) Tag
+```
+
 #### func (*Compound) ReadFrom
 
 ```go
 func (n *Compound) ReadFrom(f io.Reader) (total int64, err error)
+```
+
+#### func (*Compound) Set
+
+```go
+func (n *Compound) Set(name string, t Tag)
 ```
 
 #### func (Compound) String
@@ -335,6 +347,12 @@ type List struct {
 func NewList(d []Data) *List
 ```
 
+#### func (*List) Append
+
+```go
+func (n *List) Append(d ...Data)
+```
+
 #### func (List) Copy
 
 ```go
@@ -347,10 +365,34 @@ func (n List) Copy() Data
 func (n List) Equal(e equaler.Equaler) bool
 ```
 
+#### func (List) Get
+
+```go
+func (n List) Get(n int32) Data
+```
+
+#### func (*List) Insert
+
+```go
+func (n *List) Insert(i int32, d ...Data)
+```
+
 #### func (*List) ReadFrom
 
 ```go
 func (n *List) ReadFrom(f io.Reader) (total int64, err error)
+```
+
+#### func (*List) Remove
+
+```go
+func (n *List) Remove(i int32)
+```
+
+#### func (*List) Set
+
+```go
+func (n *List) Set(i int32, d Data)
 ```
 
 #### func (List) String
@@ -502,9 +544,9 @@ type Tag interface {
 	io.WriterTo
 	equaler.Equaler
 	Data() Data
-	Name() String
+	Name() string
 	String() string
-	Tag() TagId
+	TagId() TagId
 	Copy() Tag
 }
 ```
