@@ -1,16 +1,16 @@
 // Copyright (c) 2013 - Michael Woolnough <michael.woolnough@gmail.com>
-// 
+//
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met: 
-// 
+// modification, are permitted provided that the following conditions are met:
+//
 // 1. Redistributions of source code must retain the above copyright notice, this
-//    list of conditions and the following disclaimer. 
+//    list of conditions and the following disclaimer.
 // 2. Redistributions in binary form must reproduce the above copyright notice,
 //    this list of conditions and the following disclaimer in the documentation
-//    and/or other materials provided with the distribution. 
-// 
+//    and/or other materials provided with the distribution.
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,197 +25,158 @@
 package minecraft
 
 import (
-	"fmt"
-	"github.com/MJKWoolnough/minecraft/nbtparser"
+	"github.com/MJKWoolnough/minecraft/nbt"
 )
 
-type Section interface {
-	Get(uint8, uint8, uint8) Block
-	Set(uint8, uint8, uint8, Block)
-	GetSkyLight(uint8, uint8, uint8) uint8
-	SetSkyLight(uint8, uint8, uint8, uint8)
-	Opacity(uint8, uint8, uint8) uint8
-	GetY() uint8
-	IsEmpty() bool
-	Data() *nbtparser.NBTTagCompound
+type OOB struct{}
+
+func (o OOB) Error() string {
+	return "Received Out-of-bounds error"
+}
+
+func yzx(x, y, z int32) uint32 {
+	return (uint32(y&15) << 8) | (uint32(z&15) << 4) | uint32(x&15)
+}
+
+func getNibble(arr nbt.ByteArray, x, y, z int32) (data byte, err error) {
+	coord := yzx(x, y, z)
+	if coord>>1 > uint32(len(arr)) {
+		err = &OOB{}
+	} else if coord&1 == 0 {
+		data = arr[coord>>1] & 15
+	} else {
+		data = arr[coord>>1] >> 4
+	}
+	return
+}
+
+func setNibble(arr nbt.ByteArray, x, y, z int32, data byte) error {
+	coord := yzx(x, y, z)
+	if coord>>1 > uint32(len(arr)) {
+		return &OOB{}
+	} else if coord&1 == 0 {
+		arr[coord>>1] = arr[coord>>1]&240 | data&15
+	} else {
+		arr[coord>>1] = arr[coord>>1]&15 | data<<4
+	}
+	return nil
 }
 
 type section struct {
-	section       *nbtparser.NBTTagCompound
-	blocks        *nbtparser.NBTTagByteArray
-	addTag        *nbtparser.NBTTagByteArray
-	dataTag       *nbtparser.NBTTagByteArray
-	blockLightTag *nbtparser.NBTTagByteArray
-	skyLightTag   *nbtparser.NBTTagByteArray
+	section    *nbt.Compound
+	blocks     *nbt.ByteArray
+	add        *nbt.ByteArray
+	data       *nbt.ByteArray
+	blockLight *nbt.ByteArray
+	skyLight   *nbt.ByteArray
 }
 
-func (s *section) Get(x, y, z uint8) Block {
-	if s == nil {
-		return BlockAir
-	}
-	return NewBlock(uint8(s.blocks.Get(int32(yzx(x, y, z)))), getNibble(s.addTag, x, y, z), getNibble(s.dataTag, x, y, z))
+func NewSection(y int32) *section {
+	s := new(section)
+	s.blocks = nbt.NewByteArray(make([]byte, 4096))
+	s.add = nbt.NewByteArray(make([]byte, 2048))
+	s.data = nbt.NewByteArray(make([]byte, 2048))
+	s.blockLight = nbt.NewByteArray(make([]byte, 2048))
+	s.skyLight = nbt.NewByteArray(make([]byte, 2048))
+	s.section = nbt.NewCompound([]nbt.Tag{
+		nbt.NewTag("Blocks", s.blocks),
+		nbt.NewTag("Add", s.add),
+		nbt.NewTag("Data", s.data),
+		nbt.NewTag("BlockLight", s.blockLight),
+		nbt.NewTag("SkyLight", s.skyLight),
+		nbt.NewTag("Y", nbt.NewByte(int8(y>>4))),
+	})
+	return s
 }
 
-func (s *section) Set(x, y, z uint8, block Block) {
-	if block == nil || s == nil {
-		return
+func LoadSection(c *nbt.Compound) (*section, error) {
+	s := new(section)
+	blocks := c.Get("Blocks")
+	if blocks.TagId() != nbt.Tag_ByteArray {
+		return nil, &WrongTypeError{"Blocks", nbt.Tag_ByteArray, blocks.TagId()}
 	}
-	s.blocks.Set(int32(yzx(x, y, z)), block.BlockId())
-	setNibble(s.addTag, x, y, z, block.Add())
-	setNibble(s.dataTag, x, y, z, block.Data())
-	if l, ok := lightBlocks[block.BlockId()]; ok {
-		setNibble(s.blockLightTag, x, y, z, l)
-	} else {
-		setNibble(s.blockLightTag, x, y, z, 0)
+	s.blocks = blocks.Data().(*nbt.ByteArray)
+	lenBlocks := len(*s.blocks)
+	add := c.Get("Add")
+	if add.TagId() != nbt.Tag_ByteArray {
+		return nil, &WrongTypeError{"Add", nbt.Tag_ByteArray, add.TagId()}
 	}
+	s.add = add.Data().(*nbt.ByteArray)
+	if 2*len(*s.add) != lenBlocks {
+		return nil, &OOB{}
+	}
+	data := c.Get("Data")
+	if data.TagId() != nbt.Tag_ByteArray {
+		return nil, &WrongTypeError{"Data", nbt.Tag_ByteArray, data.TagId()}
+	}
+	s.data = data.Data().(*nbt.ByteArray)
+	if 2*len(*s.data) != lenBlocks {
+		return nil, &OOB{}
+	}
+	blockLight := c.Get("BlockLight")
+	if blockLight.TagId() != nbt.Tag_ByteArray {
+		return nil, &WrongTypeError{"BlockLight", nbt.Tag_ByteArray, blockLight.TagId()}
+	}
+	s.blockLight = blockLight.Data().(*nbt.ByteArray)
+	if 2*len(*s.blockLight) != lenBlocks {
+		return nil, &OOB{}
+	}
+	skyLight := c.Get("SkyLight")
+	if skyLight.TagId() != nbt.Tag_ByteArray {
+		return nil, &WrongTypeError{"SkyLight", nbt.Tag_ByteArray, skyLight.TagId()}
+	}
+	s.skyLight = skyLight.Data().(*nbt.ByteArray)
+	if 2*len(*s.skyLight) != lenBlocks {
+		return nil, &OOB{}
+	}
+	y := c.Get("Y")
+	if y.TagId() != nbt.Tag_Byte {
+		return nil, &WrongTypeError{"Y", nbt.Tag_Byte, y.TagId()}
+	}
+	return s, nil
 }
 
-func (s *section) GetSkyLight(x, y, z uint8) uint8 {
-	if s == nil {
-		return 0
+func (s *section) GetBlock(x, y, z int32) (*Block, error) {
+	block := new(Block)
+	add, err := getNibble(*s.add, x, y, z)
+	if err != nil {
+		return nil, err
 	}
-	return getNibble(s.skyLightTag, x, y, z)
+	if block.Data, err = getNibble(*s.data, x, y, z); err != nil {
+		return nil, err
+	}
+	coord := yzx(x, y, z)
+	if coord > uint32(len(*s.blocks)) {
+		return nil, new(OOB)
+	}
+	block.BlockId = uint16(add)<<8 | uint16((*s.blocks)[coord])
+	return block, nil
 }
 
-func (s *section) SetSkyLight(x, y, z, skyLight uint8) {
-	if s != nil {
-		setNibble(s.skyLightTag, x, y, z, skyLight)
+func (s *section) SetBlock(x, y, z int32, b *Block) error {
+	coord := yzx(x, y, z)
+	if coord > uint32(len(*s.blocks)) {
+		return new(OOB)
 	}
+	(*s.blocks)[yzx(x, y, z)] = byte(b.BlockId & 255)
+	if err := setNibble(*s.add, x, y, z, byte(b.BlockId>>8)); err != nil {
+		return err
+	}
+	if err := setNibble(*s.data, x, y, z, byte(b.Data)); err != nil {
+		return err
+	}
+	return nil
 }
 
-func (s *section) Opacity(x, y, z uint8) uint8 {
-	if s == nil {
-		return 0
-	}
-	blockId := uint16(s.blocks.Get(int32(yzx(x, y, z)))) | (uint16(getNibble(s.addTag, x, y, z)) << 8)
-	if blockId == 8 || blockId == 9 {
-		return 3
-	}
-	for i := 0; i < len(transparentBlocks); i++ {
-		if transparentBlocks[i] == blockId {
-			return 0
-		}
-	}
-	return 16
-}
-
-func (s *section) GetY() uint8 {
-	return uint8(s.section.GetTag("Y").TagByte().Get())
+func (s *section) SetY(y int32) {
+	s.section.Set(nbt.NewTag("Y", nbt.NewByte(int8(y>>4))))
 }
 
 func (s *section) IsEmpty() bool {
-	if s == nil {
-		return true
-	}
-	for i := int32(0); i < 4096; i++ {
-		if s.blocks.Get(i) != 0 {
+	for _, b := range *s.blocks {
+		if b != 0 {
 			return false
 		}
 	}
 	return true
-}
-
-func (s *section) Data() *nbtparser.NBTTagCompound {
-	return s.section
-}
-
-func LoadSection(sectionData *nbtparser.NBTTagCompound) (Section, error) {
-	if sectionData == nil {
-		return nil, fmt.Errorf("Minecraft - Section: nil received")
-	}
-	if yTag := sectionData.GetTag("Y"); yTag == nil {
-		return nil, fmt.Errorf("Minecraft - Section: Missing 'Y' tag")
-	} else if yTag.TagByte() == nil {
-		return nil, fmt.Errorf("Minecraft - Section: Y tag of wrong type")
-	}
-	newSection := new(section)
-	newSection.section = sectionData
-	if blocks := sectionData.GetTag("Blocks"); blocks == nil {
-		return nil, fmt.Errorf("Minecraft - Section: Missing 'Blocks' tag")
-	} else if blocksArray := blocks.TagByteArray(); blocksArray == nil {
-		return nil, fmt.Errorf("Minecraft - Section: Blocks tag of wrong type")
-	} else if blocksArray.Length() != 4096 {
-		return nil, fmt.Errorf("Minecraft - Section: Incorrect number of blocks in array")
-	} else {
-		newSection.blocks = blocksArray
-	}
-	if adds := sectionData.GetTag("Add"); adds == nil {
-		addArray := nbtparser.NewTagByteArray("Add", make([]byte, 2048))
-		sectionData.Append(addArray)
-		newSection.addTag = addArray
-	} else if addArray := adds.TagByteArray(); addArray == nil {
-		return nil, fmt.Errorf("Minecraft - Section: Add tag of wrong type")
-	} else if addArray.Length() != 2048 {
-		return nil, fmt.Errorf("Minecraft - Section: Incorrect number of add bytes in array")
-	} else {
-		newSection.addTag = addArray
-	}
-	if data := sectionData.GetTag("Data"); data == nil {
-		return nil, fmt.Errorf("Minecraft - Section: Missing 'Data' tag")
-	} else if dataArray := data.TagByteArray(); dataArray == nil {
-		return nil, fmt.Errorf("Minecraft - Section: Data tag of wrong type")
-	} else if dataArray.Length() != 2048 {
-		return nil, fmt.Errorf("Minecraft - Section: Incorrect number of data bytes in array")
-	} else {
-		newSection.dataTag = dataArray
-	}
-	if blockLight := sectionData.GetTag("BlockLight"); blockLight == nil {
-		return nil, fmt.Errorf("Minecraft - Section: Missing 'BlockLight' tag")
-	} else if blockLightArray := blockLight.TagByteArray(); blockLightArray == nil {
-		return nil, fmt.Errorf("Minecraft - Section: BlockLight tag of wrong type")
-	} else if blockLightArray.Length() != 2048 {
-		return nil, fmt.Errorf("Minecraft - Section: Incorrect number of BlockLight bytes in array")
-	} else {
-		newSection.blockLightTag = blockLightArray
-	}
-	if skyLight := sectionData.GetTag("SkyLight"); skyLight == nil {
-		return nil, fmt.Errorf("Minecraft - Section: Missing 'skyLight' tag")
-	} else if skyLightArray := skyLight.TagByteArray(); skyLightArray == nil {
-		return nil, fmt.Errorf("Minecraft - Section: SkyLight tag of wrong type")
-	} else if skyLightArray.Length() != 2048 {
-		return nil, fmt.Errorf("Minecraft - Section: Incorrect number of SkyLight bytes in array")
-	} else {
-		newSection.skyLightTag = skyLightArray
-	}
-	return newSection, nil
-}
-
-func NewSection(y byte) (Section, error) {
-	if y > 15 {
-		return nil, fmt.Errorf("Minecraft - Section: Y value is too high for current limit")
-	}
-	skyLight := make([]byte, 2048)
-	for i := 0; i < 2048; i++ {
-		skyLight[i] = 0xFF
-	}
-	return LoadSection(nbtparser.NewTagCompound("", []nbtparser.NBTTag{
-		nbtparser.NewTagByteArray("Data", make([]byte, 2048)),
-		nbtparser.NewTagByteArray("SkyLight", skyLight),
-		nbtparser.NewTagByteArray("BlockLight", make([]byte, 2048)),
-		nbtparser.NewTagByte("Y", int8(y)),
-		nbtparser.NewTagByteArray("Blocks", make([]byte, 4096)),
-		nbtparser.NewTagByteArray("Add", make([]byte, 2048)),
-	}))
-}
-
-func yzx(x, y, z uint8) uint16 {
-	return ((uint16(y) & 15) << 8) | ((uint16(z) & 15) << 4) | (uint16(x) & 15)
-}
-
-func getNibble(arr *nbtparser.NBTTagByteArray, x, y, z uint8) uint8 {
-	coord := yzx(x, y, z)
-	if coord&1 == 0 {
-		return uint8(arr.Get(int32(coord>>1)) & 15)
-	}
-	return uint8(arr.Get(int32(coord>>1)) >> 4)
-}
-
-func setNibble(arr *nbtparser.NBTTagByteArray, x, y, z uint8, data uint8) {
-	coord := yzx(x, y, z)
-	oldData := arr.Get(int32(coord >> 1))
-	if coord&1 == 0 {
-		arr.Set(int32(coord>>1), (oldData&240)|(data&15))
-	} else {
-		arr.Set(int32(coord>>1), (data<<4)|(oldData&15))
-	}
 }
