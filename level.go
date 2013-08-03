@@ -56,7 +56,7 @@ type WrongTypeError struct {
 	expecting, got nbt.TagId
 }
 
-func (m MissingTagError) Error() {
+func (m WrongTypeError) Error() {
 	return fmt.Sprintf("minecraft - level: tag %q is of incorrect type, expecting %q, got %q", m.tagName)
 }
 
