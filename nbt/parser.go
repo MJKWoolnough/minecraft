@@ -739,8 +739,8 @@ func (n Compound) Copy() Data {
 func (n Compound) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*Compound); ok {
 		if len(n) == len(*m) {
-			for i, o := range n {
-				if !o.Equal((*m)[i]) {
+			for _, o := range n {
+				if n := m.Get(o.Name()); n == nil || !n.Equal(o) {
 					return false
 				}
 			}
