@@ -767,14 +767,29 @@ func (n Compound) Get(name string) Tag {
 	return nil
 }
 
-func (n *Compound) Set(name string, t Tag) {
+func (n *Compound) Remove(name string) {
 	for i, t := range *n {
 		if t.Name() == name {
-			(*n)[i] = t
+			copy((*n)[i:], (*n)[i+1:])
+			(*n)[len((*n))-1] = nil
+			(*n) = (*n)[:len((*n))-1]
 			return
 		}
 	}
-	*n = append(*n, t)
+}
+
+func (n *Compound) Set(tag Tag) {
+	if tag.TagId() == Tag_End {
+		return
+	}
+	name := tag.Name()
+	for i, t := range *n {
+		if t.Name() == name {
+			(*n)[i] = tag
+			return
+		}
+	}
+	*n = append(*n, tag)
 }
 
 type IntArray []int32
