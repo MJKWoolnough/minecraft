@@ -692,6 +692,10 @@ func (n *List) Remove(i int32) {
 	}
 }
 
+func (n List) Len() int {
+	return len(n.d)
+}
+
 func (n List) valid(d ...Data) error {
 	for _, e := range d {
 		if t, _ := idFromData(e); t != n.tagType {
