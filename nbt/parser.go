@@ -612,6 +612,10 @@ func (n *List) WriteTo(f io.Writer) (total int64, err error) {
 	return
 }
 
+func (n List) TagType() TagId {
+	return n.tagType
+}
+
 func (n List) Copy() Data {
 	c := new(List)
 	c.tagType = n.tagType
