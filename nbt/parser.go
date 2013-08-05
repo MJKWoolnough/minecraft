@@ -600,7 +600,7 @@ func (n *List) WriteTo(f io.Writer) (total int64, err error) {
 	}
 	for _, d := range n.d {
 		if tagId := idFromData(d); tagId != n.tagType {
-			err = &WrongTag { n.tagType, tagId }
+			err = &WrongTag{n.tagType, tagId}
 			break
 		} else if _, err = d.WriteTo(c); err != nil {
 			break
