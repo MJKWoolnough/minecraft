@@ -599,14 +599,16 @@ func (n *List) WriteTo(f io.Writer) (total int64, err error) {
 		return
 	}
 	var tagId TagId
-	for _, d := range n.d {
-		if tagId, err = idFromData(d); err != nil {
-			break
-		} else if tagId != n.tagType {
-			err = &WrongTag{n.tagType, tagId}
-			break
-		} else if _, err = d.WriteTo(c); err != nil {
-			break
+	if n.tagType != Tag_End {
+		for _, d := range n.d {
+			if tagId, err = idFromData(d); err != nil {
+				break
+			} else if tagId != n.tagType {
+				err = &WrongTag{n.tagType, tagId}
+				break
+			} else if _, err = d.WriteTo(c); err != nil {
+				break
+			}
 		}
 	}
 	return
