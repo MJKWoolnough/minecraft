@@ -661,8 +661,8 @@ func (n *List) Set(i int32, d Data) error {
 	return nil
 }
 
-func (n List) Get(i int32) Data {
-	if i >= 0 && i < int32(len(n.d)) {
+func (n List) Get(i int) Data {
+	if i >= 0 && i < len(n.d) {
 		return n.d[i]
 	}
 	return nil
@@ -676,7 +676,7 @@ func (n *List) Append(d ...Data) error {
 	return nil
 }
 
-func (n *List) Insert(i int32, d ...Data) error {
+func (n *List) Insert(i int, d ...Data) error {
 	if err := n.valid(d...); err != nil {
 		return err
 	}
@@ -684,8 +684,8 @@ func (n *List) Insert(i int32, d ...Data) error {
 	return nil
 }
 
-func (n *List) Remove(i int32) {
-	if i >= 0 && i < int32(len(n.d)) {
+func (n *List) Remove(i int) {
+	if i >= 0 && i < len(n.d) {
 		copy(n.d[i:], n.d[i+1:])
 		n.d[len(n.d)-1] = nil
 		n.d = n.d[:len(n.d)-1]
