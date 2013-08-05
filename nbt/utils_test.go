@@ -1,9 +1,6 @@
 package nbt
 
-import (
-	"bytes"
-	"testing"
-)
+import "testing"
 
 func TestTagData(t *testing.T) {
 	var (
