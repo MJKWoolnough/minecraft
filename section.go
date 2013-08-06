@@ -38,27 +38,32 @@ func yzx(x, y, z int32) uint32 {
 	return (uint32(y&15) << 8) | (uint32(z&15) << 4) | uint32(x&15)
 }
 
-func getNibble(arr nbt.ByteArray, x, y, z int32) (data byte, err error) {
+func getNibble(arr nbt.ByteArray, x, y, z int32) (byte, error) {
 	coord := yzx(x, y, z)
 	if coord>>1 > uint32(len(arr)) {
-		err = &OOB{}
-	} else if coord&1 == 0 {
-		data = arr[coord>>1] & 15
-	} else {
-		data = arr[coord>>1] >> 4
+		return 0, &OOB{}
 	}
-	return
+	data := byte(arr[coord>>1])
+	if coord&1 == 0 {
+		data &= 15
+	} else {
+		data >>= 4
+	}
+	return data, nil
 }
 
 func setNibble(arr nbt.ByteArray, x, y, z int32, data byte) error {
 	coord := yzx(x, y, z)
 	if coord>>1 > uint32(len(arr)) {
 		return &OOB{}
-	} else if coord&1 == 0 {
-		arr[coord>>1] = arr[coord>>1]&240 | data&15
-	} else {
-		arr[coord>>1] = arr[coord>>1]&15 | data<<4
 	}
+	oldData := byte(arr[coord>>1])
+	if coord&1 == 0 {
+		oldData = oldData&240 | data&15
+	} else {
+		oldData = oldData&15 | data<<4
+	}
+	arr[coord>>1] = int8(oldData)
 	return nil
 }
 
@@ -73,11 +78,11 @@ type section struct {
 
 func NewSection(y int32) *section {
 	s := new(section)
-	s.blocks = nbt.NewByteArray(make([]byte, 4096))
-	s.add = nbt.NewByteArray(make([]byte, 2048))
-	s.data = nbt.NewByteArray(make([]byte, 2048))
-	s.blockLight = nbt.NewByteArray(make([]byte, 2048))
-	s.skyLight = nbt.NewByteArray(make([]byte, 2048))
+	s.blocks = nbt.NewByteArray(make([]int8, 4096))
+	s.add = nbt.NewByteArray(make([]int8, 2048))
+	s.data = nbt.NewByteArray(make([]int8, 2048))
+	s.blockLight = nbt.NewByteArray(make([]int8, 2048))
+	s.skyLight = nbt.NewByteArray(make([]int8, 2048))
 	s.section = nbt.NewCompound([]nbt.Tag{
 		nbt.NewTag("Blocks", s.blocks),
 		nbt.NewTag("Add", s.add),
@@ -149,7 +154,7 @@ func (s *section) GetBlock(x, y, z int32) (*Block, error) {
 	if coord > uint32(len(*s.blocks)) {
 		return nil, new(OOB)
 	}
-	block.BlockId = uint16(add)<<8 | uint16((*s.blocks)[coord])
+	block.BlockId = uint16(add)<<8 | uint16(byte((*s.blocks)[coord]))
 	return block, nil
 }
 
@@ -158,7 +163,7 @@ func (s *section) SetBlock(x, y, z int32, b *Block) error {
 	if coord > uint32(len(*s.blocks)) {
 		return new(OOB)
 	}
-	(*s.blocks)[yzx(x, y, z)] = byte(b.BlockId & 255)
+	(*s.blocks)[yzx(x, y, z)] = int8(b.BlockId & 255)
 	if err := setNibble(*s.add, x, y, z, byte(b.BlockId>>8)); err != nil {
 		return err
 	}

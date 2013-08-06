@@ -25,25 +25,25 @@ func TestY(t *testing.T) {
 }
 
 func TestGetBlock(t *testing.T) {
-	blocks := make([]byte, 4096)
-	add := make([]byte, 2048)
-	data := make([]byte, 2048)
+	blocks := make([]int8, 4096)
+	add := make([]int8, 2048)
+	data := make([]int8, 2048)
 	blocks[0] = 1
 	blocks[10] = 2
 	blocks[18] = 24
 	blocks[19] = 13
 	blocks[3475] = 45
-	blocks[4054] = 194
-	add[9] = 12<<4 | 7
+	blocks[4054] = b2i(194)
+	add[9] = b2i(12<<4 | 7)
 	add[2027] = 5
-	data[1737] = 9 << 4
+	data[1737] = b2i(9 << 4)
 	data[2027] = 8
 	section, _ := LoadSection(nbt.NewCompound([]nbt.Tag{
 		nbt.NewTag("Blocks", nbt.NewByteArray(blocks)),
 		nbt.NewTag("Add", nbt.NewByteArray(add)),
 		nbt.NewTag("Data", nbt.NewByteArray(data)),
-		nbt.NewTag("BlockLight", nbt.NewByteArray(make([]byte, 2048))),
-		nbt.NewTag("SkyLight", nbt.NewByteArray(make([]byte, 2048))),
+		nbt.NewTag("BlockLight", nbt.NewByteArray(make([]int8, 2048))),
+		nbt.NewTag("SkyLight", nbt.NewByteArray(make([]int8, 2048))),
 		nbt.NewTag("Y", nbt.NewByte(0)),
 	}))
 	tests := []struct {
@@ -72,7 +72,7 @@ func TestGetBlock(t *testing.T) {
 }
 
 func TestSetBlock(t *testing.T) {
-	section := NewSection(0)
+	section := NewSection(32)
 	tests := []struct {
 		xyz [3]int32
 		Block
@@ -108,4 +108,12 @@ func TestSetBlock(t *testing.T) {
 			}
 		}
 	}
+}
+
+func b2i(b byte) int8 {
+	return int8(b)
+}
+
+func i2b(b int8) byte {
+	return byte(b)
 }
