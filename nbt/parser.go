@@ -434,9 +434,9 @@ func (n Double) String() string {
 	return fmt.Sprintf("%f", n)
 }
 
-type ByteArray []byte
+type ByteArray []int8
 
-func NewByteArray(d []byte) *ByteArray {
+func NewByteArray(d []int8) *ByteArray {
 	e := ByteArray(d)
 	return &e
 }
@@ -448,7 +448,7 @@ func (n *ByteArray) ReadFrom(f io.Reader) (total int64, err error) {
 	if err = binary.Read(c, binary.BigEndian, &length); err != nil {
 		return
 	}
-	*n = make([]byte, length)
+	*n = make([]int8, length)
 	err = binary.Read(c, binary.BigEndian, n)
 	return
 }
@@ -464,7 +464,7 @@ func (n *ByteArray) WriteTo(f io.Writer) (total int64, err error) {
 }
 
 func (n ByteArray) Copy() Data {
-	c := ByteArray(make([]byte, len(n)))
+	c := ByteArray(make([]int8, len(n)))
 	copy(c, n)
 	return &c
 }
@@ -484,7 +484,7 @@ func (n ByteArray) Equal(e equaler.Equaler) bool {
 }
 
 func (n ByteArray) String() string {
-	return fmt.Sprintf("[%d bytes] %v", len(n), []byte(n))
+	return fmt.Sprintf("[%d bytes] %v", len(n), []int8(n))
 }
 
 type String string
