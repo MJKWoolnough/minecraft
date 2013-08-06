@@ -563,7 +563,7 @@ func NewList(d []Data) *List {
 	}
 }
 
-func NewEmptyList(tagType TagType) *List {
+func NewEmptyList(tagType TagId) *List {
 	return &List{
 		tagType,
 		make([]Data, 0),
