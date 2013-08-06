@@ -563,6 +563,13 @@ func NewList(d []Data) *List {
 	}
 }
 
+func NewEmptyList(tagType TagType) *List {
+	return &List{
+		tagType,
+		make([]Data, 0),
+	}
+}
+
 func (n *List) ReadFrom(f io.Reader) (total int64, err error) {
 	c := &rwcount.CountReader{Reader: f}
 	defer func() { total = c.BytesRead() }()
