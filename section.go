@@ -96,6 +96,7 @@ func NewSection(y int32) *section {
 
 func LoadSection(c *nbt.Compound) (*section, error) {
 	s := new(section)
+	s.section = c
 	blocks := c.Get("Blocks")
 	if blocks.TagId() != nbt.Tag_ByteArray {
 		return nil, &WrongTypeError{"Blocks", nbt.Tag_ByteArray, blocks.TagId()}
