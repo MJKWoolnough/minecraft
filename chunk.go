@@ -268,7 +268,7 @@ func (c *chunk) GetBlock(x, y, z int32) (b *Block, err error) {
 	}
 	ys := y >> 4
 	if c.sections[ys] == nil {
-		b = BlockAir
+		b = &Block{}
 	} else {
 		if b, err = c.sections[ys].GetBlock(x, y, z); err != nil {
 			return
@@ -289,7 +289,7 @@ func (c *chunk) SetBlock(x, y, z int32, b *Block) error {
 	}
 	ys := y >> 4
 	if c.sections[ys] == nil {
-		if b.Equal(BlockAir) {
+		if b.Equal(&Block{}) {
 			return nil
 		}
 		c.sections[ys] = NewSection(y)
