@@ -61,6 +61,26 @@ func (u UnexpectedValue) Error() string {
 	return fmt.Sprintf("minecraft: tag %q was expecting %s, but got %q", u.tagName, u.expecting, u.got)
 }
 
+type UnknownCompression struct {
+	code byte
+}
+
+func (u UnknownCompression) Error() string {
+	return fmt.Sprintf("unknown compression code: %d", u.code)
+}
+
+type ExpectedData struct{}
+
+func (e ExpectedData) Error() string {
+	return "received nil data stream where non-nil was expected."
+}
+
+type NoLock struct{}
+
+func (n NoLock) Error() string {
+	return "lost lock on files"
+}
+
 var (
 	transparentBlocks []uint16
 	lightBlocks       map[uint8]uint8
