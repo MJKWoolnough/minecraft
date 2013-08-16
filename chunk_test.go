@@ -1,13 +1,11 @@
 package minecraft
 
 import (
-	"bytes"
-	"compress/zlib"
 	"github.com/MJKWoolnough/minecraft/nbt"
 	"testing"
 )
 
-func TestCompression(t *testing.T) {
+func TestNew(t *testing.T) {
 	biomes := make([]int8, 256)
 	biome := int8(-1)
 	blocks := make([]int8, 4096)
@@ -19,9 +17,6 @@ func TestCompression(t *testing.T) {
 			biome = -1
 		}
 	}
-	chunk := new(chunk)
-	chunk.compressed = new(bytes.Buffer)
-	zBuf := zlib.NewWriter(chunk.compressed)
 	dataTag := nbt.NewTag("", nbt.NewCompound([]nbt.Tag{
 		nbt.NewTag("Level", nbt.NewCompound([]nbt.Tag{
 			nbt.NewTag("Biomes", nbt.NewByteArray(biomes)),
@@ -157,38 +152,20 @@ func TestCompression(t *testing.T) {
 			nbt.NewTag("zPos", nbt.NewInt(23)),
 		})),
 	}))
-	if _, err := dataTag.WriteTo(zBuf); err != nil {
+	if _, err := newChunk(-12, 23, dataTag); err != nil {
 		t.Fatalf("reveived unexpected error during testing, %q", err.Error())
-	}
-	zBuf.Close()
-	if err := chunk.decompress(); err != nil {
-		t.Fatalf("reveived unexpected error during testing, %q", err.Error())
-	} else if err := chunk.compress(); err != nil {
-		t.Fatalf("reveived unexpected error during testing, %q", err.Error())
-	}
-	zBufR, err := zlib.NewReader(chunk.compressed)
-	defer zBufR.Close()
-	if err != nil {
-		t.Fatalf("reveived unexpected error during testing, %q", err.Error())
-	}
-	if newData, _, err := nbt.ReadNBTFrom(zBufR); err != nil {
-		t.Fatalf("reveived unexpected error during testing, %q", err.Error())
-	} else if !dataTag.Equal(newData) {
-		t.Errorf("pre- and post-compression data do not match, expecting %s, got %s", dataTag.String(), newData.String())
 	}
 }
 
 func TestBiomes(t *testing.T) {
-	chunk := newChunk(0, 0)
+	chunk, _ := newChunk(0, 0, nil)
 	for b := Biome(-1); b < 23; b++ {
 		biome := b
 		for x := int32(0); x < 16; x++ {
 			for z := int32(0); z < 16; z++ {
 				if err := chunk.SetBiome(x, z, biome); err != nil {
 					t.Fatalf("reveived unexpected error during testing, %q", err.Error())
-				} else if newB, err := chunk.GetBiome(x, z); err != nil {
-					t.Fatalf("reveived unexpected error during testing, %q", err.Error())
-				} else if newB != biome {
+				} else if newB := chunk.GetBiome(x, z); newB != biome {
 					t.Errorf("error setting biome at co-ordinates, expecting %q, got %q", biome.String(), newB.String())
 				} else if biome++; biome >= 23 {
 					biome = -1
@@ -199,7 +176,7 @@ func TestBiomes(t *testing.T) {
 }
 
 func TestBlock(t *testing.T) {
-	chunk := newChunk(0, 0)
+	chunk, _ := newChunk(0, 0, nil)
 	testBlocks := []struct {
 		Block
 		x, y, z int32
@@ -315,12 +292,6 @@ func TestBlock(t *testing.T) {
 		} else if !tB.Block.Equal(block) {
 			t.Errorf("blocks do not match, expecting %s, got %s", tB.Block.String(), block.String())
 		}
-	}
-	if err := chunk.compress(); err != nil {
-		t.Fatalf("reveived unexpected error during testing, %q", err.Error())
-	}
-	if err := chunk.decompress(); err != nil {
-		t.Fatalf("reveived unexpected error during testing, %q", err.Error())
 	}
 	for _, tB := range testBlocks {
 		if tB.recheck {
