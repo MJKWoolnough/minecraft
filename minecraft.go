@@ -25,7 +25,10 @@
 // Package Minecraft will be a full featured minecraft level editor/viewer.
 package minecraft
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/MJKWoolnough/minecraft/nbt"
+)
 
 type MissingTagError struct {
 	tagName string
