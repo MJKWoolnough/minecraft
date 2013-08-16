@@ -28,12 +28,6 @@ import (
 	"github.com/MJKWoolnough/minecraft/nbt"
 )
 
-type OOB struct{}
-
-func (o OOB) Error() string {
-	return "Received Out-of-bounds error"
-}
-
 func yzx(x, y, z int32) uint32 {
 	return (uint32(y&15) << 8) | (uint32(z&15) << 4) | uint32(x&15)
 }
