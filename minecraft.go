@@ -22,8 +22,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-// Minecraft will be a full featured minecraft level editor/viewer.
+// Package Minecraft will be a full featured minecraft level editor/viewer.
 package minecraft
+
+import "fmt"
 
 type MissingTagError struct {
 	tagName string
@@ -46,6 +48,14 @@ type OOB struct{}
 
 func (o OOB) Error() string {
 	return "Received Out-of-bounds error"
+}
+
+type UnexpectedValue struct {
+	tagName, expecting, got string
+}
+
+func (u UnexpectedValue) Error() string {
+	return fmt.Sprintf("minecraft: tag %q was expecting %s, but got %q", u.tagName, u.expecting, u.got)
 }
 
 var (
