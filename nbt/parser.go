@@ -865,5 +865,5 @@ func (n IntArray) Equal(e equaler.Equaler) bool {
 }
 
 func (n IntArray) String() string {
-	return fmt.Sprintf("[%d ints] %v", len(n), n)
+	return fmt.Sprintf("[%d ints] %v", len(n), []int32(n))
 }
