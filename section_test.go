@@ -6,11 +6,11 @@ import (
 )
 
 func TestY(t *testing.T) {
-	section := NewSection(0)
+	section := newSection(0)
 	if y := *section.section.Get("Y").Data().(*nbt.Byte); y != 0 {
 		t.Errorf("expecting %d, got %d", 0, y)
 	}
-	section = NewSection(16)
+	section = newSection(16)
 	if y := *section.section.Get("Y").Data().(*nbt.Byte); y != 1 {
 		t.Errorf("expecting %d, got %d", 1, y)
 	}
@@ -38,7 +38,7 @@ func TestGetBlock(t *testing.T) {
 	add[2027] = 5
 	data[1737] = b2i(9 << 4)
 	data[2027] = 8
-	section, _ := LoadSection(nbt.NewCompound([]nbt.Tag{
+	section, _ := loadSection(nbt.NewCompound([]nbt.Tag{
 		nbt.NewTag("Blocks", nbt.NewByteArray(blocks)),
 		nbt.NewTag("Add", nbt.NewByteArray(add)),
 		nbt.NewTag("Data", nbt.NewByteArray(data)),
@@ -72,7 +72,7 @@ func TestGetBlock(t *testing.T) {
 }
 
 func TestSetBlock(t *testing.T) {
-	section := NewSection(32)
+	section := newSection(32)
 	tests := []struct {
 		xyz [3]int32
 		Block

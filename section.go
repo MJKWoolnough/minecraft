@@ -70,7 +70,7 @@ type section struct {
 	skyLight   *nbt.ByteArray
 }
 
-func NewSection(y int32) *section {
+func newSection(y int32) *section {
 	s := new(section)
 	s.blocks = nbt.NewByteArray(make([]int8, 4096))
 	s.add = nbt.NewByteArray(make([]int8, 2048))
@@ -88,7 +88,7 @@ func NewSection(y int32) *section {
 	return s
 }
 
-func LoadSection(c *nbt.Compound) (*section, error) {
+func loadSection(c *nbt.Compound) (*section, error) {
 	s := new(section)
 	s.section = c
 	blocks := c.Get("Blocks")
