@@ -1,16 +1,16 @@
 // Copyright (c) 2013 - Michael Woolnough <michael.woolnough@gmail.com>
-// 
+//
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met: 
-// 
+// modification, are permitted provided that the following conditions are met:
+//
 // 1. Redistributions of source code must retain the above copyright notice, this
-//    list of conditions and the following disclaimer. 
+//    list of conditions and the following disclaimer.
 // 2. Redistributions in binary form must reproduce the above copyright notice,
 //    this list of conditions and the following disclaimer in the documentation
-//    and/or other materials provided with the distribution. 
-// 
+//    and/or other materials provided with the distribution.
+//
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 // ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 // WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -29,18 +29,48 @@ import (
 	"strconv"
 )
 
-// Needs Implementation
-type Biome byte
+const (
+	Biome_Auto Biome = iota - 1
+	Biome_Ocean
+	Biome_Plains
+	Biome_Desert
+	Biome_ExtremeHills
+	Biome_Forest
+	Biome_Taiga
+	Biome_Swampland
+	Biome_River
+	Biome_Hell
+	Biome_Sky
+	Biome_FrozenOcean
+	Biome_FrozenRiver
+	Biome_IcePlains
+	Biome_IceMountains
+	Biome_MushroomIsland
+	Biome_MushroomIslandShore
+	Biome_Beach
+	Biome_DesertHills
+	Biome_ForestHills
+	Biome_TaigaHills
+	Biome_ExtremeHillsEdge
+	Biome_Jungle
+	Biome_JungleHills
+)
 
-func (b *Biome) Equal(e equaler.Equaler) bool {
+type Biome int8
+
+func (b Biome) Equal(e equaler.Equaler) bool {
 	if c, ok := e.(*Biome); ok {
+		return b == *c
+	} else if c, ok := e.(Biome); ok {
 		return b == c
 	}
 	return false
 }
 
-func (b *Biome) String() string {
-	switch *b {
+func (b Biome) String() string {
+	switch b {
+	case -1:
+		return "Auto"
 	case 0:
 		return "Ocean"
 	case 1:
@@ -88,9 +118,5 @@ func (b *Biome) String() string {
 	case 22:
 		return "Jungle Hills"
 	}
-	return "Unrecognised Biome ID - " + strconv.Itoa(int(*b))
-}
-
-func NewBiome(biomeId uint8) Biome {
-	return Biome(biomeId)
+	return "Unrecognised Biome ID - " + strconv.Itoa(int(b))
 }

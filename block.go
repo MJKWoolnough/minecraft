@@ -38,11 +38,17 @@ type Block struct {
 }
 
 func (b Block) Equal(e equaler.Equaler) bool {
-	if c, ok := e.(*Block); ok {
+	c, ok := e.(*Block)
+	if !ok {
+		if d, ok := e.(Block); ok {
+			c = &d
+		}
+	}
+	if c != nil {
 		if b.BlockId == c.BlockId && b.Data == c.Data && b.Tick == c.Tick {
-			if len(b.Metadata) > 0 {
-				if len(c.Metadata) > 0 {
-					for _, v := range b.Metadata {
+			if len(b.metadata) > 0 {
+				if len(c.metadata) > 0 {
+					for _, v := range b.metadata {
 						name := v.Name()
 						found := false
 						for _, w := range c.metadata {
@@ -72,7 +78,6 @@ func (b Block) Opacity() uint8 {
 	if b.BlockId == 8 || b.BlockId == 9 {
 		return 3
 	}
-	// 	blockId := uint16(b.BlockId) | (uint16(b.add) << 8)
 	for i := 0; i < len(transparentBlocks); i++ {
 		if transparentBlocks[i] == b.BlockId {
 			return 1
@@ -86,7 +91,7 @@ func (b Block) IsLiquid() bool {
 }
 
 func (b Block) HasMetadata() bool {
-	if b.Metadata == nil || len(b.Metadata) == 0 {
+	if b.metadata == nil || len(b.metadata) == 0 {
 		return false
 	}
 	return true
@@ -129,6 +134,10 @@ func (b Block) String() string {
 			toRet += "	" + b.metadata[i].String() + "\n"
 		}
 	}
-
+	if b.Tick {
+		toRet += "Tick: on"
+	} else {
+		toRet += "Tick: off"
+	}
 	return toRet
 }
