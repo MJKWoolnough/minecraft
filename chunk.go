@@ -104,14 +104,14 @@ func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
 		}
 		data = nbt.NewTag("", nbt.NewCompound([]nbt.Tag{
 			nbt.NewTag("Level", nbt.NewCompound([]nbt.Tag{
+				nbt.NewTag("xPos", nbt.NewInt(x)),
+				nbt.NewTag("zPos", nbt.NewInt(z)),
 				nbt.NewTag("Biomes", nbt.NewByteArray(biomes)),
 				nbt.NewTag("HeightMap", nbt.NewIntArray(make([]int32, 256))),
 				nbt.NewTag("InhabitedTime", nbt.NewLong(0)),
 				nbt.NewTag("LastUpdate", nbt.NewLong(0)),
 				nbt.NewTag("Sections", nbt.NewEmptyList(nbt.Tag_Compound)),
 				nbt.NewTag("TerrainPopulated", nbt.NewByte(1)),
-				nbt.NewTag("xPos", nbt.NewInt(x)),
-				nbt.NewTag("zPos", nbt.NewInt(z)),
 			})),
 		}))
 	}
@@ -132,14 +132,14 @@ func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
 			return nil, &WrongTypeError{req.name, req.TagId, tagId}
 		}
 	}
-	
+
 	if tX := int32(*c.data.Get("xPos").Data().(*nbt.Int)); tX != x {
-		return nil, &UnexpectedValue{ "[Chunk Base]->Level->xPos", fmt.Sprintf("%d", x), fmt.Sprintf("%d", tX) }
+		return nil, &UnexpectedValue{"[Chunk Base]->Level->xPos", fmt.Sprintf("%d", x), fmt.Sprintf("%d", tX)}
 	}
 	if tZ := int32(*c.data.Get("zPos").Data().(*nbt.Int)); tZ != z {
-		return nil, &UnexpectedValue{ "[Chunk Base]->Level->zPos", fmt.Sprintf("%d", z), fmt.Sprintf("%d", tZ) }
+		return nil, &UnexpectedValue{"[Chunk Base]->Level->zPos", fmt.Sprintf("%d", z), fmt.Sprintf("%d", tZ)}
 	}
-	
+
 	for _, co := range chunkOther {
 		if tag := c.data.Get(co.name); tag == nil {
 			continue
@@ -210,7 +210,7 @@ func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
 		} else {
 			y := int32(*yc.Data().(*nbt.Byte))
 			var err error
-			if c.sections[y], err = LoadSection(section); err != nil {
+			if c.sections[y], err = loadSection(section); err != nil {
 				return nil, err
 			}
 		}
@@ -227,10 +227,11 @@ func (c *chunk) GetBlock(x, y, z int32) (b *Block, err error) {
 		if b, err = c.sections[ys].GetBlock(x, y, z); err != nil {
 			return
 		}
-		if md, ok := c.tileEntities[xyz(x, y, z)]; ok && md != nil {
+		pos := xyz(x, y, z)
+		if md, ok := c.tileEntities[pos]; ok && md != nil {
 			b.SetMetadata([]nbt.Tag(*md))
 		}
-		if tt, ok := c.tileTicks[xyz(x, y, z)]; ok && tt != nil {
+		if tt, ok := c.tileTicks[pos]; ok && tt != nil {
 			b.Tick = true
 		}
 	}
@@ -243,7 +244,7 @@ func (c *chunk) SetBlock(x, y, z int32, b *Block) error {
 		if b.Equal(&Block{}) {
 			return nil
 		}
-		c.sections[ys] = NewSection(y)
+		c.sections[ys] = newSection(y)
 	}
 	if err := c.sections[ys].SetBlock(x, y, z, b); err != nil {
 		return err
