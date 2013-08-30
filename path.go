@@ -210,6 +210,8 @@ func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
 		if positions[chunk.pos]&255 == newSize {
 			if _, err = f.Seek(4*int64(chunk.pos)+4096, os.SEEK_SET); err != nil { // Write the time, then the data
 				return err
+			} else if err = binary.Write(f, binary.BigEndian, uint32(time.Now().Unix())); err != nil {
+				return err
 			} else if _, err = f.Seek(int64(positions[chunk.pos])>>8<<12, os.SEEK_SET); err != nil {
 				return err
 			} else if err = binary.Write(f, binary.BigEndian, uint32(len(chunk.buf))+1); err != nil {
