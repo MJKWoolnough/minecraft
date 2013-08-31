@@ -56,10 +56,10 @@ var (
 )
 
 type chunk struct {
-	sections [16]*section
-	biomes   *nbt.ByteArray
-	data     *nbt.Compound
-	//entities     map[uint16]*nbt.Compound
+	sections     [16]*section
+	biomes       *nbt.ByteArray
+	data         *nbt.Compound
+	heightMap    *nbt.IntArray
 	tileEntities map[uint16]*nbt.Compound
 	tileTicks    map[uint16]*nbt.Compound
 }
@@ -166,6 +166,7 @@ func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
 		c.biomes = nbt.NewByteArray(biomes)
 		c.data.Set(nbt.NewTag("Biomes", c.biomes))
 	}
+	c.heightMap = c.data.Get("HeightMap").Data().(*nbt.IntArray)
 	c.tileEntities = make(map[uint16]*nbt.Compound)
 	if tileEntities := c.data.Get("TileEntities"); tileEntities != nil {
 		if lTileEntities, ok := tileEntities.Data().(*nbt.List); ok {
@@ -248,6 +249,21 @@ func (c *chunk) SetBlock(x, y, z int32, b *Block) error {
 	}
 	if err := c.sections[ys].SetBlock(x, y, z, b); err != nil {
 		return err
+	}
+	if hmpos := x&15<<4 | z&15; b.Opacity() <= 1 { //All transparent blocks block 1 light when they are below the highest non-transparent block
+		if y == (*c.heightMap)[hmpos] {
+			(*c.heightMap)[hmpos] = 0
+			for i := y; i >= 0; i-- {
+				if c.sections[ys] != nil {
+					if tB, _ := c.sections[ys].GetBlock(x, y, z); tB.Opacity() <= 1 {
+						(*c.heightMap)[hmpos] = i
+						break
+					}
+				}
+			}
+		}
+	} else if y > (*c.heightMap)[hmpos] {
+		(*c.heightMap)[hmpos] = y
 	}
 	pos := xyz(x, y, z)
 	if b.metadata == nil {
