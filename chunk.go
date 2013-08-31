@@ -274,11 +274,11 @@ func (c *chunk) SetBlock(x, y, z int32, b *Block) error {
 }
 
 func (c *chunk) GetBiome(x, z int32) Biome {
-	return Biome((*c.biomes)[z&15<<4|x&15])
+	return Biome((*c.biomes)[x&15<<4|z&15])
 }
 
 func (c *chunk) SetBiome(x, z int32, b Biome) error {
-	(*c.biomes)[z&15<<4|x&15] = int8(b)
+	(*c.biomes)[x&15<<4|z&15] = int8(b)
 	return nil
 }
 
