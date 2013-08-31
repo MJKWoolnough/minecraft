@@ -420,6 +420,9 @@ func (m *memPath) RemoveChunk(x, z int32) error {
 }
 
 func (m *memPath) ReadLevelDat() (nbt.Tag, error) {
+	if len(m.level) == 0 {
+		return nil, nil
+	}
 	return m.read(m.level)
 }
 
