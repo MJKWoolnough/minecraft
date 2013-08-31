@@ -98,10 +98,15 @@ func loadSection(c *nbt.Compound) (*section, error) {
 	s.blocks = blocks.Data().(*nbt.ByteArray)
 	lenBlocks := len(*s.blocks)
 	add := c.Get("Add")
-	if add.TagId() != nbt.Tag_ByteArray {
-		return nil, &WrongTypeError{"Add", nbt.Tag_ByteArray, add.TagId()}
+	if add != nil {
+		if add.TagId() != nbt.Tag_ByteArray {
+			return nil, &WrongTypeError{"Add", nbt.Tag_ByteArray, add.TagId()}
+		}
+		s.add = add.Data().(*nbt.ByteArray)
+	} else {
+		s.add = nbt.NewByteArray(make([]int8, 2048))
+		c.Set(nbt.NewTag("Add", s.add))
 	}
-	s.add = add.Data().(*nbt.ByteArray)
 	if 2*len(*s.add) != lenBlocks {
 		return nil, &OOB{}
 	}
