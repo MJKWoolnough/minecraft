@@ -213,6 +213,7 @@ type Path interface {
 }
 ```
 
+
 #### type FilePath
 
 ```go
@@ -285,6 +286,7 @@ Update tracks the lock file for updates to remove the lock.
 func (p *FilePath) WriteLevelDat(data nbt.Tag) error
 ```
 
+
 #### type MemPath
 
 ```go
@@ -335,6 +337,7 @@ func (m *MemPath) SetChunk(data ...nbt.Tag) error
 func (m *MemPath) WriteLevelDat(data nbt.Tag) error
 ```
 
+
 ### Errors
 
 
@@ -371,6 +374,7 @@ func (e ExpectedData) Error() string
 
 ```go
 type MissingTagError struct {
+	TagName string
 }
 ```
 
@@ -412,6 +416,7 @@ func (o OOB) Error() string
 
 ```go
 type UnexpectedValue struct {
+	TagName, Expecting, Got string
 }
 ```
 
@@ -426,6 +431,7 @@ func (u UnexpectedValue) Error() string
 
 ```go
 type UnknownCompression struct {
+	Code byte
 }
 ```
 
@@ -440,6 +446,8 @@ func (u UnknownCompression) Error() string
 
 ```go
 type WrongTypeError struct {
+	TagName        string
+	Expecting, Got nbt.TagId
 }
 ```
 
