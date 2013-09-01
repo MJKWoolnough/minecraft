@@ -2,186 +2,450 @@
 --
     import "github.com/MJKWoolnough/minecraft"
 
-A first run at a minecraft level editor.
+Package Minecraft will be a full featured minecraft level editor/viewer.
 
 ## Usage
+
+```go
+const (
+	GZip byte = 1
+	Zlib byte = 2
+)
+```
+
+#### func  CoordsToRegion
+
+```go
+func CoordsToRegion(x, z int32) (int32, int32)
+```
 
 #### type Biome
 
 ```go
-type Biome byte
+type Biome int8
 ```
 
-Needs Implementation
-
-#### func  NewBiome
 
 ```go
-func NewBiome(biomeId uint8) Biome
+const (
+	Biome_Auto Biome = iota - 1
+	Biome_Ocean
+	Biome_Plains
+	Biome_Desert
+	Biome_ExtremeHills
+	Biome_Forest
+	Biome_Taiga
+	Biome_Swampland
+	Biome_River
+	Biome_Hell
+	Biome_Sky
+	Biome_FrozenOcean
+	Biome_FrozenRiver
+	Biome_IcePlains
+	Biome_IceMountains
+	Biome_MushroomIsland
+	Biome_MushroomIslandShore
+	Biome_Beach
+	Biome_DesertHills
+	Biome_ForestHills
+	Biome_TaigaHills
+	Biome_ExtremeHillsEdge
+	Biome_Jungle
+	Biome_JungleHills
+)
 ```
 
-#### func (*Biome) Equal
+#### func (Biome) Equal
 
 ```go
-func (b *Biome) Equal(e equaler.Equaler) bool
+func (b Biome) Equal(e equaler.Equaler) bool
 ```
 
-#### func (*Biome) String
+#### func (Biome) String
 
 ```go
-func (b *Biome) String() string
+func (b Biome) String() string
 ```
 
 #### type Block
 
 ```go
-type Block interface {
-	BlockId() uint8
-	Add() uint8
-	Data() uint8
-	Opacity() uint8
-	IsLiquid() bool
-	HasMetadata() bool
-	GetMetadata() []nbtparser.NBTTag
-	SetMetadata([]nbtparser.NBTTag)
-	Tick(bool)
-	ToTick() bool
-	equaler.Equaler
-}
-```
+type Block struct {
+	BlockId uint16
+	Data    uint8
 
-Block allows access to the data of a minecraft block.
-
-```go
-var (
-	BlockAir Block // BlockAir is useful as a nil block.
-)
-```
-
-#### func  NewBlock
-
-```go
-func NewBlock(blockId, add, data uint8) Block
-```
-
-#### type Chunk
-
-```go
-type Chunk interface {
-	io.WriterTo
-	Get(uint8, uint8, uint8) Block
-	Set(uint8, uint8, uint8, Block)
-	GetSkyLight(uint8, uint8, uint8) uint8
-	SetSkyLight(uint8, uint8, uint8, uint8)
-	Opacity(uint8, uint8, uint8) uint8
-	IsEmpty() bool
-	GetMetadata(uint8, uint8, uint8) []nbtparser.NBTTag
-	SetMetadata(uint8, uint8, uint8, []nbtparser.NBTTag)
-	GetTick(x, y, z uint8) bool
-	SetTick(x, y, z uint8, data []nbtparser.NBTTag)
-	HasChanged() bool
-	Compress()
+	Tick bool
 }
 ```
 
 
-#### func  LoadChunk
+#### func (Block) Equal
 
 ```go
-func LoadChunk(data io.Reader) (Chunk, error)
+func (b Block) Equal(e equaler.Equaler) bool
 ```
 
-#### func  NewChunk
+#### func (Block) GetMetadata
 
 ```go
-func NewChunk(x, z int32) Chunk
+func (b Block) GetMetadata() []nbt.Tag
 ```
+
+#### func (Block) HasMetadata
+
+```go
+func (b Block) HasMetadata() bool
+```
+
+#### func (Block) IsLiquid
+
+```go
+func (b Block) IsLiquid() bool
+```
+
+#### func (Block) Opacity
+
+```go
+func (b Block) Opacity() uint8
+```
+Opacity returns how much light is blocked by this block.
+
+#### func (*Block) SetMetadata
+
+```go
+func (b *Block) SetMetadata(data []nbt.Tag)
+```
+
+#### func (Block) String
+
+```go
+func (b Block) String() string
+```
+
 
 #### type Level
 
 ```go
-type Level interface {
-	Get(int32, int32, int32) Block
-	Set(int32, int32, int32, Block)
-	GetName() string
-	SetName(string)
-	GetSpawn() (int32, int32, int32)
-	SetSpawn(int32, int32, int32)
-	SaveLevelData(string) error
-	ExportOpenRegions(string) error
-	CloseOpenRegions()
-	Compress()
-	GetSkyLight(int32, int32, int32) uint8
-	SetSkyLight(int32, int32, int32, uint8)
-	Opacity(int32, int32, int32) uint8
+type Level struct {
+	Path
 }
 ```
 
-
-#### func  LoadLevel
-
-```go
-func LoadLevel(path string) (Level, error)
-```
 
 #### func  NewLevel
 
 ```go
-func NewLevel(name string) Level
+func NewLevel(location Path) (*Level, error)
 ```
 
-#### type Region
+#### func (*Level) Close
 
 ```go
-type Region interface {
-	Get(int32, int32, int32) Block
-	Set(int32, int32, int32, Block)
-	GetSkyLight(int32, int32, int32) uint8
-	SetSkyLight(int32, int32, int32, uint8)
-	Opacity(int32, int32, int32) uint8
-	Export(io.WriteSeeker) error
-	HasChanged() bool
-	Compress()
+func (l *Level) Close()
+```
+
+#### func (*Level) GetBiome
+
+```go
+func (l *Level) GetBiome(x, z int32) (Biome, error)
+```
+
+#### func (*Level) GetBlock
+
+```go
+func (l *Level) GetBlock(x, y, z int32) (*Block, error)
+```
+
+#### func (Level) GetName
+
+```go
+func (l Level) GetName() string
+```
+
+#### func (Level) GetSpawn
+
+```go
+func (l Level) GetSpawn() (x, y, z int32)
+```
+
+#### func (*Level) Save
+
+```go
+func (l *Level) Save() error
+```
+
+#### func (*Level) SetBiome
+
+```go
+func (l *Level) SetBiome(x, z int32, biome Biome) error
+```
+
+#### func (*Level) SetBlock
+
+```go
+func (l *Level) SetBlock(x, y, z int32, block *Block) error
+```
+
+#### func (*Level) SetName
+
+```go
+func (l *Level) SetName(name string)
+```
+
+#### func (*Level) SetSpawn
+
+```go
+func (l *Level) SetSpawn(x, y, z int32)
+```
+
+
+#### type Path
+
+```go
+type Path interface {
+	// Returns a nil nbt.Tag when chunk does not exists
+	GetChunk(int32, int32) (nbt.Tag, error)
+	SetChunk(...nbt.Tag) error
+	RemoveChunk(int32, int32) error
+	ReadLevelDat() (nbt.Tag, error)
+	WriteLevelDat(nbt.Tag) error
+	GetRegions() [][2]int32
+}
+```
+
+#### type FilePath
+
+```go
+type FilePath struct {
 }
 ```
 
 
-#### func  LoadRegion
+#### func  NewFilePath
 
 ```go
-func LoadRegion(data io.ReadSeeker) (Region, error)
+func NewFilePath(dirname string) (*FilePath, error)
+```
+NewFilePath constructs a new directory based path to read from.
+
+#### func (*FilePath) Defrag
+
+```go
+func (p *FilePath) Defrag(x, z int32) error
 ```
 
-#### func  NewRegion
+#### func (*FilePath) GetChunk
 
 ```go
-func NewRegion() (Region, error)
+func (p *FilePath) GetChunk(x, z int32) (nbt.Tag, error)
 ```
 
-#### type Section
+#### func (*FilePath) GetRegions
 
 ```go
-type Section interface {
-	Get(uint8, uint8, uint8) Block
-	Set(uint8, uint8, uint8, Block)
-	GetSkyLight(uint8, uint8, uint8) uint8
-	SetSkyLight(uint8, uint8, uint8, uint8)
-	Opacity(uint8, uint8, uint8) uint8
-	GetY() uint8
-	IsEmpty() bool
-	Data() *nbtparser.NBTTagCompound
+func (p *FilePath) GetRegions() [][2]int32
+```
+GetRegions returns a list of region x,z coords of all generated regions.
+
+#### func (*FilePath) Lock
+
+```go
+func (p *FilePath) Lock()
+```
+Lock will retake the lock file if it has been lost. May cause corruption.
+
+#### func (*FilePath) ReadLevelDat
+
+```go
+func (p *FilePath) ReadLevelDat() (nbt.Tag, error)
+```
+
+#### func (*FilePath) RemoveChunk
+
+```go
+func (p *FilePath) RemoveChunk(x, z int32) error
+```
+
+#### func (*FilePath) SetChunk
+
+```go
+func (p *FilePath) SetChunk(data ...nbt.Tag) error
+```
+
+#### func (*FilePath) Update
+
+```go
+func (p *FilePath) Update(filname string, mode uint8)
+```
+Update tracks the lock file for updates to remove the lock.
+
+#### func (*FilePath) WriteLevelDat
+
+```go
+func (p *FilePath) WriteLevelDat(data nbt.Tag) error
+```
+
+#### type MemPath
+
+```go
+type MemPath struct {
 }
 ```
 
 
-#### func  LoadSection
+#### func  NewMemPath
 
 ```go
-func LoadSection(sectionData *nbtparser.NBTTagCompound) (Section, error)
+func NewMemPath() *MemPath
 ```
 
-#### func  NewSection
+#### func (*MemPath) GetChunk
 
 ```go
-func NewSection(y byte) (Section, error)
+func (m *MemPath) GetChunk(x, z int32) (nbt.Tag, error)
+```
+
+#### func (*MemPath) GetRegions
+
+```go
+func (m *MemPath) GetRegions() [][2]int32
+```
+
+#### func (*MemPath) ReadLevelDat
+
+```go
+func (m *MemPath) ReadLevelDat() (nbt.Tag, error)
+```
+
+#### func (*MemPath) RemoveChunk
+
+```go
+func (m *MemPath) RemoveChunk(x, z int32) error
+```
+
+#### func (*MemPath) SetChunk
+
+```go
+func (m *MemPath) SetChunk(data ...nbt.Tag) error
+```
+
+#### func (*MemPath) WriteLevelDat
+
+```go
+func (m *MemPath) WriteLevelDat(data nbt.Tag) error
+```
+
+### Errors
+
+
+#### type ConflictError
+
+```go
+type ConflictError struct {
+	X, Z int32
+}
+```
+
+
+#### func (ConflictError) Error
+
+```go
+func (c ConflictError) Error() string
+```
+
+#### type ExpectedData
+
+```go
+type ExpectedData struct{}
+```
+
+
+#### func (ExpectedData) Error
+
+```go
+func (e ExpectedData) Error() string
+```
+
+
+#### type MissingTagError
+
+```go
+type MissingTagError struct {
+}
+```
+
+
+#### func (MissingTagError) Error
+
+```go
+func (m MissingTagError) Error() string
+```
+
+#### type NoLock
+
+```go
+type NoLock struct{}
+```
+
+
+#### func (NoLock) Error
+
+```go
+func (n NoLock) Error() string
+```
+
+#### type OOB
+
+```go
+type OOB struct{}
+```
+
+
+#### func (OOB) Error
+
+```go
+func (o OOB) Error() string
+```
+
+
+#### type UnexpectedValue
+
+```go
+type UnexpectedValue struct {
+}
+```
+
+
+#### func (UnexpectedValue) Error
+
+```go
+func (u UnexpectedValue) Error() string
+```
+
+#### type UnknownCompression
+
+```go
+type UnknownCompression struct {
+}
+```
+
+
+#### func (UnknownCompression) Error
+
+```go
+func (u UnknownCompression) Error() string
+```
+
+#### type WrongTypeError
+
+```go
+type WrongTypeError struct {
+}
+```
+
+
+#### func (WrongTypeError) Error
+
+```go
+func (w WrongTypeError) Error() string
 ```
