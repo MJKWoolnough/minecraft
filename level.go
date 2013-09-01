@@ -25,12 +25,8 @@
 package minecraft
 
 import (
-	"compress/gzip"
-	"fmt"
-	"github.com/MJKWoolnough/io-watcher"
 	"github.com/MJKWoolnough/minecraft/nbt"
 	"math/rand"
-	"os"
 	"time"
 )
 
@@ -43,53 +39,49 @@ var (
 	}
 )
 
-type MissingTagError struct {
-	tagName string
-}
-
-func (m MissingTagError) Error() {
-	return fmt.Sprintf("minecraft - level: missing %q tag", m.tagName)
-}
-
-type WrongTypeError struct {
-	tagName        string
-	expecting, got nbt.TagId
-}
-
-func (m WrongTypeError) Error() {
-	return fmt.Sprintf("minecraft - level: tag %q is of incorrect type, expecting %q, got %q", m.tagName)
-}
-
 type Level struct {
-	location  Path
-	regions   map[int32]map[int32]Region
-	levelData nbt.Tag
+	Path
+	regions   map[uint64]*region
+	levelData *nbt.Compound
 	changed   bool
 }
 
 func NewLevel(location Path) (*Level, error) {
 	var (
-		t    nbt.Tag
-		data *nbt.Compound
+		levelDat nbt.Tag
+		data     *nbt.Compound
 	)
-	levelDat, err = location.readLevelDat()
+	levelDat, err := location.ReadLevelDat()
 	if err != nil {
 		return nil, err
 	} else if levelDat == nil {
-		t = newLevelDat()
-	} else {
-		defer levelDat.Close()
-		file, err := gzip.NewReader(levelDat)
-		if err != nil {
-			return nil, err
-		}
-		defer file.Close()
-		t, _, err = nbt.ReadNBTFrom(file)
-		if err != nil {
-			return nil, err
-		}
+		levelDat = nbt.NewTag("", nbt.NewCompound([]nbt.Tag{
+			nbt.NewTag("Data", nbt.NewCompound([]nbt.Tag{
+				nbt.NewTag("GameType", nbt.NewInt(1)),
+				nbt.NewTag("generatorName", nbt.NewString("flat")),
+				nbt.NewTag("generatorVersion", nbt.NewInt(0)),
+				nbt.NewTag("generatorOptions", nbt.NewString("0")),
+				nbt.NewTag("hardcore", nbt.NewByte(0)),
+				nbt.NewTag("LastPlayed", nbt.NewLong(timestampMS())),
+				nbt.NewTag("LevelName", nbt.NewString("")),
+				nbt.NewTag("MapFeatures", nbt.NewByte(0)),
+				nbt.NewTag("RandomSeed", nbt.NewLong(rand.New(rand.NewSource(time.Now().Unix())).Int63())),
+				nbt.NewTag("raining", nbt.NewByte(0)),
+				nbt.NewTag("rainTime", nbt.NewInt(0)),
+				nbt.NewTag("SizeOnDisk", nbt.NewLong(0)),
+				nbt.NewTag("SpawnX", nbt.NewInt(0)),
+				nbt.NewTag("SpawnY", nbt.NewInt(0)),
+				nbt.NewTag("SpawnZ", nbt.NewInt(0)),
+				nbt.NewTag("Time", nbt.NewLong(0)),
+				nbt.NewTag("thundering", nbt.NewByte(0)),
+				nbt.NewTag("thunderTime", nbt.NewInt(0)),
+				nbt.NewTag("version", nbt.NewInt(19133)),
+			})),
+		}))
 	}
-	if d := t.Get("Data"); d != nil {
+	if levelDat.TagId() != nbt.Tag_Compound {
+		return nil, WrongTypeError{"[BASE]", nbt.Tag_Compound, levelDat.TagId()}
+	} else if d := levelDat.Data().(*nbt.Compound).Get("Data"); d != nil {
 		if d.TagId() == nbt.Tag_Compound {
 			data = d.Data().(*nbt.Compound)
 		} else {
@@ -107,8 +99,8 @@ func NewLevel(location Path) (*Level, error) {
 	}
 	return &Level{
 		location,
-		make(map[int32]map[int32]Region),
-		t,
+		make(map[uint64]*region),
+		levelDat.Data().(*nbt.Compound).Get("Data").Data().(*nbt.Compound),
 		false,
 	}, nil
 }
@@ -117,8 +109,7 @@ func (l Level) GetSpawn() (x, y, z int32) {
 	if l.levelData == nil {
 		return
 	}
-	data := l.levelData.Get("Data").Data().(*nbt.Compound)
-	xTag, yTag, zTag := data.Get("SpawnX"), data.Get("SpawnY"), data.Get("SpawnZ")
+	xTag, yTag, zTag := l.levelData.Get("SpawnX"), l.levelData.Get("SpawnY"), l.levelData.Get("SpawnZ")
 	if xd, ok := xTag.Data().(*nbt.Int); !ok {
 		return
 	} else {
@@ -136,132 +127,83 @@ func (l Level) GetSpawn() (x, y, z int32) {
 }
 
 func (l *Level) SetSpawn(x, y, z int32) {
-	data := l.levelData.Get("Data").Data().(*nbt.Compound)
-	data.Set("SpawnX", nbt.NewInt(x))
-	data.Set("SpawnY", nbt.NewInt(y))
-	data.Set("SpawnZ", nbt.NewInt(z))
+	l.levelData.Set(nbt.NewTag("SpawnX", nbt.NewInt(x)))
+	l.levelData.Set(nbt.NewTag("SpawnY", nbt.NewInt(y)))
+	l.levelData.Set(nbt.NewTag("SpawnZ", nbt.NewInt(z)))
 	l.changed = true
 }
 
 func (l *Level) GetBlock(x, y, z int32) (*Block, error) {
-	r, err := l.GetRegion(CoordsToRegion(x, z))
-	if err != nil {
-		return nil, err
-	}
+	r := l.getRegion(CoordsToRegion(x, z))
 	if r == nil {
-		return BlockAir
+		return &Block{}, nil
 	}
-	return r.GetBlock(x, y, z)
+	return r.GetBlock(l.Path, x, y, z)
 }
 
 func (l *Level) SetBlock(x, y, z int32, block *Block) error {
-	r, err := l.GetRegion(CoordsToRegion(x, z))
-	if err != nil {
-		return err
-	}
+	r := l.getRegion(CoordsToRegion(x, z))
 	if r != nil {
-		r.SetBlock(x, y, z, block)
+		return r.SetBlock(l.Path, x, y, z, block)
 	}
+	return nil
 }
 
 func (l *Level) GetBiome(x, z int32) (Biome, error) {
-	r, err := l.GetRegion(CoordsToRegion(x, z))
+	r := l.getRegion(CoordsToRegion(x, z))
 	if r == nil {
-		return Biome_Plains, err
+		return Biome_Plains, nil
 	}
-	r.GetBiome(x, z)
+	return r.GetBiome(l.Path, x, z)
 }
 
 func (l *Level) SetBiome(x, z int32, biome Biome) error {
-	r, err := l.GetRegion(CoordsToRegion(x, z))
-	if err != nil {
-		return err
-	}
+	r := l.getRegion(CoordsToRegion(x, z))
 	if r != nil {
-		r.SetBiome(x, z, biome)
+		return r.SetBiome(l.Path, x, z, biome)
 	}
+	return nil
 }
 
 func (l Level) GetName() string {
-	s := l.levelData.Get("Data").Data().(*nbt.Compound).Get("LevelName").(*nbt.String)
+	s := l.levelData.Get("LevelName").Data().(*nbt.String)
 	return string(*s)
 }
 
 func (l *Level) SetName(name string) {
-	l.levelData.Get("Data").Data().(*nbt.Compound).Set("LevelName", nbt.NewString(name))
+	l.levelData.Set(nbt.NewTag("LevelName", nbt.NewString(name)))
 	l.changed = true
 }
 
-func (l *Level) GetRegion(x, z) (*Region, error) {
-	if ra, ok := l.regions[x]; ok {
-		if r, ok := ra[z]; ok {
-			return r, nil
-		}
+func (l *Level) getRegion(x, z int32) *region {
+	pos := uint64(z)<<32 | uint64(uint32(x))
+	if _, ok := l.regions[pos]; !ok {
+		l.regions[pos] = new(region)
 	}
-	if _, ok := l.regions[x]; !ok {
-		l.regions[x] = make(map[int32]*Region)
-	}
-	r, err := newRegion(x, z)
-	l.regions[x][z] = r
-	return r, err
+	return l.regions[pos]
 }
 
 func (l *Level) Save() error {
-	if !l.haveLock {
-		return &NoLock{}
-	}
 	if l.changed {
-		l, err = l.path.writeLevelDat()
-		if err != nil {
+		if err := l.WriteLevelDat(nbt.NewTag("", nbt.NewCompound([]nbt.Tag{nbt.NewTag("Data", l.levelData)}))); err != nil {
 			return err
 		}
-		defer l.Close()
-		file := gzip.NewWriter(file)
-		defer file.Close()
-		if _, err = l.levelData.WriteTo(file); err != nil {
-			return err
-		}
-		l.change = false
+		l.changed = false
 	}
-	// 	for _, x := range l.regions {
-	// 		for _, z := range x {
-	//
-	// 		}
-	// 	}
+	for n, r := range l.regions {
+		if err := r.Save(l.Path); err != nil {
+			return err
+		}
+		delete(l.regions, n)
+	}
 	return nil
 }
 
 func (l *Level) Close() {
-	l.change = false
-	// 	for _, x := range l.regions {
-	// 		for _, z := range x {
-	//
-	// 		}
-	// 	}
-}
-
-func newLevelDat() nbt.Tag {
-	return nbt.NewTag("", nbt.NewCompound([]Tag{
-		nbt.NewTag("GameType", nbt.NewInt(1)),
-		nbt.NewTag("generatorName", nbt.NewString("flat")),
-		nbt.NewTag("generatorVersion", nbt.NewInt(0)),
-		nbt.NewTag("generatorOptions", nbt.NewString("0")),
-		nbt.NewTag("hardcore", nbt.NewByte(0)),
-		nbt.NewTag("LastPlayed", nbt.NewLong(timestampMS())),
-		nbt.NewTag("LevelName", nbt.NewString("")),
-		nbt.NewTag("MapFeatures", nbt.NewByte(0)),
-		nbt.NewTag("RandomSeed", nbt.NewLong(rand.New(rand.NewSource(time.Unix())).Int63())),
-		nbt.NewTag("raining", nbt.NewByte(0)),
-		nbt.NewTag("rainTime", nbt.NewInt(0)),
-		nbt.NewTag("SizeOnDisk", nbt.NewLong(0)),
-		nbt.NewTag("SpawnX", nbt.NewInt(0)),
-		nbt.NewTag("SpawnY", nbt.NewInt(0)),
-		nbt.NewTag("SpawnZ", nbt.NewInt(0)),
-		nbt.NewTag("Time", nbt.NewLong(0)),
-		nbt.NewTag("thundering", nbt.NewByte(0)),
-		nbt.NewTag("thunderTime", nbt.NewInt(0)),
-		nbt.NewTag("version", nbt.NewInt(19133)),
-	}))
+	l.changed = false
+	for n := range l.regions {
+		delete(l.regions, n)
+	}
 }
 
 func CoordsToRegion(x, z int32) (int32, int32) {
