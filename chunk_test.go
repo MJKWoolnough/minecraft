@@ -163,9 +163,8 @@ func TestBiomes(t *testing.T) {
 		biome := b
 		for x := int32(0); x < 16; x++ {
 			for z := int32(0); z < 16; z++ {
-				if err := chunk.SetBiome(x, z, biome); err != nil {
-					t.Fatalf("reveived unexpected error during testing, %q", err.Error())
-				} else if newB := chunk.GetBiome(x, z); newB != biome {
+				chunk.SetBiome(x, z, biome)
+				if newB := chunk.GetBiome(x, z); newB != biome {
 					t.Errorf("error setting biome at co-ordinates, expecting %q, got %q", biome.String(), newB.String())
 				} else if biome++; biome >= 23 {
 					biome = -1
@@ -285,19 +284,14 @@ func TestBlock(t *testing.T) {
 		},
 	}
 	for _, tB := range testBlocks {
-		if err := chunk.SetBlock(tB.x, tB.y, tB.z, &tB.Block); err != nil {
-			t.Fatalf("reveived unexpected error during testing, %q", err.Error())
-		} else if block, err := chunk.GetBlock(tB.x, tB.y, tB.z); err != nil {
-			t.Fatalf("reveived unexpected error during testing, %q", err.Error())
-		} else if !tB.Block.Equal(block) {
+		chunk.SetBlock(tB.x, tB.y, tB.z, &tB.Block)
+		if block := chunk.GetBlock(tB.x, tB.y, tB.z); !tB.Block.Equal(block) {
 			t.Errorf("blocks do not match, expecting %s, got %s", tB.Block.String(), block.String())
 		}
 	}
 	for _, tB := range testBlocks {
 		if tB.recheck {
-			if block, err := chunk.GetBlock(tB.x, tB.y, tB.z); err != nil {
-				t.Fatalf("reveived unexpected error during testing, %q", err.Error())
-			} else if !tB.Block.Equal(block) {
+			if block := chunk.GetBlock(tB.x, tB.y, tB.z); !tB.Block.Equal(block) {
 				t.Errorf("blocks do not match, expecting:-\n%s\ngot:-\n%s", tB.Block.String(), block.String())
 			}
 		}

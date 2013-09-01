@@ -32,25 +32,19 @@ func yzx(x, y, z int32) uint32 {
 	return (uint32(y&15) << 8) | (uint32(z&15) << 4) | uint32(x&15)
 }
 
-func getNibble(arr nbt.ByteArray, x, y, z int32) (byte, error) {
+func getNibble(arr nbt.ByteArray, x, y, z int32) byte {
 	coord := yzx(x, y, z)
-	if coord>>1 > uint32(len(arr)) {
-		return 0, &OOB{}
-	}
 	data := byte(arr[coord>>1])
 	if coord&1 == 0 {
 		data &= 15
 	} else {
 		data >>= 4
 	}
-	return data, nil
+	return data
 }
 
-func setNibble(arr nbt.ByteArray, x, y, z int32, data byte) error {
+func setNibble(arr nbt.ByteArray, x, y, z int32, data byte) {
 	coord := yzx(x, y, z)
-	if coord>>1 > uint32(len(arr)) {
-		return &OOB{}
-	}
 	oldData := byte(arr[coord>>1])
 	if coord&1 == 0 {
 		oldData = oldData&240 | data&15
@@ -58,7 +52,7 @@ func setNibble(arr nbt.ByteArray, x, y, z int32, data byte) error {
 		oldData = oldData&15 | data<<4
 	}
 	arr[coord>>1] = int8(oldData)
-	return nil
+	return
 }
 
 type section struct {
@@ -96,7 +90,9 @@ func loadSection(c *nbt.Compound) (*section, error) {
 		return nil, &WrongTypeError{"Blocks", nbt.Tag_ByteArray, blocks.TagId()}
 	}
 	s.blocks = blocks.Data().(*nbt.ByteArray)
-	lenBlocks := len(*s.blocks)
+	if len(*s.blocks) != 4096 {
+		return nil, &OOB{}
+	}
 	add := c.Get("Add")
 	if add != nil {
 		if add.TagId() != nbt.Tag_ByteArray {
@@ -107,7 +103,7 @@ func loadSection(c *nbt.Compound) (*section, error) {
 		s.add = nbt.NewByteArray(make([]int8, 2048))
 		c.Set(nbt.NewTag("Add", s.add))
 	}
-	if 2*len(*s.add) != lenBlocks {
+	if len(*s.add) != 2048 {
 		return nil, &OOB{}
 	}
 	data := c.Get("Data")
@@ -115,7 +111,7 @@ func loadSection(c *nbt.Compound) (*section, error) {
 		return nil, &WrongTypeError{"Data", nbt.Tag_ByteArray, data.TagId()}
 	}
 	s.data = data.Data().(*nbt.ByteArray)
-	if 2*len(*s.data) != lenBlocks {
+	if len(*s.data) != 2048 {
 		return nil, &OOB{}
 	}
 	blockLight := c.Get("BlockLight")
@@ -123,7 +119,7 @@ func loadSection(c *nbt.Compound) (*section, error) {
 		return nil, &WrongTypeError{"BlockLight", nbt.Tag_ByteArray, blockLight.TagId()}
 	}
 	s.blockLight = blockLight.Data().(*nbt.ByteArray)
-	if 2*len(*s.blockLight) != lenBlocks {
+	if len(*s.blockLight) != 2048 {
 		return nil, &OOB{}
 	}
 	skyLight := c.Get("SkyLight")
@@ -131,7 +127,7 @@ func loadSection(c *nbt.Compound) (*section, error) {
 		return nil, &WrongTypeError{"SkyLight", nbt.Tag_ByteArray, skyLight.TagId()}
 	}
 	s.skyLight = skyLight.Data().(*nbt.ByteArray)
-	if 2*len(*s.skyLight) != lenBlocks {
+	if len(*s.skyLight) != 2048 {
 		return nil, &OOB{}
 	}
 	y := c.Get("Y")
@@ -141,36 +137,17 @@ func loadSection(c *nbt.Compound) (*section, error) {
 	return s, nil
 }
 
-func (s *section) GetBlock(x, y, z int32) (*Block, error) {
-	block := new(Block)
-	add, err := getNibble(*s.add, x, y, z)
-	if err != nil {
-		return nil, err
+func (s *section) GetBlock(x, y, z int32) *Block {
+	return &Block{
+		BlockId: uint16(getNibble(*s.add, x, y, z))<<8 | uint16(byte((*s.blocks)[yzx(x, y, z)])),
+		Data:    getNibble(*s.data, x, y, z),
 	}
-	if block.Data, err = getNibble(*s.data, x, y, z); err != nil {
-		return nil, err
-	}
-	coord := yzx(x, y, z)
-	if coord > uint32(len(*s.blocks)) {
-		return nil, new(OOB)
-	}
-	block.BlockId = uint16(add)<<8 | uint16(byte((*s.blocks)[coord]))
-	return block, nil
 }
 
-func (s *section) SetBlock(x, y, z int32, b *Block) error {
-	coord := yzx(x, y, z)
-	if coord > uint32(len(*s.blocks)) {
-		return new(OOB)
-	}
+func (s *section) SetBlock(x, y, z int32, b *Block) {
 	(*s.blocks)[yzx(x, y, z)] = int8(b.BlockId & 255)
-	if err := setNibble(*s.add, x, y, z, byte(b.BlockId>>8)); err != nil {
-		return err
-	}
-	if err := setNibble(*s.data, x, y, z, byte(b.Data)); err != nil {
-		return err
-	}
-	return nil
+	setNibble(*s.add, x, y, z, byte(b.BlockId>>8))
+	setNibble(*s.data, x, y, z, byte(b.Data))
 }
 
 func (s *section) SetY(y int32) {

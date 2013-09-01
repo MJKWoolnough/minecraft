@@ -58,14 +58,8 @@ func TestGetBlock(t *testing.T) {
 		{[3]int32{6, 15, 13}, Block{BlockId: 1474, Data: 8}},
 		{[3]int32{9, 12, 11}, Block{}},
 	}
-	var (
-		b   *Block
-		err error
-	)
 	for n, test := range tests {
-		if b, err = section.GetBlock(test.xyz[0], test.xyz[1], test.xyz[2]); err != nil {
-			t.Errorf("test %d failed - %q", n+1, err.Error())
-		} else if !test.Block.Equal(b) {
+		if b := section.GetBlock(test.xyz[0], test.xyz[1], test.xyz[2]); !test.Block.Equal(b) {
 			t.Errorf("test %d failed\nExpecting: %s\nGot: %s", n+1, test.Block.String(), b.String())
 		}
 	}
@@ -86,24 +80,15 @@ func TestSetBlock(t *testing.T) {
 		{[3]int32{4, 7, 9}, Block{BlockId: 761, Data: 5}, false},
 		{[3]int32{4, 7, 9}, Block{}, false},
 	}
-	var (
-		b   *Block
-		err error
-	)
 	for n, test := range tests {
-		if err = section.SetBlock(test.xyz[0], test.xyz[1], test.xyz[2], &test.Block); err != nil {
-			t.Errorf("test %d failed - %q", n+1, err.Error())
-		} else if b, err = section.GetBlock(test.xyz[0], test.xyz[1], test.xyz[2]); err != nil {
-			t.Errorf("test %d failed - %q", n+1, err.Error())
-		} else if !test.Block.Equal(b) {
+		section.SetBlock(test.xyz[0], test.xyz[1], test.xyz[2], &test.Block)
+		if b := section.GetBlock(test.xyz[0], test.xyz[1], test.xyz[2]); !test.Block.Equal(b) {
 			t.Errorf("test %d failed\nExpecting: %s\nGot: %s", n+1, test.Block.String(), b.String())
 		}
 	}
 	for n, test := range tests {
 		if test.recheck {
-			if b, err = section.GetBlock(test.xyz[0], test.xyz[1], test.xyz[2]); err != nil {
-				t.Errorf("retest %d failed - %q", n+1, err.Error())
-			} else if !test.Block.Equal(b) {
+			if b := section.GetBlock(test.xyz[0], test.xyz[1], test.xyz[2]); !test.Block.Equal(b) {
 				t.Errorf("retest %d failed\nExpecting: %s\nGot: %s", n+1, test.Block.String(), b.String())
 			}
 		}

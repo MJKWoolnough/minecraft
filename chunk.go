@@ -220,14 +220,12 @@ func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
 	return c, nil
 }
 
-func (c *chunk) GetBlock(x, y, z int32) (b *Block, err error) {
+func (c *chunk) GetBlock(x, y, z int32) *Block {
 	ys := y >> 4
 	if c.sections[ys] == nil {
-		b = &Block{}
+		return &Block{}
 	} else {
-		if b, err = c.sections[ys].GetBlock(x, y, z); err != nil {
-			return
-		}
+		b := c.sections[ys].GetBlock(x, y, z)
 		pos := xyz(x, y, z)
 		if md, ok := c.tileEntities[pos]; ok && md != nil {
 			b.SetMetadata([]nbt.Tag(*md))
@@ -235,27 +233,25 @@ func (c *chunk) GetBlock(x, y, z int32) (b *Block, err error) {
 		if tt, ok := c.tileTicks[pos]; ok && tt != nil {
 			b.Tick = true
 		}
+		return b
 	}
-	return
 }
 
-func (c *chunk) SetBlock(x, y, z int32, b *Block) error {
+func (c *chunk) SetBlock(x, y, z int32, b *Block) {
 	ys := y >> 4
 	if c.sections[ys] == nil {
 		if b.Equal(&Block{}) {
-			return nil
+			return
 		}
 		c.sections[ys] = newSection(y)
 	}
-	if err := c.sections[ys].SetBlock(x, y, z, b); err != nil {
-		return err
-	}
+	c.sections[ys].SetBlock(x, y, z, b)
 	if hmpos := x&15<<4 | z&15; b.Opacity() <= 1 { //All transparent blocks block 1 light when they are below the highest non-transparent block
 		if y == (*c.heightMap)[hmpos] {
 			(*c.heightMap)[hmpos] = 0
 			for i := y; i >= 0; i-- {
 				if c.sections[ys] != nil {
-					if tB, _ := c.sections[ys].GetBlock(x, y, z); tB.Opacity() <= 1 {
+					if tB := c.sections[ys].GetBlock(x, y, z); tB.Opacity() <= 1 {
 						(*c.heightMap)[hmpos] = i
 						break
 					}
@@ -286,16 +282,14 @@ func (c *chunk) SetBlock(x, y, z int32, b *Block) error {
 	} else {
 		delete(c.tileTicks, pos)
 	}
-	return nil
 }
 
 func (c *chunk) GetBiome(x, z int32) Biome {
 	return Biome((*c.biomes)[x&15<<4|z&15])
 }
 
-func (c *chunk) SetBiome(x, z int32, b Biome) error {
+func (c *chunk) SetBiome(x, z int32, b Biome) {
 	(*c.biomes)[x&15<<4|z&15] = int8(b)
-	return nil
 }
 
 func (c *chunk) IsEmpty() bool {
