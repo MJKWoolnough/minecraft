@@ -160,6 +160,26 @@ func (s *section) SetBlock(x, y, z int32, b *Block) {
 	setNibble(*s.data, x, y, z, byte(b.Data))
 }
 
+func (s *section) GetOpacity(x, y, z int32) uint8 {
+	return s.GetBlock(x, y, z).Opacity()
+}
+
+func (s *section) GetBlockLight(x, y, z int32) uint8 {
+	return getNibble(*s.blockLight, x, y, z)
+}
+
+func (s *section) SetBlockLight(x, y, z int32, l uint8) {
+	setNibble(*s.blockLight, x, y, z, l)
+}
+
+func (s *section) GetSkyLight(x, y, z int32) uint8 {
+	return getNibble(*s.skyLight, x, y, z)
+}
+
+func (s *section) SetSkyLight(x, y, z int32, l uint8) {
+	setNibble(*s.skyLight, x, y, z, l)
+}
+
 func (s *section) SetY(y int32) {
 	s.section.Set(nbt.NewTag("Y", nbt.NewByte(int8(y>>4))))
 }

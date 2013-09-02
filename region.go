@@ -75,6 +75,56 @@ func (r *region) SetBiome(path Path, x, z int32, biome Biome) error {
 	return nil
 }
 
+func (r *region) GetOpacity(path Path, x, y, z int32) (uint8, error) {
+	c, err := r.getChunk(path, x, z, false)
+	if err != nil {
+		return 0, err
+	}
+	return c.GetOpacity(x, y, z), nil
+}
+
+func (r *region) GetHeight(path Path, x, z int32) (int32, error) {
+	c, err := r.getChunk(path, x, z, false)
+	if err != nil {
+		return 0, err
+	}
+	return c.GetHeight(x, z), nil
+}
+
+func (r *region) GetBlockLight(path Path, x, y, z int32) (uint8, error) {
+	c, err := r.getChunk(path, x, z, false)
+	if err != nil {
+		return 0, err
+	}
+	return c.GetBlockLight(x, y, z), nil
+}
+
+func (r *region) SetBlockLight(path Path, x, y, z int32, l uint8) error {
+	c, err := r.getChunk(path, x, z, true)
+	if err != nil {
+		return err
+	}
+	c.SetBlockLight(x, y, z, l)
+	return nil
+}
+
+func (r *region) GetSkyLight(path Path, x, y, z int32) (uint8, error) {
+	c, err := r.getChunk(path, x, z, false)
+	if err != nil {
+		return 0, err
+	}
+	return c.GetSkyLight(x, y, z), nil
+}
+
+func (r *region) SetSkyLight(path Path, x, y, z int32, l uint8) error {
+	c, err := r.getChunk(path, x, z, true)
+	if err != nil {
+		return err
+	}
+	c.SetSkyLight(x, y, z, l)
+	return nil
+}
+
 func (r *region) Save(path Path) error {
 	toSave := make([]nbt.Tag, 0)
 	for i := 0; i < 1024; i++ {

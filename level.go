@@ -39,10 +39,17 @@ var (
 	}
 )
 
+const (
+	LIGHT_NONE uint8 = iota
+	LIGHT_SIMPLE
+	LIGHT_ALL
+)
+
 type Level struct {
 	Path
 	regions   map[uint64]*region
 	levelData *nbt.Compound
+	lighting  uint8
 	changed   bool
 }
 
@@ -101,6 +108,7 @@ func NewLevel(location Path) (*Level, error) {
 		location,
 		make(map[uint64]*region),
 		levelDat.Data().(*nbt.Compound).Get("Data").Data().(*nbt.Compound),
+		LIGHT_NONE,
 		false,
 	}, nil
 }
@@ -143,8 +151,28 @@ func (l *Level) GetBlock(x, y, z int32) (*Block, error) {
 
 func (l *Level) SetBlock(x, y, z int32, block *Block) error {
 	r := l.getRegion(CoordsToRegion(x, z))
+	var opacity, light uint8
+	if l.lighting != LIGHT_NONE {
+		var err error
+		if opacity, err = r.GetOpacity(l.Path, x, y, z); err != nil {
+			return err
+		}
+		if l.lighting == LIGHT_ALL {
+			if light, err = r.GetBlockLight(l.Path, x, y, z); err != nil {
+				return err
+			}
+		}
+	}
 	if r != nil {
 		return r.SetBlock(l.Path, x, y, z, block)
+	}
+	if l.lighting != LIGHT_NONE {
+		if block.Opacity() != opacity {
+
+		}
+		if block.Light() != light {
+
+		}
 	}
 	return nil
 }

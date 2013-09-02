@@ -240,24 +240,23 @@ func (c *chunk) GetBlock(x, y, z int32) *Block {
 	ys := y >> 4
 	if c.sections[ys] == nil {
 		return &Block{}
-	} else {
-		b := c.sections[ys].GetBlock(x, y, z)
-		pos := xyz(x, y, z)
-		if md, ok := c.tileEntities[pos]; ok && md != nil {
-			b.SetMetadata([]nbt.Tag(*md))
-		}
-		if tt, ok := c.tileTicks[pos]; ok && tt != nil {
-			b.ticks = make([]Tick, len(tt))
-			for n, tick := range tt {
-				b.ticks[n] = Tick{
-					int32(*tick.Get("i").Data().(*nbt.Int)),
-					int32(*tick.Get("t").Data().(*nbt.Int)),
-					int32(*tick.Get("p").Data().(*nbt.Int)),
-				}
+	}
+	b := c.sections[ys].GetBlock(x, y, z)
+	pos := xyz(x, y, z)
+	if md, ok := c.tileEntities[pos]; ok && md != nil {
+		b.SetMetadata([]nbt.Tag(*md))
+	}
+	if tt, ok := c.tileTicks[pos]; ok && tt != nil {
+		b.ticks = make([]Tick, len(tt))
+		for n, tick := range tt {
+			b.ticks[n] = Tick{
+				int32(*tick.Get("i").Data().(*nbt.Int)),
+				int32(*tick.Get("t").Data().(*nbt.Int)),
+				int32(*tick.Get("p").Data().(*nbt.Int)),
 			}
 		}
-		return b
 	}
+	return b
 }
 
 func (c *chunk) SetBlock(x, y, z int32, b *Block) {
@@ -317,6 +316,53 @@ func (c *chunk) GetBiome(x, z int32) Biome {
 
 func (c *chunk) SetBiome(x, z int32, b Biome) {
 	(*c.biomes)[x&15<<4|z&15] = int8(b)
+}
+
+func (c *chunk) GetOpacity(x, y, z int32) uint8 {
+	ys := y >> 4
+	if c.sections[ys] == nil {
+		return 1
+	}
+	return c.sections[ys].GetOpacity(x, y, z)
+}
+
+func (c *chunk) GetHeight(x, z int32) int32 {
+	return (*c.heightMap)[x&15<<4|z&15]
+}
+
+func (c *chunk) GetBlockLight(x, y, z int32) uint8 {
+	ys := y >> 4
+	if c.sections[ys] == nil {
+		return 0
+	}
+	return c.sections[ys].GetBlockLight(x, y, z)
+}
+
+func (c *chunk) SetBlockLight(x, y, z int32, l uint8) {
+	ys := y >> 4
+	if c.sections[ys] != nil {
+		c.sections[ys].SetBlockLight(x, y, z, l)
+	}
+}
+
+func (c *chunk) GetSkyLight(x, y, z int32) uint8 {
+	ys := y >> 4
+	if c.sections[ys] == nil {
+		for ; ys < 16; ys++ {
+			if c.sections[ys] != nil {
+				return c.sections[ys].GetSkyLight(x, y, z) - uint8(ys<<4-y)
+			}
+		}
+		return 15
+	}
+	return c.sections[ys].GetSkyLight(x, y, z)
+}
+
+func (c *chunk) SetSkyLight(x, y, z int32, l uint8) {
+	ys := y >> 4
+	if c.sections[ys] != nil {
+		c.sections[ys].SetSkyLight(x, y, z, l)
+	}
 }
 
 func (c *chunk) IsEmpty() bool {
