@@ -86,7 +86,9 @@ func loadSection(c *nbt.Compound) (*section, error) {
 	s := new(section)
 	s.section = c
 	blocks := c.Get("Blocks")
-	if blocks.TagId() != nbt.Tag_ByteArray {
+	if blocks == nil {
+		return nil, &MissingTagError{"[SECTION]->Blocks"}
+	} else if blocks.TagId() != nbt.Tag_ByteArray {
 		return nil, &WrongTypeError{"Blocks", nbt.Tag_ByteArray, blocks.TagId()}
 	}
 	s.blocks = blocks.Data().(*nbt.ByteArray)
@@ -107,7 +109,9 @@ func loadSection(c *nbt.Compound) (*section, error) {
 		return nil, &OOB{}
 	}
 	data := c.Get("Data")
-	if data.TagId() != nbt.Tag_ByteArray {
+	if data == nil {
+		return nil, &MissingTagError{"[SECTION]->Data"}
+	} else if data.TagId() != nbt.Tag_ByteArray {
 		return nil, &WrongTypeError{"Data", nbt.Tag_ByteArray, data.TagId()}
 	}
 	s.data = data.Data().(*nbt.ByteArray)
@@ -115,7 +119,9 @@ func loadSection(c *nbt.Compound) (*section, error) {
 		return nil, &OOB{}
 	}
 	blockLight := c.Get("BlockLight")
-	if blockLight.TagId() != nbt.Tag_ByteArray {
+	if blockLight == nil {
+		return nil, &MissingTagError{"[SECTION]->BlockLight"}
+	} else if blockLight.TagId() != nbt.Tag_ByteArray {
 		return nil, &WrongTypeError{"BlockLight", nbt.Tag_ByteArray, blockLight.TagId()}
 	}
 	s.blockLight = blockLight.Data().(*nbt.ByteArray)
@@ -123,7 +129,9 @@ func loadSection(c *nbt.Compound) (*section, error) {
 		return nil, &OOB{}
 	}
 	skyLight := c.Get("SkyLight")
-	if skyLight.TagId() != nbt.Tag_ByteArray {
+	if skyLight == nil {
+		return nil, &MissingTagError{"[SECTION]->SkyLight"}
+	} else if skyLight.TagId() != nbt.Tag_ByteArray {
 		return nil, &WrongTypeError{"SkyLight", nbt.Tag_ByteArray, skyLight.TagId()}
 	}
 	s.skyLight = skyLight.Data().(*nbt.ByteArray)
@@ -131,7 +139,9 @@ func loadSection(c *nbt.Compound) (*section, error) {
 		return nil, &OOB{}
 	}
 	y := c.Get("Y")
-	if y.TagId() != nbt.Tag_Byte {
+	if blockLight == nil {
+		return nil, &MissingTagError{"[SECTION]->Y"}
+	} else if y.TagId() != nbt.Tag_Byte {
 		return nil, &WrongTypeError{"Y", nbt.Tag_Byte, y.TagId()}
 	}
 	return s, nil
