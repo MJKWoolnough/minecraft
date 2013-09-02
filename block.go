@@ -30,11 +30,15 @@ import (
 	"github.com/MJKWoolnough/minecraft/nbt"
 )
 
+type Tick struct {
+	I, T, P int32
+}
+
 type Block struct {
 	BlockId  uint16
 	Data     uint8
 	metadata []nbt.Tag
-	Tick     bool
+	ticks    []Tick
 }
 
 func (b Block) Equal(e equaler.Equaler) bool {
@@ -45,29 +49,36 @@ func (b Block) Equal(e equaler.Equaler) bool {
 		}
 	}
 	if c != nil {
-		if b.BlockId == c.BlockId && b.Data == c.Data && b.Tick == c.Tick {
-			if len(b.metadata) > 0 {
-				if len(c.metadata) > 0 {
-					for _, v := range b.metadata {
-						name := v.Name()
-						found := false
-						for _, w := range c.metadata {
-							if w.Name() == name {
-								if !v.Equal(w) {
-									return false
-								}
-								found = true
-							}
-						}
-						if !found {
+		if b.BlockId == c.BlockId && b.Data == c.Data && len(b.metadata) == len(c.metadata) && len(b.ticks) == len(c.ticks) {
+			for _, bT := range b.ticks {
+				found := false
+				for _, cT := range c.ticks {
+					if bT.I == cT.I && bT.T == cT.T && bT.P == cT.P {
+						found = true
+						break
+					}
+				}
+				if !found {
+					return false
+				}
+			}
+			for _, v := range b.metadata {
+				name := v.Name()
+				found := false
+				for _, w := range c.metadata {
+					if w.Name() == name {
+						if !v.Equal(w) {
 							return false
 						}
+						found = true
+						break
 					}
-					return true
 				}
-			} else {
-				return len(c.metadata) == 0
+				if !found {
+					return false
+				}
 			}
+			return true
 		}
 	}
 	return false
@@ -91,10 +102,7 @@ func (b Block) IsLiquid() bool {
 }
 
 func (b Block) HasMetadata() bool {
-	if b.metadata == nil || len(b.metadata) == 0 {
-		return false
-	}
-	return true
+	return len(b.metadata) > 0
 }
 
 func (b Block) GetMetadata() []nbt.Tag {
@@ -126,6 +134,25 @@ func (b *Block) SetMetadata(data []nbt.Tag) {
 	}
 }
 
+func (b Block) HasTicks() bool {
+	return len(b.ticks) > 0
+}
+
+func (b Block) GetTicks() []Tick {
+	t := make([]Tick, len(b.ticks))
+	copy(t, b.ticks)
+	return t
+}
+
+func (b *Block) AddTicks(t ...Tick) {
+	b.ticks = append(b.ticks, t...)
+}
+
+func (b *Block) SetTicks(t []Tick) {
+	b.ticks = make([]Tick, len(t))
+	copy(b.ticks, t)
+}
+
 func (b Block) String() string {
 	toRet := fmt.Sprintf("Block ID: %d\nData: %d\n", b.BlockId, b.Data)
 	if b.metadata != nil && len(b.metadata) != 0 {
@@ -134,10 +161,8 @@ func (b Block) String() string {
 			toRet += "	" + b.metadata[i].String() + "\n"
 		}
 	}
-	if b.Tick {
-		toRet += "Tick: on"
-	} else {
-		toRet += "Tick: off"
+	for n, tick := range b.ticks {
+		toRet += fmt.Sprintf("	Tick: %d, i: %d, t: %d, p: %d\n", n+1, tick.I, tick.T, tick.P)
 	}
 	return toRet
 }

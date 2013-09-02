@@ -238,17 +238,21 @@ func init() {
 		for j := 0; j < 16; j++ {
 			for k := 0; k < 256; k++ {
 				if k < 8 {
+					var tick []Tick
+					if k%2 == 0 {
+						tick = []Tick{{int32(i+j+k) % 4096, 1, -1}}
+					}
 					chunks[3].SetBlock(int32(i), int32(k), int32(j), &Block{
 						uint16(i+j+k) % 4096,
 						uint8(i),
 						[]nbt.Tag{
 							nbt.NewTag("testMD", nbt.NewInt(int32(i*j*k))),
 						},
-						k%2 == 0,
+						tick,
 					})
 				}
 				if k < 250 {
-					chunks[2].SetBlock(int32(i), int32(k), int32(j), &Block{1, 0, nil, false})
+					chunks[2].SetBlock(int32(i), int32(k), int32(j), &Block{1, 0, nil, nil})
 				} else {
 					chunks[2].SetBlock(int32(i), int32(k), int32(j), &Block{
 						1,
@@ -256,7 +260,7 @@ func init() {
 						[]nbt.Tag{
 							nbt.NewTag("testMD", nbt.NewInt(int32(i*j*k))),
 						},
-						false,
+						nil,
 					})
 				}
 			}
@@ -270,9 +274,9 @@ func init() {
 					nbt.NewTag("testMD4", nbt.NewInt(int32(i+3))),
 					nbt.NewTag("testMD5", nbt.NewInt(int32(i+4))),
 				},
-				true,
+				[]Tick{{int32(i*j+i+j) % 4096, 1, -1}},
 			})
 		}
-		chunks[0].SetBlock(int32(i), int32(i), int32(i), &Block{uint16(i), uint8(i), nil, false})
+		chunks[0].SetBlock(int32(i), int32(i), int32(i), &Block{uint16(i), uint8(i), nil, nil})
 	}
 }

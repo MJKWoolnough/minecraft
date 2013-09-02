@@ -380,16 +380,16 @@ func (p *FilePath) Defrag(x, z int32) error {
 	return nil
 }
 
-type memPath struct {
+type MemPath struct {
 	level  []byte
 	chunks map[uint64][]byte
 }
 
-func NewMemPath() *memPath {
-	return &memPath{chunks: make(map[uint64][]byte)}
+func NewMemPath() *MemPath {
+	return &MemPath{chunks: make(map[uint64][]byte)}
 }
 
-func (m *memPath) GetChunk(x, z int32) (nbt.Tag, error) {
+func (m *MemPath) GetChunk(x, z int32) (nbt.Tag, error) {
 	pos := uint64(z)<<32 | uint64(uint32(x))
 	if m.chunks[pos] == nil {
 		return nil, nil
@@ -397,7 +397,7 @@ func (m *memPath) GetChunk(x, z int32) (nbt.Tag, error) {
 	return m.read(m.chunks[pos])
 }
 
-func (m *memPath) SetChunk(data ...nbt.Tag) error {
+func (m *MemPath) SetChunk(data ...nbt.Tag) error {
 	for _, d := range data {
 		x, z, err := chunkCoords(d)
 		if err != nil {
@@ -413,24 +413,24 @@ func (m *memPath) SetChunk(data ...nbt.Tag) error {
 	return nil
 }
 
-func (m *memPath) RemoveChunk(x, z int32) error {
+func (m *MemPath) RemoveChunk(x, z int32) error {
 	pos := uint64(z)<<32 | uint64(uint32(x))
 	delete(m.chunks, pos)
 	return nil
 }
 
-func (m *memPath) ReadLevelDat() (nbt.Tag, error) {
+func (m *MemPath) ReadLevelDat() (nbt.Tag, error) {
 	if len(m.level) == 0 {
 		return nil, nil
 	}
 	return m.read(m.level)
 }
 
-func (m *memPath) WriteLevelDat(data nbt.Tag) error {
+func (m *MemPath) WriteLevelDat(data nbt.Tag) error {
 	return m.write(data, &m.level)
 }
 
-func (m *memPath) GetRegions() [][2]int32 {
+func (m *MemPath) GetRegions() [][2]int32 {
 	toRet := make([][2]int32, 0)
 JP:
 	for i := range m.chunks {
@@ -446,7 +446,7 @@ JP:
 	return toRet
 }
 
-func (m *memPath) read(buf []byte) (nbt.Tag, error) {
+func (m *MemPath) read(buf []byte) (nbt.Tag, error) {
 	z, err := zlib.NewReader(memio.Open(buf))
 	if err != nil {
 		return nil, err
@@ -455,7 +455,7 @@ func (m *memPath) read(buf []byte) (nbt.Tag, error) {
 	return data, err
 }
 
-func (m *memPath) write(data nbt.Tag, buf *[]byte) error {
+func (m *MemPath) write(data nbt.Tag, buf *[]byte) error {
 	z := zlib.NewWriter(memio.Create(buf))
 	defer z.Close()
 	_, err := data.WriteTo(z)

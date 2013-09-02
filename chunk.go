@@ -61,7 +61,7 @@ type chunk struct {
 	data         *nbt.Compound
 	heightMap    *nbt.IntArray
 	tileEntities map[uint16]*nbt.Compound
-	tileTicks    map[uint16]*nbt.Compound
+	tileTicks    map[uint16][]*nbt.Compound
 }
 
 func (c *chunk) GetNBT() nbt.Tag {
@@ -83,8 +83,8 @@ func (c *chunk) GetNBT() nbt.Tag {
 	}
 	data.Set(nbt.NewTag("TileEntities", nbt.NewList(tileEntities)))
 	tileTicks := make([]nbt.Data, 0)
-	for _, cmp := range c.tileTicks {
-		if cmp != nil {
+	for _, cmpa := range c.tileTicks {
+		for _, cmp := range cmpa {
 			tileTicks = append(tileTicks, cmp)
 		}
 	}
@@ -184,7 +184,7 @@ func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
 		}
 	}
 	c.data.Remove("TileEntities")
-	c.tileTicks = make(map[uint16]*nbt.Compound)
+	c.tileTicks = make(map[uint16][]*nbt.Compound)
 	if tileTicks := c.data.Get("TileTicks"); tileTicks != nil {
 		if lTileTicks, ok := tileTicks.Data().(*nbt.List); ok {
 			for i := 0; i < lTileTicks.Len(); i++ {
@@ -196,7 +196,23 @@ func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
 				if err != nil {
 					return nil, err
 				}
-				c.tileTicks[xyz(x, y, z)] = tag
+				if id := tag.Get("i"); id == nil {
+					return nil, &MissingTagError{"TileTicks->Child->i"}
+				} else if j := id.TagId(); j != nbt.Tag_Int {
+					return nil, &WrongTypeError{"TileTicks->Child->i", nbt.Tag_Int, j}
+				}
+				if t := tag.Get("t"); t == nil {
+					return nil, &MissingTagError{"TileTicks->Child->t"}
+				} else if j := t.TagId(); j != nbt.Tag_Int {
+					return nil, &WrongTypeError{"TileTicks->Child->t", nbt.Tag_Int, j}
+				}
+				if p := tag.Get("p"); p == nil {
+					return nil, &MissingTagError{"TileTicks->Child->p"}
+				} else if j := p.TagId(); j != nbt.Tag_Int {
+					return nil, &WrongTypeError{"TileTicks->Child->p", nbt.Tag_Int, j}
+				}
+				pos := xyz(x, y, z)
+				c.tileTicks[pos] = append(c.tileTicks[pos], tag)
 			}
 		}
 	}
@@ -231,7 +247,14 @@ func (c *chunk) GetBlock(x, y, z int32) *Block {
 			b.SetMetadata([]nbt.Tag(*md))
 		}
 		if tt, ok := c.tileTicks[pos]; ok && tt != nil {
-			b.Tick = true
+			b.ticks = make([]Tick, len(tt))
+			for n, tick := range tt {
+				b.ticks[n] = Tick{
+					int32(*tick.Get("i").Data().(*nbt.Int)),
+					int32(*tick.Get("t").Data().(*nbt.Int)),
+					int32(*tick.Get("p").Data().(*nbt.Int)),
+				}
+			}
 		}
 		return b
 	}
@@ -270,15 +293,19 @@ func (c *chunk) SetBlock(x, y, z int32, b *Block) {
 		c.tileEntities[pos].Set(nbt.NewTag("y", nbt.NewInt(y)))
 		c.tileEntities[pos].Set(nbt.NewTag("z", nbt.NewInt(z)))
 	}
-	if b.Tick {
-		c.tileTicks[pos] = nbt.NewCompound([]nbt.Tag{
-			nbt.NewTag("i", nbt.NewInt(int32(b.BlockId))),
-			nbt.NewTag("p", nbt.NewInt(1)),
-			nbt.NewTag("t", nbt.NewInt(-1)),
-			nbt.NewTag("x", nbt.NewInt(x)),
-			nbt.NewTag("y", nbt.NewInt(y)),
-			nbt.NewTag("z", nbt.NewInt(z)),
-		})
+	if b.HasTicks() {
+		ticks := b.GetTicks()
+		c.tileTicks[pos] = make([]*nbt.Compound, len(ticks))
+		for n, tick := range ticks {
+			c.tileTicks[pos][n] = nbt.NewCompound([]nbt.Tag{
+				nbt.NewTag("i", nbt.NewInt(tick.I)),
+				nbt.NewTag("p", nbt.NewInt(tick.P)),
+				nbt.NewTag("t", nbt.NewInt(tick.T)),
+				nbt.NewTag("x", nbt.NewInt(x)),
+				nbt.NewTag("y", nbt.NewInt(y)),
+				nbt.NewTag("z", nbt.NewInt(z)),
+			})
+		}
 	} else {
 		delete(c.tileTicks, pos)
 	}

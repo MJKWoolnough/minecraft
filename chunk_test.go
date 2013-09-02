@@ -265,14 +265,14 @@ func TestBlock(t *testing.T) {
 		//Test tick [un]set
 		{
 			Block{
-				Tick: true,
+				ticks: []Tick{{123, 1, 4}, {123, 7, -1}},
 			},
 			0, 1, 1,
 			true,
 		},
 		{
 			Block{
-				Tick: true,
+				ticks: []Tick{{654, 4, 6}, {4, 63, 5}, {4, 5, 9}},
 			},
 			1, 1, 1,
 			false,
