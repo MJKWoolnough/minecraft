@@ -241,21 +241,18 @@ func (l *Level) Save() error {
 	for n, c := range l.chunks {
 		if l.changes.Get(n) {
 			toSave = append(toSave, c.GetNBT())
-			l.changes.Set(n, false)
 		}
-		delete(l.chunks, n)
 	}
 	if len(toSave) > 0 {
 		return l.path.SetChunk(toSave...)
 	}
+	l.changes = boolmap.NewMap()
 	return nil
 }
 
 func (l *Level) Close() {
 	l.changed = false
-	for n := range l.chunks {
-		delete(l.chunks, n)
-	}
+	l.chunks = make(map[uint64]*chunk)
 	l.changes = boolmap.NewMap()
 }
 
