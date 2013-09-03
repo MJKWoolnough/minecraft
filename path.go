@@ -367,7 +367,7 @@ func (p *FilePath) Lock() {
 	if f, err := os.Create(session); err != nil {
 		return //??
 	} else {
-		fmt.Fprintf(f, "%d", timestampMS())
+		fmt.Fprintf(f, "%d", time.Now().Unix()*1000)
 		f.Close()
 	}
 	watcher.Watch(session, p)
