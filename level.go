@@ -25,6 +25,7 @@
 package minecraft
 
 import (
+	"github.com/MJKWoolnough/boolmap"
 	"github.com/MJKWoolnough/minecraft/nbt"
 	"math/rand"
 	"time"
@@ -46,8 +47,9 @@ const (
 )
 
 type Level struct {
-	Path
-	regions   map[uint64]*region
+	path      Path
+	chunks    map[uint64]*chunk
+	changes   boolmap.Map
 	levelData *nbt.Compound
 	lighting  uint8
 	changed   bool
@@ -106,7 +108,8 @@ func NewLevel(location Path) (*Level, error) {
 	}
 	return &Level{
 		location,
-		make(map[uint64]*region),
+		make(map[uint64]*chunk),
+		boolmap.NewMap(),
 		levelDat.Data().(*nbt.Compound).Get("Data").Data().(*nbt.Compound),
 		LIGHT_NONE,
 		false,
@@ -142,30 +145,28 @@ func (l *Level) SetSpawn(x, y, z int32) {
 }
 
 func (l *Level) GetBlock(x, y, z int32) (*Block, error) {
-	r := l.getRegion(CoordsToRegion(x, z))
-	if r == nil {
+	c, err := l.getChunk(x, z, false)
+	if err != nil {
+		return nil, err
+	} else if c == nil {
 		return &Block{}, nil
 	}
-	return r.GetBlock(l.Path, x, y, z)
+	return c.GetBlock(x, y, z), nil
 }
 
 func (l *Level) SetBlock(x, y, z int32, block *Block) error {
-	r := l.getRegion(CoordsToRegion(x, z))
+	c, err := l.getChunk(x, z, true)
+	if err != nil {
+		return err
+	}
 	var opacity, light uint8
 	if l.lighting != LIGHT_NONE {
-		var err error
-		if opacity, err = r.GetOpacity(l.Path, x, y, z); err != nil {
-			return err
-		}
+		opacity = c.GetOpacity(x, y, z)
 		if l.lighting == LIGHT_ALL {
-			if light, err = r.GetBlockLight(l.Path, x, y, z); err != nil {
-				return err
-			}
+			light = c.GetBlockLight(x, y, z)
 		}
 	}
-	if r != nil {
-		return r.SetBlock(l.Path, x, y, z, block)
-	}
+	c.SetBlock(x, y, z, block)
 	if l.lighting != LIGHT_NONE {
 		if block.Opacity() != opacity {
 
@@ -178,18 +179,21 @@ func (l *Level) SetBlock(x, y, z int32, block *Block) error {
 }
 
 func (l *Level) GetBiome(x, z int32) (Biome, error) {
-	r := l.getRegion(CoordsToRegion(x, z))
-	if r == nil {
+	c, err := l.getChunk(x, z, false)
+	if err != nil {
+		return Biome_Auto, err
+	} else if c == nil {
 		return Biome_Plains, nil
 	}
-	return r.GetBiome(l.Path, x, z)
+	return c.GetBiome(x, z), nil
 }
 
 func (l *Level) SetBiome(x, z int32, biome Biome) error {
-	r := l.getRegion(CoordsToRegion(x, z))
-	if r != nil {
-		return r.SetBiome(l.Path, x, z, biome)
+	c, err := l.getChunk(x, z, true)
+	if err != nil {
+		return err
 	}
+	c.SetBiome(x, z, biome)
 	return nil
 }
 
@@ -203,35 +207,56 @@ func (l *Level) SetName(name string) {
 	l.changed = true
 }
 
-func (l *Level) getRegion(x, z int32) *region {
+func (l *Level) getChunk(x, z int32, create bool) (*chunk, error) {
 	pos := uint64(z)<<32 | uint64(uint32(x))
-	if _, ok := l.regions[pos]; !ok {
-		l.regions[pos] = new(region)
+	if l.chunks[pos] == nil {
+		chunkData, err := l.path.GetChunk(x, z)
+		if err != nil {
+			return nil, err
+		}
+		if chunkData != nil {
+			chunk, err := newChunk(x, z, chunkData)
+			if err != nil {
+				return nil, err
+			}
+			l.chunks[pos] = chunk
+		} else if create {
+			l.chunks[pos], _ = newChunk(x, z, nil)
+		}
 	}
-	return l.regions[pos]
+	if create {
+		l.changes.Set(pos, true)
+	}
+	return l.chunks[pos], nil
 }
 
 func (l *Level) Save() error {
 	if l.changed {
-		if err := l.WriteLevelDat(nbt.NewTag("", nbt.NewCompound([]nbt.Tag{nbt.NewTag("Data", l.levelData)}))); err != nil {
+		if err := l.path.WriteLevelDat(nbt.NewTag("", nbt.NewCompound([]nbt.Tag{nbt.NewTag("Data", l.levelData)}))); err != nil {
 			return err
 		}
 		l.changed = false
 	}
-	for n, r := range l.regions {
-		if err := r.Save(l.Path); err != nil {
-			return err
+	toSave := make([]nbt.Tag, 0)
+	for n, c := range l.chunks {
+		if l.changes.Get(n) {
+			toSave = append(toSave, c.GetNBT())
+			l.changes.Set(n, false)
 		}
-		delete(l.regions, n)
+		delete(l.chunks, n)
+	}
+	if len(toSave) > 0 {
+		return l.path.SetChunk(toSave...)
 	}
 	return nil
 }
 
 func (l *Level) Close() {
 	l.changed = false
-	for n := range l.regions {
-		delete(l.regions, n)
+	for n := range l.chunks {
+		delete(l.chunks, n)
 	}
+	l.changes = boolmap.NewMap()
 }
 
 func CoordsToRegion(x, z int32) (int32, int32) {
