@@ -259,10 +259,6 @@ func (l *Level) Close() {
 	l.changes = boolmap.NewMap()
 }
 
-func CoordsToRegion(x, z int32) (int32, int32) {
-	return x >> 9, z >> 9
-}
-
 func timestampMS() int64 {
 	return time.Now().Unix() * 1000
 }
