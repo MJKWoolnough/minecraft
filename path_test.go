@@ -120,7 +120,7 @@ func testPathChunkRemove(t *testing.T, path Path) {
 	}
 }
 
-func testPathRegionsGet(t *testing.T, path Path) {
+func testPathRegionsGet(t *testing.T, path *FilePath) {
 	regions := path.GetRegions()
 	should := [][2]int32{
 		{-1, -1},
@@ -154,13 +154,8 @@ func addPos(x, z int32, chunkNum uint8) nbt.Tag {
 
 func TestMemPath(t *testing.T) {
 	f := NewMemPath()
-	if a := len(f.GetRegions()); a != 0 {
-		t.Errorf("should start with zero regions, have %d", a)
-		return
-	}
 	testPathChunkSetGet(t, f)
 	testPathLevelSetGet(t, f)
-	testPathRegionsGet(t, f)
 	testPathChunkRemove(t, f)
 }
 
@@ -168,7 +163,7 @@ func TestFilePath(t *testing.T) {
 	var (
 		tempDir string
 		err     error
-		f       Path
+		f       *FilePath
 	)
 	if tempDir, err = ioutil.TempDir("", "minecraft-path-test"); err != nil {
 		t.Error(err.Error())

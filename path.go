@@ -50,8 +50,6 @@ type Path interface {
 	RemoveChunk(int32, int32) error
 	ReadLevelDat() (nbt.Tag, error)
 	WriteLevelDat(nbt.Tag) error
-	GetRegions() [][2]int32
-	// 	GetChunks(int32, int32) [][2]int32
 }
 
 const (
@@ -428,22 +426,6 @@ func (m *MemPath) ReadLevelDat() (nbt.Tag, error) {
 
 func (m *MemPath) WriteLevelDat(data nbt.Tag) error {
 	return m.write(data, &m.level)
-}
-
-func (m *MemPath) GetRegions() [][2]int32 {
-	toRet := make([][2]int32, 0)
-JP:
-	for i := range m.chunks {
-		x := int32(i&0xffffffff) >> 5
-		z := int32(i>>32) >> 5
-		for _, j := range toRet {
-			if j[0] == x && j[1] == z {
-				continue JP
-			}
-		}
-		toRet = append(toRet, [2]int32{x, z})
-	}
-	return toRet
 }
 
 func (m *MemPath) read(buf []byte) (nbt.Tag, error) {
