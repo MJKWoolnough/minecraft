@@ -71,7 +71,7 @@ func NewLevel(location Path) (*Level, error) {
 				nbt.NewTag("generatorVersion", nbt.NewInt(0)),
 				nbt.NewTag("generatorOptions", nbt.NewString("0")),
 				nbt.NewTag("hardcore", nbt.NewByte(0)),
-				nbt.NewTag("LastPlayed", nbt.NewLong(timestampMS())),
+				nbt.NewTag("LastPlayed", nbt.NewLong(time.Now().Unix()*1000)),
 				nbt.NewTag("LevelName", nbt.NewString("")),
 				nbt.NewTag("MapFeatures", nbt.NewByte(0)),
 				nbt.NewTag("RandomSeed", nbt.NewLong(rand.New(rand.NewSource(time.Now().Unix())).Int63())),
@@ -254,8 +254,4 @@ func (l *Level) Close() {
 	l.changed = false
 	l.chunks = make(map[uint64]*chunk)
 	l.changes = boolmap.NewMap()
-}
-
-func timestampMS() int64 {
-	return time.Now().Unix() * 1000
 }
