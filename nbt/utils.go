@@ -29,21 +29,21 @@ import (
 )
 
 type ReadError struct {
-	where string
-	err   error
+	Where string
+	Err   error
 }
 
 func (r ReadError) Error() string {
-	return fmt.Sprintf("encountered an error while trying to read a %s: %s", r.where, r.err)
+	return fmt.Sprintf("encountered an error while trying to read a %s: %s", r.Where, r.Err)
 }
 
 type WriteError struct {
-	where string
-	err   error
+	Where string
+	Err   error
 }
 
 func (w WriteError) Error() string {
-	return fmt.Sprintf("encountered an error while trying to write a %s: %s", w.where, w.err)
+	return fmt.Sprintf("encountered an error while trying to write a %s: %s", w.Where, w.Err)
 }
 
 type UnknownTag struct {
@@ -55,11 +55,11 @@ func (u UnknownTag) Error() string {
 }
 
 type WrongTag struct {
-	expecting, got TagId
+	Expecting, Got TagId
 }
 
 func (w WrongTag) Error() string {
-	return fmt.Sprintf("expecting tag id %d, got %d", w.expecting, w.got)
+	return fmt.Sprintf("expecting tag id %d, got %d", w.Expecting, w.Got)
 }
 
 type BadRange struct{}
