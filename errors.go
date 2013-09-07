@@ -24,7 +24,7 @@ func (w WrongTypeError) Error() string {
 
 type OOB struct{}
 
-func (o OOB) Error() string {
+func (OOB) Error() string {
 	return "Received Out-of-bounds error"
 }
 
@@ -46,13 +46,13 @@ func (u UnknownCompression) Error() string {
 
 type ExpectedData struct{}
 
-func (e ExpectedData) Error() string {
+func (ExpectedData) Error() string {
 	return "received nil data stream where non-nil was expected."
 }
 
 type NoLock struct{}
 
-func (n NoLock) Error() string {
+func (NoLock) Error() string {
 	return "lost lock on files"
 }
 
