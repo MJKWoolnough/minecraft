@@ -6,6 +6,19 @@ import (
 	"testing"
 )
 
+func TestSize(t *testing.T) {
+	for i := TagId(1); i < 12; i++ {
+		o := new(bytes.Buffer)
+		tag, _ := newFromTag(i)
+		d := NewTag("test", tag)
+		n, _ := d.WriteTo(o)
+		_, m, _ := ReadNBTFrom(o)
+		if n != m {
+			t.Errorf("written and read sizes for %s do not match, written %d, read %d", i, n, m)
+		}
+	}
+}
+
 func TestSmall(t *testing.T) { //test.nbt
 	testNBT(`CgALaGVsbG8gd29ybGQIAARuYW1lAAlCYW5hbnJhbWEA`,
 		NewTag("hello world", NewCompound([]Tag{
@@ -105,7 +118,7 @@ func testNBT(input string, middle Tag, t *testing.T) {
 		return
 	}
 	if c != d {
-		t.Error("read and write byte counts do not match")
+		t.Errorf("read and write byte counts do not match, read %d, wrote %d", c, d)
 		return
 	}
 	if o.String() != input {

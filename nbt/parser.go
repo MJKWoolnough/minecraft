@@ -27,10 +27,8 @@
 package nbt
 
 import (
-	"encoding/binary"
 	"fmt"
 	"github.com/MJKWoolnough/equaler"
-	"github.com/MJKWoolnough/rwcount"
 	"io"
 )
 
@@ -120,23 +118,33 @@ func NewTag(name string, d Data) (n Tag) {
 }
 
 func (n *namedTag) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &rwcount.CountReader{Reader: f}
-	defer func() { total = c.BytesRead() }()
-	if err = binary.Read(c, binary.BigEndian, &n.tagType); err != nil {
+	var (
+		c    int
+		d    int64
+		data [1]byte
+	)
+	c, err = io.ReadFull(f, data[:])
+	total += int64(c)
+	if err != nil {
 		err = &ReadError{"named TagId", err}
 		return
 	}
+	n.tagType = TagId(data[0])
 	if n.tagType == Tag_End {
 		n.d = new(end)
 	} else {
 		if n.d, err = newFromTag(n.tagType); err != nil {
 			return
 		}
-		if _, err = n.name.ReadFrom(c); err != nil {
+		d, err = n.name.ReadFrom(f)
+		total += d
+		if err != nil {
 			err = &ReadError{"name", err}
 			return
 		}
-		if _, err = n.d.ReadFrom(c); err != nil {
+		d, err = n.d.ReadFrom(f)
+		total += d
+		if err != nil {
 			if _, ok := err.(*ReadError); !ok {
 				err = &ReadError{n.tagType.String(), err}
 			}
@@ -146,23 +154,30 @@ func (n *namedTag) ReadFrom(f io.Reader) (total int64, err error) {
 }
 
 func (n *namedTag) WriteTo(f io.Writer) (total int64, err error) {
-	c := &rwcount.CountWriter{Writer: f}
-	defer func() { total = c.BytesWritten() }()
-	if err = binary.Write(c, binary.BigEndian, n.tagType); err != nil {
+	var (
+		c int
+		d int64
+	)
+	c, err = f.Write([]byte{byte(n.tagType)})
+	total += int64(c)
+	if err != nil {
 		err = &WriteError{"named TagId", err}
 		return
 	}
 	if n.tagType == Tag_End {
 		return
 	}
-	if _, err = n.name.WriteTo(c); err != nil {
+	d, err = n.name.WriteTo(f)
+	total += d
+	if err != nil {
 		return
 	}
-	_, err = n.d.WriteTo(c)
+	d, err = n.d.WriteTo(f)
+	total += d
 	return
 }
 
-func (n namedTag) Copy() Tag {
+func (n *namedTag) Copy() Tag {
 	return &namedTag{
 		n.tagType,
 		n.name,
@@ -170,7 +185,7 @@ func (n namedTag) Copy() Tag {
 	}
 }
 
-func (n namedTag) Equal(e equaler.Equaler) bool {
+func (n *namedTag) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*namedTag); ok {
 		if n.tagType == m.tagType && n.name == m.name {
 			return n.d.Equal(m.d)
@@ -179,42 +194,42 @@ func (n namedTag) Equal(e equaler.Equaler) bool {
 	return false
 }
 
-func (n namedTag) Data() Data {
+func (n *namedTag) Data() Data {
 	return n.d
 }
 
-func (n namedTag) Name() string {
+func (n *namedTag) Name() string {
 	return string(n.name)
 }
 
-func (n namedTag) TagId() TagId {
+func (n *namedTag) TagId() TagId {
 	return n.tagType
 }
 
-func (n namedTag) String() string {
+func (n *namedTag) String() string {
 	return fmt.Sprintf("%s(%q): %s", n.tagType, n.name, n.d)
 }
 
 type end struct{}
 
-func (n *end) ReadFrom(f io.Reader) (total int64, err error) {
+func (end) ReadFrom(f io.Reader) (total int64, err error) {
 	return
 }
 
-func (n *end) WriteTo(f io.Writer) (total int64, err error) {
+func (end) WriteTo(f io.Writer) (total int64, err error) {
 	return
 }
 
-func (n end) Copy() Data {
+func (end) Copy() Data {
 	return &end{}
 }
 
-func (n end) Equal(e equaler.Equaler) bool {
+func (end) Equal(e equaler.Equaler) bool {
 	_, ok := e.(*end)
 	return ok
 }
 
-func (n end) String() string {
+func (end) String() string {
 	return ""
 }
 
@@ -226,16 +241,20 @@ func NewByte(d int8) *Byte {
 }
 
 func (n *Byte) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &rwcount.CountReader{Reader: f}
-	defer func() { total = c.BytesRead() }()
-	err = binary.Read(c, binary.BigEndian, n)
+	var (
+		c    int
+		data [1]byte
+	)
+	c, err = io.ReadFull(f, data[:])
+	total += int64(c)
+	*n = Byte(data[0])
 	return
 }
 
 func (n *Byte) WriteTo(f io.Writer) (total int64, err error) {
-	c := &rwcount.CountWriter{Writer: f}
-	defer func() { total = c.BytesWritten() }()
-	err = binary.Write(c, binary.BigEndian, n)
+	var c int
+	c, err = f.Write([]byte{byte(*n)})
+	total += int64(c)
 	return
 }
 
@@ -262,16 +281,20 @@ func NewShort(d int16) *Short {
 }
 
 func (n *Short) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &rwcount.CountReader{Reader: f}
-	defer func() { total = c.BytesRead() }()
-	err = binary.Read(c, binary.BigEndian, n)
+	var (
+		c    int
+		data [2]byte
+	)
+	c, err = io.ReadFull(f, data[:])
+	total += int64(c)
+	*n = Short(getUint16(data[:]))
 	return
 }
 
 func (n *Short) WriteTo(f io.Writer) (total int64, err error) {
-	c := &rwcount.CountWriter{Writer: f}
-	defer func() { total = c.BytesWritten() }()
-	err = binary.Write(c, binary.BigEndian, n)
+	var c int
+	c, err = f.Write(putUint16(uint16(*n)))
+	total += int64(c)
 	return
 }
 
@@ -298,16 +321,20 @@ func NewInt(d int32) *Int {
 }
 
 func (n *Int) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &rwcount.CountReader{Reader: f}
-	defer func() { total = c.BytesRead() }()
-	err = binary.Read(c, binary.BigEndian, n)
+	var (
+		c    int
+		data [4]byte
+	)
+	c, err = io.ReadFull(f, data[:])
+	total += int64(c)
+	*n = Int(getUint32(data[:]))
 	return
 }
 
 func (n *Int) WriteTo(f io.Writer) (total int64, err error) {
-	c := &rwcount.CountWriter{Writer: f}
-	defer func() { total = c.BytesWritten() }()
-	err = binary.Write(c, binary.BigEndian, n)
+	var c int
+	c, err = f.Write(putUint32(uint32(*n)))
+	total += int64(c)
 	return
 }
 
@@ -334,16 +361,20 @@ func NewLong(d int64) *Long {
 }
 
 func (n *Long) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &rwcount.CountReader{Reader: f}
-	defer func() { total = c.BytesRead() }()
-	err = binary.Read(c, binary.BigEndian, n)
+	var (
+		c    int
+		data [8]byte
+	)
+	c, err = io.ReadFull(f, data[:])
+	total += int64(c)
+	*n = Long(getUint64(data[:]))
 	return
 }
 
 func (n *Long) WriteTo(f io.Writer) (total int64, err error) {
-	c := &rwcount.CountWriter{Writer: f}
-	defer func() { total = c.BytesWritten() }()
-	err = binary.Write(c, binary.BigEndian, n)
+	var c int
+	c, err = f.Write(putUint64(uint64(*n)))
+	total += int64(c)
 	return
 }
 
@@ -370,16 +401,20 @@ func NewFloat(d float32) *Float {
 }
 
 func (n *Float) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &rwcount.CountReader{Reader: f}
-	defer func() { total = c.BytesRead() }()
-	err = binary.Read(c, binary.BigEndian, n)
+	var (
+		c    int
+		data [4]byte
+	)
+	c, err = io.ReadFull(f, data[:])
+	total += int64(c)
+	*n = Float(float32frombits(getUint32(data[:])))
 	return
 }
 
 func (n *Float) WriteTo(f io.Writer) (total int64, err error) {
-	c := &rwcount.CountWriter{Writer: f}
-	defer func() { total = c.BytesWritten() }()
-	err = binary.Write(c, binary.BigEndian, n)
+	var c int
+	c, err = f.Write(putUint32(float32bits(float32(*n))))
+	total += int64(c)
 	return
 }
 
@@ -406,16 +441,20 @@ func NewDouble(d float64) *Double {
 }
 
 func (n *Double) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &rwcount.CountReader{Reader: f}
-	defer func() { total = c.BytesRead() }()
-	err = binary.Read(c, binary.BigEndian, n)
+	var (
+		c    int
+		data [8]byte
+	)
+	c, err = io.ReadFull(f, data[:])
+	total += int64(c)
+	*n = Double(float64frombits(getUint64(data[:])))
 	return
 }
 
 func (n *Double) WriteTo(f io.Writer) (total int64, err error) {
-	c := &rwcount.CountWriter{Writer: f}
-	defer func() { total = c.BytesWritten() }()
-	err = binary.Write(c, binary.BigEndian, n)
+	var c int
+	c, err = f.Write(putUint64(float64bits(float64(*n))))
+	total += int64(c)
 	return
 }
 
@@ -442,24 +481,37 @@ func NewByteArray(d []int8) *ByteArray {
 }
 
 func (n *ByteArray) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &rwcount.CountReader{Reader: f}
-	defer func() { total = c.BytesRead() }()
-	var length uint32
-	if err = binary.Read(c, binary.BigEndian, &length); err != nil {
-		return
+	var (
+		c    int
+		data [4]byte
+	)
+	c, err = io.ReadFull(f, data[:])
+	total += int64(c)
+	length := getUint32(data[:])
+	bData := make([]byte, length)
+	iData := ByteArray(make([]int8, length))
+	c, err = io.ReadFull(f, bData)
+	total += int64(c)
+	for i := uint32(0); i < length; i++ {
+		iData[i] = int8(bData[i])
 	}
-	*n = make([]int8, length)
-	err = binary.Read(c, binary.BigEndian, n)
+	*n = iData
 	return
 }
 
 func (n *ByteArray) WriteTo(f io.Writer) (total int64, err error) {
-	c := &rwcount.CountWriter{Writer: f}
-	defer func() { total = c.BytesWritten() }()
-	if err = binary.Write(c, binary.BigEndian, uint32(len(*n))); err != nil {
+	var c int
+	c, err = f.Write(putUint32(uint32(len(*n))))
+	total += int64(c)
+	if err != nil {
 		return
 	}
-	err = binary.Write(c, binary.BigEndian, n)
+	data := make([]byte, len(*n))
+	for i := 0; i < len(data); i++ {
+		data[i] = byte((*n)[i])
+	}
+	c, err = f.Write(data)
+	total += int64(c)
 	return
 }
 
@@ -495,32 +547,28 @@ func NewString(d string) *String {
 }
 
 func (n *String) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &rwcount.CountReader{Reader: f}
-	defer func() { total = c.BytesRead() }()
 	var (
-		length uint16
-		Data   []byte
+		c    int
+		data [2]byte
 	)
-	if err = binary.Read(c, binary.BigEndian, &length); err != nil {
-		return
-	}
-	Data = make([]byte, length)
-	if err = binary.Read(c, binary.BigEndian, &Data); err != nil {
-		return
-	}
-	*n = String(Data)
+	c, err = io.ReadFull(f, data[:])
+	total += int64(c)
+	bData := make([]byte, getUint16(data[:]))
+	c, err = io.ReadFull(f, bData)
+	total += int64(c)
+	*n = String(bData)
 	return
 }
 
 func (n *String) WriteTo(f io.Writer) (total int64, err error) {
-	c := &rwcount.CountWriter{Writer: f}
-	defer func() { total = c.BytesWritten() }()
-	Data := []byte(*n)
-	length := uint16(len(Data))
-	if err = binary.Write(c, binary.BigEndian, length); err != nil {
+	var c int
+	c, err = f.Write(putUint16(uint16(len(*n))))
+	total += int64(c)
+	if err != nil {
 		return
 	}
-	err = binary.Write(c, binary.BigEndian, Data)
+	c, err = f.Write([]byte(*n))
+	total += int64(c)
 	return
 }
 
@@ -571,49 +619,66 @@ func NewEmptyList(tagType TagId) *List {
 }
 
 func (n *List) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &rwcount.CountReader{Reader: f}
-	defer func() { total = c.BytesRead() }()
-	if err = binary.Read(c, binary.BigEndian, &n.tagType); err != nil {
-		return
-	}
 	var (
-		length int32
-		d      Data
+		c    int
+		d    int64
+		data [4]byte
 	)
-	if err = binary.Read(c, binary.BigEndian, &length); err != nil {
+	c, err = io.ReadFull(f, data[:1])
+	total += int64(c)
+	if err != nil {
+		err = &ReadError{"list TagId", err}
 		return
 	}
-	n.d = make([]Data, 0, length)
-	for i := int32(0); i < length; i++ {
-		if d, err = newFromTag(n.tagType); err != nil {
+	n.tagType = TagId(data[0])
+	c, err = io.ReadFull(f, data[:])
+	total += int64(c)
+	if err != nil {
+		err = &ReadError{"list length", err}
+		return
+	}
+	length := getUint32(data[:])
+	n.d = make([]Data, length)
+	for i := uint32(0); i < length; i++ {
+		if n.d[i], err = newFromTag(n.tagType); err != nil {
 			return
 		}
-		if _, err = d.ReadFrom(c); err != nil {
+		d, err = n.d[i].ReadFrom(f)
+		total += d
+		if err != nil {
 			return
 		}
-		n.d = append(n.d, d)
 	}
 	return
 }
 
 func (n *List) WriteTo(f io.Writer) (total int64, err error) {
-	c := &rwcount.CountWriter{Writer: f}
-	defer func() { total = c.BytesWritten() }()
-	if err = binary.Write(c, binary.BigEndian, n.tagType); err != nil {
+	var (
+		c int
+		d int64
+	)
+	c, err = f.Write([]byte{byte(n.tagType)})
+	total += int64(c)
+	if err != nil {
 		return
 	}
-	if err = binary.Write(c, binary.BigEndian, int32(len(n.d))); err != nil {
+	c, err = f.Write(putUint32(uint32(len(n.d))))
+	total += int64(c)
+	if err != nil {
 		return
 	}
 	var tagId TagId
 	if n.tagType != Tag_End {
-		for _, d := range n.d {
-			if tagId, err = idFromData(d); err != nil {
+		for _, data := range n.d {
+			if tagId, err = idFromData(data); err != nil {
 				break
 			} else if tagId != n.tagType {
 				err = &WrongTag{n.tagType, tagId}
 				break
-			} else if _, err = d.WriteTo(c); err != nil {
+			}
+			d, err = data.WriteTo(f)
+			total += d
+			if err != nil {
 				break
 			}
 		}
@@ -621,11 +686,11 @@ func (n *List) WriteTo(f io.Writer) (total int64, err error) {
 	return
 }
 
-func (n List) TagType() TagId {
+func (n *List) TagType() TagId {
 	return n.tagType
 }
 
-func (n List) Copy() Data {
+func (n *List) Copy() Data {
 	c := new(List)
 	c.tagType = n.tagType
 	c.d = make([]Data, len(n.d))
@@ -635,7 +700,7 @@ func (n List) Copy() Data {
 	return c
 }
 
-func (n List) Equal(e equaler.Equaler) bool {
+func (n *List) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*List); ok {
 		if n.tagType == m.tagType && len(n.d) == len(m.d) {
 			for i, o := range n.d {
@@ -649,7 +714,7 @@ func (n List) Equal(e equaler.Equaler) bool {
 	return false
 }
 
-func (n List) String() string {
+func (n *List) String() string {
 	s := fmt.Sprintf("%d entries of type %s {", len(n.d), n.tagType)
 	for _, d := range n.d {
 		s += fmt.Sprintf("\n	%s: %s", n.tagType, indent(d.String()))
@@ -668,7 +733,7 @@ func (n *List) Set(i int32, d Data) error {
 	return nil
 }
 
-func (n List) Get(i int) Data {
+func (n *List) Get(i int) Data {
 	if i >= 0 && i < len(n.d) {
 		return n.d[i]
 	}
@@ -699,11 +764,11 @@ func (n *List) Remove(i int) {
 	}
 }
 
-func (n List) Len() int {
+func (n *List) Len() int {
 	return len(n.d)
 }
 
-func (n List) valid(d ...Data) error {
+func (n *List) valid(d ...Data) error {
 	for _, e := range d {
 		if t, _ := idFromData(e); t != n.tagType {
 			return &WrongTag{n.tagType, t}
@@ -720,34 +785,40 @@ func NewCompound(d []Tag) *Compound {
 }
 
 func (n *Compound) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &rwcount.CountReader{Reader: f}
-	defer func() { total = c.BytesRead() }()
+	var d int64
 	*n = Compound(make([]Tag, 0))
 	for {
-		d := new(namedTag)
-		if _, err = d.ReadFrom(f); err != nil {
+		data := new(namedTag)
+		d, err = data.ReadFrom(f)
+		total += d
+		if err != nil {
 			return
 		}
-		if d.tagType == Tag_End {
+		if data.tagType == Tag_End {
 			break
 		}
-		*n = append(*n, d)
+		*n = append(*n, data)
 	}
 	return
 }
 
-func (n *Compound) WriteTo(f io.Writer) (total int64, err error) {
-	c := &rwcount.CountWriter{Writer: f}
-	defer func() { total = c.BytesWritten() }()
-	for _, d := range *n {
-		if _, err = d.WriteTo(c); err != nil {
+func (n Compound) WriteTo(f io.Writer) (total int64, err error) {
+	var (
+		c int
+		d int64
+	)
+	for _, data := range n {
+		d, err = data.WriteTo(f)
+		total += d
+		if err != nil {
 			return
 		}
-		if d.TagId() == Tag_End {
+		if data.TagId() == Tag_End {
 			return
 		}
 	}
-	err = binary.Write(c, binary.BigEndian, Tag_End)
+	c, err = f.Write([]byte{byte(Tag_End)})
+	total += int64(c)
 	return
 }
 
@@ -823,24 +894,40 @@ func NewIntArray(d []int32) *IntArray {
 }
 
 func (n *IntArray) ReadFrom(f io.Reader) (total int64, err error) {
-	c := &rwcount.CountReader{Reader: f}
-	defer func() { total = c.BytesRead() }()
-	var length int32
-	if err = binary.Read(c, binary.BigEndian, &length); err != nil {
+	var (
+		c    int
+		data [4]byte
+	)
+	c, err = io.ReadFull(f, data[:])
+	total += int64(c)
+	if err != nil {
 		return
 	}
+	length := getUint32(data[:])
 	*n = make([]int32, length)
-	err = binary.Read(c, binary.BigEndian, n)
+	ints := make([]byte, 4*length)
+	c, err = io.ReadFull(f, ints)
+	total += int64(c)
+	for i := uint32(0); i < length; i++ {
+		(*n)[i] = int32(getUint32(ints[:4]))
+		ints = ints[4:]
+	}
 	return
 }
 
-func (n *IntArray) WriteTo(f io.Writer) (total int64, err error) {
-	c := &rwcount.CountWriter{Writer: f}
-	defer func() { total = c.BytesWritten() }()
-	if err = binary.Write(c, binary.BigEndian, int32(len(*n))); err != nil {
+func (n IntArray) WriteTo(f io.Writer) (total int64, err error) {
+	var c int
+	c, err = f.Write(putUint32(uint32(len(n))))
+	total += int64(c)
+	if err != nil {
 		return
 	}
-	err = binary.Write(c, binary.BigEndian, n)
+	ints := make([]byte, 0, 4*len(n))
+	for i := 0; i < len(n); i++ {
+		ints = append(ints, putUint32(uint32(n[i]))...)
+	}
+	c, err = f.Write(ints)
+	total += int64(c)
 	return
 }
 
