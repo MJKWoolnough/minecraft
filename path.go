@@ -27,8 +27,8 @@ package minecraft
 import (
 	"compress/gzip"
 	"compress/zlib"
-	"encoding/binary"
 	"fmt"
+	"github.com/MJKWoolnough/bytewrite"
 	"github.com/MJKWoolnough/io-watcher"
 	"github.com/MJKWoolnough/memio"
 	"github.com/MJKWoolnough/minecraft/nbt"
@@ -81,18 +81,23 @@ func (p *FilePath) GetChunk(x, z int32) (nbt.Tag, error) {
 		return nil, &NoLock{}
 	}
 	f, err := os.Open(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x>>5, z>>5)))
-	if os.IsNotExist(err) {
-		return nil, nil
+	if err != nil {
+		if os.IsNotExist(err) {
+			err = nil
+		}
+		return nil, err
 	}
 	defer f.Close()
 	pos := int64((z&31)<<5 | (x & 31))
 	if _, err = f.Seek(4*pos, os.SEEK_SET); err != nil {
 		return nil, err
 	}
-	var locationSize uint32
-	if err = binary.Read(f, binary.BigEndian, &locationSize); err != nil {
+	var bytes [4]byte
+	if _, err = io.ReadFull(f, bytes[:]); err != nil {
 		return nil, err
-	} else if locationSize>>8 == 0 {
+	}
+	locationSize := bytewrite.BigEndian.Uint32(bytes[:])
+	if locationSize>>8 == 0 {
 		return nil, nil
 	} else if _, err = f.Seek(int64(locationSize>>8<<12), os.SEEK_SET); err != nil {
 		return nil, err
@@ -100,16 +105,18 @@ func (p *FilePath) GetChunk(x, z int32) (nbt.Tag, error) {
 	reader := io.LimitReader(f, int64(locationSize&255<<12))
 	var (
 		length      uint32
-		compression byte
+		compression [1]byte
 	)
-	if err = binary.Read(reader, binary.BigEndian, &length); err != nil {
+
+	if _, err = io.ReadFull(f, bytes[:]); err != nil {
 		return nil, err
 	}
+	length = bytewrite.BigEndian.Uint32(bytes[:])
 	reader = io.LimitReader(reader, int64(length))
-	if err = binary.Read(reader, binary.BigEndian, &compression); err != nil {
+	if _, err = io.ReadFull(f, compression[:]); err != nil {
 		return nil, err
 	}
-	switch compression {
+	switch compression[0] {
 	case GZip:
 		gReader, err := gzip.NewReader(reader)
 		if err != nil {
@@ -122,7 +129,7 @@ func (p *FilePath) GetChunk(x, z int32) (nbt.Tag, error) {
 			return nil, err
 		}
 	default:
-		return nil, &UnknownCompression{compression}
+		return nil, &UnknownCompression{compression[0]}
 	}
 	data, _, err := nbt.ReadNBTFrom(reader)
 	return data, err
@@ -195,9 +202,17 @@ func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
 		return err
 	}
 	defer f.Close()
-	var positions [1024]uint32
-	if err = binary.Read(f, binary.BigEndian, positions[:]); err != nil && err != io.EOF {
+	var (
+		bytes     [4096]byte
+		positions [1024]uint32
+	)
+	pBytes := bytes[:]
+	if _, err = io.ReadFull(f, pBytes); err != nil && err != io.EOF {
 		return err
+	}
+	for i := 0; i < 1024; i++ {
+		positions[i] = bytewrite.BigEndian.Uint32(pBytes[:4])
+		pBytes = pBytes[4:]
 	}
 	var todoChunks []rc
 	for _, chunk := range chunks {
@@ -208,15 +223,15 @@ func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
 		if positions[chunk.pos]&255 == newSize {
 			if _, err = f.Seek(4*int64(chunk.pos)+4096, os.SEEK_SET); err != nil { // Write the time, then the data
 				return err
-			} else if err = binary.Write(f, binary.BigEndian, uint32(time.Now().Unix())); err != nil {
+			} else if _, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(time.Now().Unix()))); err != nil {
 				return err
 			} else if _, err = f.Seek(int64(positions[chunk.pos])>>8<<12, os.SEEK_SET); err != nil {
 				return err
-			} else if err = binary.Write(f, binary.BigEndian, uint32(len(chunk.buf))+1); err != nil {
+			} else if _, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(len(chunk.buf)) + 1)); err != nil {
 				return err
-			} else if err = binary.Write(f, binary.BigEndian, Zlib); err != nil {
+			} else if _, err = f.Write([]byte{Zlib}); err != nil {
 				return err
-			} else if err = binary.Write(f, binary.BigEndian, chunk.buf); err != nil {
+			} else if _, err = f.Write(chunk.buf); err != nil {
 				return err
 			}
 		} else {
@@ -257,24 +272,24 @@ func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
 		// Write the new position
 		if _, err = f.Seek(4*int64(chunk.pos), os.SEEK_SET); err != nil {
 			return err
-		} else if err = binary.Write(f, binary.BigEndian, positions[0]); err != nil {
+		} else if _, err = f.Write(bytewrite.BigEndian.PutUint32(positions[0])); err != nil {
 			return err
 		} else if _, err = f.Seek(4*(int64(chunk.pos)+1024), os.SEEK_SET); err != nil { // Write the time, then the data
 			return err
-		} else if err = binary.Write(f, binary.BigEndian, uint32(time.Now().Unix())); err != nil {
+		} else if _, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(time.Now().Unix()))); err != nil {
 			return err
 		} else if _, err = f.Seek(int64(newPosition)<<12, os.SEEK_SET); err != nil {
 			return err
-		} else if err = binary.Write(f, binary.BigEndian, uint32(len(chunk.buf))+1); err != nil {
+		} else if _, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(len(chunk.buf)) + 1)); err != nil {
 			return err
-		} else if err = binary.Write(f, binary.BigEndian, Zlib); err != nil {
+		} else if _, err = f.Write([]byte{Zlib}); err != nil {
 			return err
-		} else if err = binary.Write(f, binary.BigEndian, chunk.buf); err != nil {
+		} else if _, err = f.Write(chunk.buf); err != nil {
 			return err
 		} else if writeLastByte { // Make filesize mod 4096 (for minecraft compatibility)
 			if _, err = f.Seek(int64(newPosition+newSize)<<12-1, os.SEEK_SET); err != nil {
 				return err
-			} else if err = binary.Write(f, binary.BigEndian, byte(0)); err != nil {
+			} else if _, err = f.Write([]byte{0}); err != nil {
 				return err
 			}
 
@@ -298,7 +313,8 @@ func (p *FilePath) RemoveChunk(x, z int32) error {
 	if _, err = f.Seek(int64(chunkZ<<5|chunkX)*4, os.SEEK_SET); err != nil {
 		return err
 	}
-	return binary.Write(f, binary.BigEndian, int32(0))
+	_, err = f.Write([]byte{0, 0, 0, 0})
+	return err
 }
 
 func (p *FilePath) ReadLevelDat() (nbt.Tag, error) {
@@ -350,6 +366,39 @@ func (p *FilePath) GetRegions() [][2]int32 {
 		}
 	}
 	return toRet
+}
+
+// GetChunks returns a list of all chunks within a region with coords x,z
+func (p *FilePath) GetChunks(x, z int32) ([][2]int32, error) {
+	if !p.lock {
+		return nil, &NoLock{}
+	}
+	f, err := os.Open(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x>>5, z>>5)))
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	var (
+		bytes     [4096]byte
+		positions [1024]uint32
+	)
+	pBytes := bytes[:]
+	if _, err = io.ReadFull(f, pBytes); err != nil {
+		return nil, err
+	}
+	for i := 0; i < 1024; i++ {
+		positions[i] = bytewrite.BigEndian.Uint32(pBytes[:4])
+		pBytes = pBytes[4:]
+	}
+	baseX := x << 5
+	baseZ := z << 5
+	var toRet [][2]int32
+	for i := uint(0); i < 1024; i++ {
+		if positions[i] != 0 {
+			toRet = append(toRet, [2]int32{baseX + int32(i&31), baseZ + int32(i>>5)})
+		}
+	}
+	return toRet, nil
 }
 
 // Update tracks the lock file for updates to remove the lock.
