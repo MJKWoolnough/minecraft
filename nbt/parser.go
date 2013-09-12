@@ -28,6 +28,7 @@ package nbt
 
 import (
 	"fmt"
+	"github.com/MJKWoolnough/bytewrite"
 	"github.com/MJKWoolnough/equaler"
 	"io"
 )
@@ -287,13 +288,13 @@ func (n *Short) ReadFrom(f io.Reader) (total int64, err error) {
 	)
 	c, err = io.ReadFull(f, data[:])
 	total += int64(c)
-	*n = Short(getUint16(data[:]))
+	*n = Short(bytewrite.BigEndian.Uint16(data[:]))
 	return
 }
 
 func (n *Short) WriteTo(f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(putUint16(uint16(*n)))
+	c, err = f.Write(bytewrite.BigEndian.PutUint16(uint16(*n)))
 	total += int64(c)
 	return
 }
@@ -327,13 +328,13 @@ func (n *Int) ReadFrom(f io.Reader) (total int64, err error) {
 	)
 	c, err = io.ReadFull(f, data[:])
 	total += int64(c)
-	*n = Int(getUint32(data[:]))
+	*n = Int(bytewrite.BigEndian.Uint32(data[:]))
 	return
 }
 
 func (n *Int) WriteTo(f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(putUint32(uint32(*n)))
+	c, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(*n)))
 	total += int64(c)
 	return
 }
@@ -367,13 +368,13 @@ func (n *Long) ReadFrom(f io.Reader) (total int64, err error) {
 	)
 	c, err = io.ReadFull(f, data[:])
 	total += int64(c)
-	*n = Long(getUint64(data[:]))
+	*n = Long(bytewrite.BigEndian.Uint64(data[:]))
 	return
 }
 
 func (n *Long) WriteTo(f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(putUint64(uint64(*n)))
+	c, err = f.Write(bytewrite.BigEndian.PutUint64(uint64(*n)))
 	total += int64(c)
 	return
 }
@@ -407,13 +408,13 @@ func (n *Float) ReadFrom(f io.Reader) (total int64, err error) {
 	)
 	c, err = io.ReadFull(f, data[:])
 	total += int64(c)
-	*n = Float(float32frombits(getUint32(data[:])))
+	*n = Float(bytewrite.BigEndian.Float32(data[:]))
 	return
 }
 
 func (n *Float) WriteTo(f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(putUint32(float32bits(float32(*n))))
+	c, err = f.Write(bytewrite.BigEndian.PutFloat32(float32(*n)))
 	total += int64(c)
 	return
 }
@@ -447,13 +448,13 @@ func (n *Double) ReadFrom(f io.Reader) (total int64, err error) {
 	)
 	c, err = io.ReadFull(f, data[:])
 	total += int64(c)
-	*n = Double(float64frombits(getUint64(data[:])))
+	*n = Double(bytewrite.BigEndian.Float64(data[:]))
 	return
 }
 
 func (n *Double) WriteTo(f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(putUint64(float64bits(float64(*n))))
+	c, err = f.Write(bytewrite.BigEndian.PutFloat64(float64(*n)))
 	total += int64(c)
 	return
 }
@@ -487,7 +488,7 @@ func (n *ByteArray) ReadFrom(f io.Reader) (total int64, err error) {
 	)
 	c, err = io.ReadFull(f, data[:])
 	total += int64(c)
-	length := getUint32(data[:])
+	length := bytewrite.BigEndian.Uint32(data[:])
 	bData := make([]byte, length)
 	iData := ByteArray(make([]int8, length))
 	c, err = io.ReadFull(f, bData)
@@ -501,7 +502,7 @@ func (n *ByteArray) ReadFrom(f io.Reader) (total int64, err error) {
 
 func (n *ByteArray) WriteTo(f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(putUint32(uint32(len(*n))))
+	c, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(len(*n))))
 	total += int64(c)
 	if err != nil {
 		return
@@ -553,7 +554,7 @@ func (n *String) ReadFrom(f io.Reader) (total int64, err error) {
 	)
 	c, err = io.ReadFull(f, data[:])
 	total += int64(c)
-	bData := make([]byte, getUint16(data[:]))
+	bData := make([]byte, bytewrite.BigEndian.Uint16(data[:]))
 	c, err = io.ReadFull(f, bData)
 	total += int64(c)
 	*n = String(bData)
@@ -562,7 +563,7 @@ func (n *String) ReadFrom(f io.Reader) (total int64, err error) {
 
 func (n *String) WriteTo(f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(putUint16(uint16(len(*n))))
+	c, err = f.Write(bytewrite.BigEndian.PutUint16(uint16(len(*n))))
 	total += int64(c)
 	if err != nil {
 		return
@@ -637,7 +638,7 @@ func (n *List) ReadFrom(f io.Reader) (total int64, err error) {
 		err = &ReadError{"list length", err}
 		return
 	}
-	length := getUint32(data[:])
+	length := bytewrite.BigEndian.Uint32(data[:])
 	n.d = make([]Data, length)
 	for i := uint32(0); i < length; i++ {
 		if n.d[i], err = newFromTag(n.tagType); err != nil {
@@ -662,7 +663,7 @@ func (n *List) WriteTo(f io.Writer) (total int64, err error) {
 	if err != nil {
 		return
 	}
-	c, err = f.Write(putUint32(uint32(len(n.d))))
+	c, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(len(n.d))))
 	total += int64(c)
 	if err != nil {
 		return
@@ -903,13 +904,13 @@ func (n *IntArray) ReadFrom(f io.Reader) (total int64, err error) {
 	if err != nil {
 		return
 	}
-	length := getUint32(data[:])
+	length := bytewrite.BigEndian.Uint32(data[:])
 	*n = make([]int32, length)
 	ints := make([]byte, 4*length)
 	c, err = io.ReadFull(f, ints)
 	total += int64(c)
 	for i := uint32(0); i < length; i++ {
-		(*n)[i] = int32(getUint32(ints[:4]))
+		(*n)[i] = int32(bytewrite.BigEndian.Uint32(ints[:4]))
 		ints = ints[4:]
 	}
 	return
@@ -917,14 +918,14 @@ func (n *IntArray) ReadFrom(f io.Reader) (total int64, err error) {
 
 func (n IntArray) WriteTo(f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(putUint32(uint32(len(n))))
+	c, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(len(n))))
 	total += int64(c)
 	if err != nil {
 		return
 	}
 	ints := make([]byte, 0, 4*len(n))
 	for i := 0; i < len(n); i++ {
-		ints = append(ints, putUint32(uint32(n[i]))...)
+		ints = append(ints, bytewrite.BigEndian.PutUint32(uint32(n[i]))...)
 	}
 	c, err = f.Write(ints)
 	total += int64(c)
