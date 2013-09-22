@@ -269,19 +269,19 @@ func (c *chunk) SetBlock(x, y, z int32, b *Block) {
 	}
 	c.sections[ys].SetBlock(x, y, z, b)
 	if hmpos := x&15<<4 | z&15; b.Opacity() <= 1 { //All transparent blocks block 1 light when they are below the highest non-transparent block
-		if y == (*c.heightMap)[hmpos] {
+		if y == (*c.heightMap)[hmpos]-1 {
 			(*c.heightMap)[hmpos] = 0
 			for i := y; i >= 0; i-- {
-				if c.sections[ys] != nil {
-					if tB := c.sections[ys].GetBlock(x, y, z); tB.Opacity() <= 1 {
-						(*c.heightMap)[hmpos] = i
+				if yt := i >> 4; c.sections[yt] != nil {
+					if c.sections[yt].GetOpacity(x, i, z) > 1 {
+						(*c.heightMap)[hmpos] = i + 1
 						break
 					}
 				}
 			}
 		}
-	} else if y > (*c.heightMap)[hmpos] {
-		(*c.heightMap)[hmpos] = y
+	} else if y >= (*c.heightMap)[hmpos] {
+		(*c.heightMap)[hmpos] = y + 1
 	}
 	pos := xyz(x, y, z)
 	if b.metadata == nil {
@@ -346,16 +346,24 @@ func (c *chunk) SetBlockLight(x, y, z int32, l uint8) {
 }
 
 func (c *chunk) GetSkyLight(x, y, z int32) uint8 {
-	ys := y >> 4
-	if c.sections[ys] == nil {
-		for ; ys < 16; ys++ {
-			if c.sections[ys] != nil {
-				return c.sections[ys].GetSkyLight(x, y, z) - uint8(ys<<4-y)
-			}
-		}
+	if y >= (*c.heightMap)[x&15<<4|z&15] {
 		return 15
+	} else if y > 255 {
+		return 15
+	} else if y < 0 {
+		return 0
+	} else if ys := y >> 4; c.sections[ys] != nil {
+		return c.sections[ys].GetSkyLight(x, y, z)
+	} else if ys < 15 && c.sections[ys+1] != nil {
+		sl := c.sections[ys+1].GetSkyLight(x, 0, z)
+		if d := uint8((ys+1)<<4 - y); d < sl {
+			sl -= d
+		} else {
+			sl = 0
+		}
+		return sl
 	}
-	return c.sections[ys].GetSkyLight(x, y, z)
+	return 0
 }
 
 func (c *chunk) SetSkyLight(x, y, z int32, l uint8) {

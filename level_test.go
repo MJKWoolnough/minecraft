@@ -6,14 +6,14 @@ import (
 
 func TestNewLevel(t *testing.T) {
 	m := NewMemPath()
-	l, err := NewLevel(m)
+	l, err := NewLevel(m, LIGHT_NONE)
 	if err != nil {
 		t.Error(err.Error())
 		return
 	}
-	l.SetSpawn(1534545, 23, 56456)
-	if x, y, z := l.GetSpawn(); x != 1534545 || y != 23 || z != 56456 {
-		t.Errorf("[SG]etSpawn test failed, expecting 1534545, 23, 56456, got %d, %d, %d", x, y, z)
+	l.SetSpawn(1534545, 23, -56456)
+	if x, y, z := l.GetSpawn(); x != 1534545 || y != 23 || z != -56456 {
+		t.Errorf("[SG]etSpawn test failed, expecting 1534545, 23, -56456, got %d, %d, %d", x, y, z)
 	}
 	biomes := []struct {
 		x, z int32
@@ -67,12 +67,12 @@ func TestNewLevel(t *testing.T) {
 		}
 	}
 	l.Save()
-	if l, err = NewLevel(m); err != nil {
+	if l, err = NewLevel(m, LIGHT_NONE); err != nil {
 		t.Error(err.Error())
 		return
 	}
-	if x, y, z := l.GetSpawn(); x != 1534545 || y != 23 || z != 56456 {
-		t.Errorf("[SG]etSpawn test failed, expecting 1534545, 23, 56456, got %d, %d, %d", x, y, z)
+	if x, y, z := l.GetSpawn(); x != 1534545 || y != 23 || z != -56456 {
+		t.Errorf("[SG]etSpawn test failed, expecting 1534545, 23, -56456, got %d, %d, %d", x, y, z)
 	}
 	for n, biome := range biomes {
 		if tBiome, err := l.GetBiome(biome.x, biome.z); err != nil {
@@ -88,4 +88,64 @@ func TestNewLevel(t *testing.T) {
 			t.Errorf("biome test %d: expecting %s, got %s", n, block, tBlock)
 		}
 	}
+}
+
+// var (
+// 	stone = &Block{BlockId: 1}
+// 	water = &Block{BlockId: 8}
+// 	glass = &Block{BlockId: 20}
+// }
+
+func TestLightingSimpleSkyLight(t *testing.T) {
+	l, _ := NewLevel(NewMemPath(), LIGHT_SIMPLE)
+	tests := []struct {
+		x, y, z int32
+		*Block
+		light [][4]int32 //x, y, z, skyLight
+	}{
+		{0, 20, 0, &Block{BlockId: 1}, [][4]int32{{0, 20, 0, 0}, {0, 19, 0, 0}, {0, 0, 0, 0}}},
+		{0, 19, 0, &Block{BlockId: 1}, [][4]int32{{0, 20, 0, 0}, {0, 19, 0, 0}, {0, 0, 0, 0}}},
+		{0, 20, 0, &Block{}, [][4]int32{{1, 20, 0, 15}, {0, 19, 0, 0}, {0, 0, 0, 0}}},
+		{1, 20, 0, &Block{BlockId: 8}, [][4]int32{{1, 20, 0, 12}, {1, 19, 0, 11}, {1, 0, 0, 0}}},
+		{1, 19, 0, &Block{BlockId: 8}, [][4]int32{{1, 20, 0, 12}, {1, 19, 0, 9}, {1, 0, 0, 0}}},
+		{1, 20, 0, &Block{}, [][4]int32{{1, 20, 0, 15}, {1, 19, 0, 12}, {1, 0, 0, 0}}},
+		{0, 16, 1, &Block{BlockId: 1}, [][4]int32{{0, 16, 1, 0}, {0, 15, 1, 0}, {0, 0, 1, 0}}},
+		{0, 15, 1, &Block{BlockId: 1}, [][4]int32{{0, 16, 1, 0}, {0, 15, 1, 0}, {0, 0, 1, 0}}},
+		{0, 16, 1, &Block{}, [][4]int32{{0, 16, 1, 15}, {0, 15, 1, 0}, {0, 0, 1, 0}}},
+		{1, 16, 1, &Block{BlockId: 8}, [][4]int32{{1, 16, 1, 12}, {1, 15, 1, 11}, {1, 0, 1, 0}}},
+		{1, 15, 1, &Block{BlockId: 8}, [][4]int32{{1, 16, 1, 12}, {1, 15, 1, 9}, {1, 0, 1, 0}}},
+		{1, 16, 1, &Block{}, [][4]int32{{1, 16, 1, 15}, {1, 15, 1, 12}, {1, 0, 1, 0}}},
+	}
+	for n, test := range tests {
+		l.SetBlock(test.x, test.y, test.z, test.Block)
+		for o, light := range test.light {
+			if m, _ := l.getSkyLight(light[0], light[1], light[2]); int32(m) != light[3] {
+				t.Errorf("SimpleSkyLight test %d-%d: sky light level at [%d, %d, %d] does not match expected, got %d, expecting %d", n+1, o+1, light[0], light[1], light[2], m, light[3])
+			}
+		}
+	}
+}
+
+func TestLightingAllSkyLight(t *testing.T) {
+
+}
+
+func (l *Level) getBlockLight(x, y, z int32) (uint8, error) {
+	c, err := l.getChunk(x, z, false)
+	if err != nil {
+		return 0, err
+	} else if c == nil {
+		return 0, nil
+	}
+	return c.GetBlockLight(x, y, z), nil
+}
+
+func (l *Level) getSkyLight(x, y, z int32) (uint8, error) {
+	c, err := l.getChunk(x, z, false)
+	if err != nil {
+		return 0, err
+	} else if c == nil {
+		return 0, nil
+	}
+	return c.GetSkyLight(x, y, z), nil
 }
