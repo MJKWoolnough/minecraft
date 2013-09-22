@@ -7,17 +7,30 @@ http://web.archive.org/web/20110723210920/http://www.minecraft.net/docs/NBT.txt
 
 ## Usage
 
+#### type BadRange
+
+```go
+type BadRange struct{}
+```
+
+
+#### func (BadRange) Error
+
+```go
+func (b BadRange) Error() string
+```
+
 #### type Byte
 
 ```go
-type Byte byte
+type Byte int8
 ```
 
 
 #### func  NewByte
 
 ```go
-func NewByte(d byte) *Byte
+func NewByte(d int8) *Byte
 ```
 
 #### func (Byte) Copy
@@ -53,14 +66,14 @@ func (n *Byte) WriteTo(f io.Writer) (total int64, err error)
 #### type ByteArray
 
 ```go
-type ByteArray []byte
+type ByteArray []int8
 ```
 
 
 #### func  NewByteArray
 
 ```go
-func NewByteArray(d []byte) *ByteArray
+func NewByteArray(d []int8) *ByteArray
 ```
 
 #### func (ByteArray) Copy
@@ -130,10 +143,16 @@ func (n Compound) Get(name string) Tag
 func (n *Compound) ReadFrom(f io.Reader) (total int64, err error)
 ```
 
+#### func (*Compound) Remove
+
+```go
+func (n *Compound) Remove(name string)
+```
+
 #### func (*Compound) Set
 
 ```go
-func (n *Compound) Set(name string, t Tag)
+func (n *Compound) Set(tag Tag)
 ```
 
 #### func (Compound) String
@@ -142,10 +161,10 @@ func (n *Compound) Set(name string, t Tag)
 func (n Compound) String() string
 ```
 
-#### func (*Compound) WriteTo
+#### func (Compound) WriteTo
 
 ```go
-func (n *Compound) WriteTo(f io.Writer) (total int64, err error)
+func (n Compound) WriteTo(f io.Writer) (total int64, err error)
 ```
 
 #### type Data
@@ -327,10 +346,10 @@ func (n *IntArray) ReadFrom(f io.Reader) (total int64, err error)
 func (n IntArray) String() string
 ```
 
-#### func (*IntArray) WriteTo
+#### func (IntArray) WriteTo
 
 ```go
-func (n *IntArray) WriteTo(f io.Writer) (total int64, err error)
+func (n IntArray) WriteTo(f io.Writer) (total int64, err error)
 ```
 
 #### type List
@@ -341,6 +360,12 @@ type List struct {
 ```
 
 
+#### func  NewEmptyList
+
+```go
+func NewEmptyList(tagType TagId) *List
+```
+
 #### func  NewList
 
 ```go
@@ -350,31 +375,37 @@ func NewList(d []Data) *List
 #### func (*List) Append
 
 ```go
-func (n *List) Append(d ...Data)
+func (n *List) Append(d ...Data) error
 ```
 
-#### func (List) Copy
+#### func (*List) Copy
 
 ```go
-func (n List) Copy() Data
+func (n *List) Copy() Data
 ```
 
-#### func (List) Equal
+#### func (*List) Equal
 
 ```go
-func (n List) Equal(e equaler.Equaler) bool
+func (n *List) Equal(e equaler.Equaler) bool
 ```
 
-#### func (List) Get
+#### func (*List) Get
 
 ```go
-func (n List) Get(n int32) Data
+func (n *List) Get(i int) Data
 ```
 
 #### func (*List) Insert
 
 ```go
-func (n *List) Insert(i int32, d ...Data)
+func (n *List) Insert(i int, d ...Data) error
+```
+
+#### func (*List) Len
+
+```go
+func (n *List) Len() int
 ```
 
 #### func (*List) ReadFrom
@@ -386,19 +417,25 @@ func (n *List) ReadFrom(f io.Reader) (total int64, err error)
 #### func (*List) Remove
 
 ```go
-func (n *List) Remove(i int32)
+func (n *List) Remove(i int)
 ```
 
 #### func (*List) Set
 
 ```go
-func (n *List) Set(i int32, d Data)
+func (n *List) Set(i int32, d Data) error
 ```
 
-#### func (List) String
+#### func (*List) String
 
 ```go
-func (n List) String() string
+func (n *List) String() string
+```
+
+#### func (*List) TagType
+
+```go
+func (n *List) TagType() TagId
 ```
 
 #### func (*List) WriteTo
@@ -448,6 +485,22 @@ func (n Long) String() string
 
 ```go
 func (n *Long) WriteTo(f io.Writer) (total int64, err error)
+```
+
+#### type ReadError
+
+```go
+type ReadError struct {
+	Where string
+	Err   error
+}
+```
+
+
+#### func (ReadError) Error
+
+```go
+func (r ReadError) Error() string
 ```
 
 #### type Short
@@ -593,4 +646,50 @@ Tag Types
 
 ```go
 func (t TagId) String() string
+```
+
+#### type UnknownTag
+
+```go
+type UnknownTag struct {
+	TagId
+}
+```
+
+
+#### func (UnknownTag) Error
+
+```go
+func (u UnknownTag) Error() string
+```
+
+#### type WriteError
+
+```go
+type WriteError struct {
+	Where string
+	Err   error
+}
+```
+
+
+#### func (WriteError) Error
+
+```go
+func (w WriteError) Error() string
+```
+
+#### type WrongTag
+
+```go
+type WrongTag struct {
+	Expecting, Got TagId
+}
+```
+
+
+#### func (WrongTag) Error
+
+```go
+func (w WrongTag) Error() string
 ```
