@@ -96,7 +96,7 @@ func NewLevel(location Path, ll uint8) (*Level, error) {
 		if d.TagId() == nbt.Tag_Compound {
 			data = d.Data().(*nbt.Compound)
 		} else {
-			return nil, WrongTypeError{"Data", nbt.Tag_Compound, d.TagId()}
+			return nil, &WrongTypeError{"Data", nbt.Tag_Compound, d.TagId()}
 		}
 	} else {
 		return nil, &MissingTagError{"Data"}

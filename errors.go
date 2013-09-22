@@ -63,3 +63,20 @@ type ConflictError struct {
 func (c ConflictError) Error() string {
 	return fmt.Sprintf("already setting chunk %d,%d, recall SetChunk to set again", c.X, c.Z)
 }
+
+type FilePathSetError struct {
+	X, Z int32
+	Err  error
+}
+
+func (f *FilePathSetError) Error() string {
+	return fmt.Sprintf("chunk %d, %d had the following error: %s", f.X, f.Z, f.Err.Error())
+}
+
+type MultiError struct {
+	Errors []error
+}
+
+func (m *MultiError) Error() string {
+	return fmt.Sprintf("received %d error(s)", len(m.Errors))
+}

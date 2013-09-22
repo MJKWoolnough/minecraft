@@ -146,25 +146,30 @@ func (p *FilePath) SetChunk(data ...nbt.Tag) error {
 	}
 	regions := make(map[uint64][]rc)
 	poses := make([]uint64, 0)
+	errors := make([]error, 0)
 	for _, d := range data {
 		x, z, err := chunkCoords(d)
 		if err != nil {
-			return err
+			errors = append(errors, &FilePathSetError{x, z, err})
+			continue
 		}
 		pos := uint64(z)<<32 | uint64(uint32(x))
 		for _, p := range poses {
 			if p == pos {
-				return &ConflictError{x, z}
+				errors = append(errors, &ConflictError{x, z})
+				continue
 			}
 		}
 		poses = append(poses, pos)
 		r := uint64(z>>5)<<32 | uint64(uint32(x>>5))
 		reg := rc{pos: (z&31)<<5 | (x & 31)}
 		zl := zlib.NewWriter(memio.Create(&reg.buf))
-		if _, err := d.WriteTo(zl); err != nil {
-			return err
-		}
+		_, err = d.WriteTo(zl)
 		zl.Close()
+		if err != nil {
+			errors = append(errors, &FilePathSetError{x, z, err})
+			continue
+		}
 		if regions[r] == nil {
 			regions[r] = []rc{reg}
 		} else {
@@ -172,9 +177,13 @@ func (p *FilePath) SetChunk(data ...nbt.Tag) error {
 		}
 	}
 	for rId, chunks := range regions {
-		if err := p.setChunks(int32(rId&0xffffffff), int32(rId>>32), chunks); err != nil {
-			return err
+		x, z := int32(rId&0xffffffff), int32(rId>>32)
+		if err := p.setChunks(x, z, chunks); err != nil {
+			errors = append(errors, &FilePathSetError{x, z, err})
 		}
+	}
+	if len(errors) > 0 {
+		return &MultiError{errors}
 	}
 	return nil
 }
