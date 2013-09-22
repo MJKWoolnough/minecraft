@@ -78,5 +78,8 @@ type MultiError struct {
 }
 
 func (m *MultiError) Error() string {
-	return fmt.Sprintf("received %d error(s)", len(m.Errors))
+	if len(m.Errors) == 1 {
+		return Errors[0].Error()
+	}
+	return fmt.Sprintf("received %d errors", len(m.Errors))
 }
