@@ -29,8 +29,7 @@ func TestSmall(t *testing.T) { //test.nbt
 func TestLarge(t *testing.T) { //bigtest.nbt
 	data := make([]int8, 1000)
 	for i := 0; i < 1000; i++ {
-		t := (i*i*255 + i*7) % 100
-		data[i] = int8(t)
+		data[i] = int8((i*i*255 + i*7) % 100)
 	}
 	testNBT(`CgAFTGV2ZWwEAAhsb25nVGVzdH//////////AgAJc2hvcnRUZXN0f/8IAApzdHJpbmdUZXN0AClI`+
 		`RUxMTyBXT1JMRCBUSElTIElTIEEgVEVTVCBTVFJJTkcgw4XDhMOWIQUACWZsb2F0VGVzdD7/GDID`+
