@@ -297,3 +297,40 @@ func TestBlock(t *testing.T) {
 		}
 	}
 }
+
+func TestHeightMap(t *testing.T) {
+	tests := []struct {
+		x, y, z int32
+		*Block
+		height int32
+	}{
+		{0, 0, 0, &Block{}, 0},
+		{1, 0, 0, &Block{BlockId: 1}, 1},
+		{1, 1, 0, &Block{BlockId: 1}, 2},
+		{1, 0, 0, &Block{}, 2},
+		{1, 1, 0, &Block{}, 0},
+		{2, 10, 0, &Block{BlockId: 1}, 11},
+		{2, 12, 0, &Block{BlockId: 1}, 13},
+		{2, 12, 0, &Block{}, 11},
+		{2, 10, 0, &Block{}, 0},
+		{3, 15, 0, &Block{BlockId: 1}, 16},
+		{3, 16, 0, &Block{BlockId: 1}, 17},
+		{3, 16, 0, &Block{}, 16},
+		{3, 15, 0, &Block{}, 0},
+		{4, 31, 0, &Block{BlockId: 1}, 32},
+		{4, 32, 0, &Block{BlockId: 1}, 33},
+		{4, 32, 0, &Block{}, 32},
+		{4, 31, 0, &Block{}, 0},
+		{5, 16, 0, &Block{BlockId: 1}, 17},
+		{5, 32, 0, &Block{BlockId: 1}, 33},
+		{5, 32, 0, &Block{}, 17},
+		{5, 16, 0, &Block{}, 0},
+	}
+	chunk, _ := newChunk(0, 0, nil)
+	for n, test := range tests {
+		chunk.SetBlock(test.x, test.y, test.z, test.Block)
+		if h := chunk.GetHeight(test.x, test.z); h != test.height {
+			t.Errorf("test %d: expecting height %d, got %d", n+1, test.height, h)
+		}
+	}
+}
