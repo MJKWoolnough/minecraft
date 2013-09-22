@@ -302,10 +302,10 @@ func (l *Level) Save() error {
 			toSave = append(toSave, c.GetNBT())
 		}
 	}
+	l.changes = boolmap.NewMap()
 	if len(toSave) > 0 {
 		return l.path.SetChunk(toSave...)
 	}
-	l.changes = boolmap.NewMap()
 	return nil
 }
 
