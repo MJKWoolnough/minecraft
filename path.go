@@ -43,6 +43,8 @@ import (
 
 var filename *regexp.Regexp
 
+// The Path interface allows the minecraft level to be created from/saved
+// to different formats.
 type Path interface {
 	// Returns a nil nbt.Tag when chunk does not exists
 	GetChunk(int32, int32) (nbt.Tag, error)
@@ -57,6 +59,8 @@ const (
 	Zlib byte = 2
 )
 
+// FilePath implements the Path interface and provides a standard minecraft
+// save format.
 type FilePath struct {
 	dirname string
 	lock    bool
@@ -76,6 +80,7 @@ func NewFilePath(dirname string) (*FilePath, error) {
 	return p, nil
 }
 
+// Returns the chunk at chunk coords x, z.
 func (p *FilePath) GetChunk(x, z int32) (nbt.Tag, error) {
 	if !p.lock {
 		return nil, &NoLock{}
@@ -140,6 +145,8 @@ type rc struct {
 	buf []byte
 }
 
+// Saves multiple chunks at once, possibly returning a MultiError if
+// multiple errors were encountered.
 func (p *FilePath) SetChunk(data ...nbt.Tag) error {
 	if !p.lock {
 		return &NoLock{}
@@ -307,6 +314,7 @@ func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
 	return nil
 }
 
+// Deletes the chunk at chunk coords x, z.
 func (p *FilePath) RemoveChunk(x, z int32) error {
 	chunkX := x & 31
 	regionX := x >> 5
@@ -326,6 +334,7 @@ func (p *FilePath) RemoveChunk(x, z int32) error {
 	return err
 }
 
+// Returns the level data.
 func (p *FilePath) ReadLevelDat() (nbt.Tag, error) {
 	if !p.lock {
 		return nil, &NoLock{}
@@ -345,6 +354,7 @@ func (p *FilePath) ReadLevelDat() (nbt.Tag, error) {
 	return data, err
 }
 
+// Writes the level data.
 func (p *FilePath) WriteLevelDat(data nbt.Tag) error {
 	if !p.lock {
 		return &NoLock{}
@@ -410,7 +420,7 @@ func (p *FilePath) GetChunks(x, z int32) ([][2]int32, error) {
 	return toRet, nil
 }
 
-// Update tracks the lock file for updates to remove the lock.
+// Update tracks the lock file for updates to remove the lock. Should not be cause by a client.
 func (p *FilePath) Update(filname string, mode uint8) {
 	p.lock = false
 	watcher.StopWatch(p.dirname)
@@ -432,19 +442,23 @@ func (p *FilePath) Lock() {
 	p.lock = true
 }
 
+// Defrag rewrites a region file to reduce wasted space.
 func (p *FilePath) Defrag(x, z int32) error {
 	return nil
 }
 
+// An in memory minecraft level format that implements the Path interface.
 type MemPath struct {
 	level  []byte
 	chunks map[uint64][]byte
 }
 
+// Creates a new MemPath implementation.
 func NewMemPath() *MemPath {
 	return &MemPath{chunks: make(map[uint64][]byte)}
 }
 
+// Returns the chunk at chunk coords x, z.
 func (m *MemPath) GetChunk(x, z int32) (nbt.Tag, error) {
 	pos := uint64(z)<<32 | uint64(uint32(x))
 	if m.chunks[pos] == nil {
@@ -453,6 +467,7 @@ func (m *MemPath) GetChunk(x, z int32) (nbt.Tag, error) {
 	return m.read(m.chunks[pos])
 }
 
+// Saves multiple chunks at once.
 func (m *MemPath) SetChunk(data ...nbt.Tag) error {
 	for _, d := range data {
 		x, z, err := chunkCoords(d)
@@ -469,12 +484,14 @@ func (m *MemPath) SetChunk(data ...nbt.Tag) error {
 	return nil
 }
 
+// Deletes the chunk at chunk coords x, z.
 func (m *MemPath) RemoveChunk(x, z int32) error {
 	pos := uint64(z)<<32 | uint64(uint32(x))
 	delete(m.chunks, pos)
 	return nil
 }
 
+// Returns the level data.
 func (m *MemPath) ReadLevelDat() (nbt.Tag, error) {
 	if len(m.level) == 0 {
 		return nil, nil
@@ -482,6 +499,7 @@ func (m *MemPath) ReadLevelDat() (nbt.Tag, error) {
 	return m.read(m.level)
 }
 
+// Writes the level data.
 func (m *MemPath) WriteLevelDat(data nbt.Tag) error {
 	return m.write(data, &m.level)
 }

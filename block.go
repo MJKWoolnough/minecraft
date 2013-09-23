@@ -105,6 +105,7 @@ func (b *Block) Light() uint8 {
 	return 0
 }
 
+// Returns true if the block id matches a liquid
 func (b *Block) IsLiquid() bool {
 	return b.BlockId == 8 || b.BlockId == 9 || b.BlockId == 10 || b.BlockId == 11
 }

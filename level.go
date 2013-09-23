@@ -55,6 +55,8 @@ type Level struct {
 	changed   bool
 }
 
+// Create/Load a minecraft level from the given path. Also takes a uint8 to
+// determine how it should it should process lighting.
 func NewLevel(location Path, ll uint8) (*Level, error) {
 	var (
 		levelDat nbt.Tag
@@ -118,6 +120,7 @@ func NewLevel(location Path, ll uint8) (*Level, error) {
 	}, nil
 }
 
+// Returns the x, y, z coordinated for the current spawn point.
 func (l *Level) GetSpawn() (x, y, z int32) {
 	if l.levelData == nil {
 		return
@@ -139,6 +142,7 @@ func (l *Level) GetSpawn() (x, y, z int32) {
 	return
 }
 
+// Sets the spawn point.
 func (l *Level) SetSpawn(x, y, z int32) {
 	l.levelData.Set(nbt.NewTag("SpawnX", nbt.NewInt(x)))
 	l.levelData.Set(nbt.NewTag("SpawnY", nbt.NewInt(y)))
@@ -146,6 +150,7 @@ func (l *Level) SetSpawn(x, y, z int32) {
 	l.changed = true
 }
 
+// Get the block at coordinates x, y, z.
 func (l *Level) GetBlock(x, y, z int32) (*Block, error) {
 	c, err := l.getChunk(x, z, false)
 	if err != nil {
@@ -156,6 +161,7 @@ func (l *Level) GetBlock(x, y, z int32) (*Block, error) {
 	return c.GetBlock(x, y, z), nil
 }
 
+// Sets the block at coordinates x, y, z. Also processes any lighting updates if applicable.
 func (l *Level) SetBlock(x, y, z int32, block *Block) error {
 	c, err := l.getChunk(x, z, true)
 	if err != nil {
@@ -235,6 +241,7 @@ func (l *Level) SetBlock(x, y, z int32, block *Block) error {
 	return nil
 }
 
+// Returns the biome for the column x, z.
 func (l *Level) GetBiome(x, z int32) (Biome, error) {
 	c, err := l.getChunk(x, z, false)
 	if err != nil {
@@ -245,6 +252,7 @@ func (l *Level) GetBiome(x, z int32) (Biome, error) {
 	return c.GetBiome(x, z), nil
 }
 
+// Sets the biome for the column x, z.
 func (l *Level) SetBiome(x, z int32, biome Biome) error {
 	c, err := l.getChunk(x, z, true)
 	if err != nil {
@@ -254,11 +262,13 @@ func (l *Level) SetBiome(x, z int32, biome Biome) error {
 	return nil
 }
 
+// Returns the name of the minecraft level.
 func (l *Level) GetName() string {
 	s := l.levelData.Get("LevelName").Data().(*nbt.String)
 	return string(*s)
 }
 
+// Sets the name of the minecraft level.
 func (l *Level) SetName(name string) {
 	l.levelData.Set(nbt.NewTag("LevelName", nbt.NewString(name)))
 	l.changed = true
@@ -289,6 +299,7 @@ func (l *Level) getChunk(x, z int32, create bool) (*chunk, error) {
 	return l.chunks[pos], nil
 }
 
+// Saves all open chunks, but does not close them.
 func (l *Level) Save() error {
 	if l.changed {
 		if err := l.path.WriteLevelDat(nbt.NewTag("", nbt.NewCompound([]nbt.Tag{nbt.NewTag("Data", l.levelData)}))); err != nil {
@@ -309,6 +320,7 @@ func (l *Level) Save() error {
 	return nil
 }
 
+// Closes all open chunks, but does not save them.
 func (l *Level) Close() {
 	l.changed = false
 	l.chunks = make(map[uint64]*chunk)
