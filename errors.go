@@ -9,7 +9,7 @@ type MissingTagError struct {
 	TagName string
 }
 
-func (m MissingTagError) Error() string {
+func (m *MissingTagError) Error() string {
 	return fmt.Sprintf("minecraft: missing %q tag", m.TagName)
 }
 
@@ -18,7 +18,7 @@ type WrongTypeError struct {
 	Expecting, Got nbt.TagId
 }
 
-func (w WrongTypeError) Error() string {
+func (w *WrongTypeError) Error() string {
 	return fmt.Sprintf("minecraft: tag %q is of incorrect type, expecting %q, got %q", w.TagName, w.Expecting, w.Got)
 }
 
@@ -32,7 +32,7 @@ type UnexpectedValue struct {
 	TagName, Expecting, Got string
 }
 
-func (u UnexpectedValue) Error() string {
+func (u *UnexpectedValue) Error() string {
 	return fmt.Sprintf("minecraft: tag %q was expecting %s, but got %q", u.TagName, u.Expecting, u.Got)
 }
 
@@ -60,7 +60,7 @@ type ConflictError struct {
 	X, Z int32
 }
 
-func (c ConflictError) Error() string {
+func (c *ConflictError) Error() string {
 	return fmt.Sprintf("already setting chunk %d,%d, recall SetChunk to set again", c.X, c.Z)
 }
 

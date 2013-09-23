@@ -118,7 +118,7 @@ func NewLevel(location Path, ll uint8) (*Level, error) {
 	}, nil
 }
 
-func (l Level) GetSpawn() (x, y, z int32) {
+func (l *Level) GetSpawn() (x, y, z int32) {
 	if l.levelData == nil {
 		return
 	}
@@ -254,7 +254,7 @@ func (l *Level) SetBiome(x, z int32, biome Biome) error {
 	return nil
 }
 
-func (l Level) GetName() string {
+func (l *Level) GetName() string {
 	s := l.levelData.Get("LevelName").Data().(*nbt.String)
 	return string(*s)
 }
