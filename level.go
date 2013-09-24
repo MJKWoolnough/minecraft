@@ -40,10 +40,39 @@ var (
 	}
 )
 
+type light uint8
+
+func (l light) SkyLight() bool {
+	return l&3 > 0
+}
+
+func (l light) SkyLightSimple() bool {
+	return l&LIGHT_SKY_SIMPLE > 0
+}
+
+func (l light) SkyLightAll() bool {
+	return l&LIGHT_SKY_ALL > 0
+}
+
+func (l light) BlockLight() bool {
+	return l&12 > 0
+}
+
+func (l light) BlockLightSimple() bool {
+	return l&LIGHT_BLOCK_SIMPLE > 0
+}
+
+func (l light) BlockLightAll() bool {
+	return l&LIGHT_BLOCK_ALL > 0
+}
+
 const (
-	LIGHT_NONE uint8 = iota
-	LIGHT_SIMPLE
-	LIGHT_ALL
+	LIGHT_SKY_NONE     light = 0
+	LIGHT_SKY_SIMPLE   light = 1
+	LIGHT_SKY_ALL      light = 3
+	LIGHT_BLOCK_NONE   light = 0
+	LIGHT_BLOCK_SIMPLE light = 4
+	LIGHT_BLOCK_ALL    light = 12
 )
 
 type Level struct {
@@ -51,13 +80,13 @@ type Level struct {
 	chunks    map[uint64]*chunk
 	changes   boolmap.Map
 	levelData *nbt.Compound
-	lighting  uint8
+	lighting  light
 	changed   bool
 }
 
 // Create/Load a minecraft level from the given path. Also takes a uint8 to
 // determine how it should it should process lighting.
-func NewLevel(location Path, ll uint8) (*Level, error) {
+func NewLevel(location Path, ll light) (*Level, error) {
 	var (
 		levelDat nbt.Tag
 		data     *nbt.Compound
@@ -93,7 +122,7 @@ func NewLevel(location Path, ll uint8) (*Level, error) {
 		changed = true
 	}
 	if levelDat.TagId() != nbt.Tag_Compound {
-		return nil, WrongTypeError{"[BASE]", nbt.Tag_Compound, levelDat.TagId()}
+		return nil, &WrongTypeError{"[BASE]", nbt.Tag_Compound, levelDat.TagId()}
 	} else if d := levelDat.Data().(*nbt.Compound).Get("Data"); d != nil {
 		if d.TagId() == nbt.Tag_Compound {
 			data = d.Data().(*nbt.Compound)
@@ -172,7 +201,7 @@ func (l *Level) SetBlock(x, y, z int32, block *Block) error {
 			return nil
 		}
 		c.sections[ys] = newSection(y)
-		if l.lighting != LIGHT_NONE {
+		if l.lighting.SkyLight() {
 			baseX := x >> 4 << 4
 			baseY := y >> 4 << 4
 			baseZ := z >> 4 << 4
@@ -184,34 +213,36 @@ func (l *Level) SetBlock(x, y, z int32, block *Block) error {
 							c.SetSkyLight(i, j, k, 15)
 						}
 					} else {
-						switch l.lighting {
-						case LIGHT_SIMPLE:
-							for currLightLevel := c.GetSkyLight(i, j+1, k); j >= baseY; j-- {
-								if currLightLevel > 0 {
-									currLightLevel--
-								}
-								c.SetSkyLight(i, j, k, currLightLevel)
+						for currLightLevel := c.GetSkyLight(i, j+1, k); j >= baseY; j-- {
+							if currLightLevel > 0 {
+								currLightLevel--
 							}
-						case LIGHT_ALL:
+							c.SetSkyLight(i, j, k, currLightLevel)
 						}
 					}
 				}
 			}
+			if l.lighting.SkyLightAll() {
+				// 				for i := baseX; i < baseX+16; i++ {
+				// 					for k := baseZ; k < baseZ+16; k++ {
+				// 						j := baseY + 15
+				// 					}
+				// 				}
+			}
 		}
 	}
 	var opacity uint8
-	if l.lighting != LIGHT_NONE {
+	if l.lighting.SkyLight() {
 		opacity = c.GetOpacity(x, y, z)
 	}
 	c.SetBlock(x, y, z, block)
-	if l.lighting != LIGHT_NONE {
+	if l.lighting.SkyLight() {
 		if block.Opacity() != opacity {
 			nY := y
 			for h := c.GetHeight(x, z); nY >= h; nY-- {
 				c.SetSkyLight(x, nY, z, 15)
 			}
-			switch l.lighting {
-			case LIGHT_SIMPLE:
+			if l.lighting.SkyLightSimple() {
 				for currLightLevel := c.GetSkyLight(x, nY+1, z); nY >= 0; nY-- {
 					if currLightLevel > 0 {
 						if o := c.GetOpacity(x, nY, z); o < currLightLevel {
@@ -225,17 +256,15 @@ func (l *Level) SetBlock(x, y, z int32, block *Block) error {
 					}
 					c.SetSkyLight(x, nY, z, currLightLevel)
 				}
-			case LIGHT_ALL:
+			} else {
 
 			}
 		}
-		if block.Light() != c.GetBlockLight(x, y, z) {
-			switch l.lighting {
-			case LIGHT_SIMPLE:
-				c.SetBlockLight(x, y, z, block.Light())
-			case LIGHT_ALL:
+	}
+	if l.lighting.BlockLight() && block.Light() != c.GetBlockLight(x, y, z) {
+		c.SetBlockLight(x, y, z, block.Light())
+		if l.lighting.BlockLightAll() {
 
-			}
 		}
 	}
 	return nil

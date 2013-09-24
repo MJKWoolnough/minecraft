@@ -6,7 +6,7 @@ import (
 
 func TestNewLevel(t *testing.T) {
 	m := NewMemPath()
-	l, err := NewLevel(m, LIGHT_NONE)
+	l, err := NewLevel(m, 0)
 	if err != nil {
 		t.Error(err.Error())
 		return
@@ -67,7 +67,7 @@ func TestNewLevel(t *testing.T) {
 		}
 	}
 	l.Save()
-	if l, err = NewLevel(m, LIGHT_NONE); err != nil {
+	if l, err = NewLevel(m, 0); err != nil {
 		t.Error(err.Error())
 		return
 	}
@@ -97,7 +97,7 @@ func TestNewLevel(t *testing.T) {
 // }
 
 func TestLightingSimpleSkyLight(t *testing.T) {
-	l, _ := NewLevel(NewMemPath(), LIGHT_SIMPLE)
+	l, _ := NewLevel(NewMemPath(), LIGHT_SKY_SIMPLE)
 	tests := []struct {
 		x, y, z int32
 		*Block
