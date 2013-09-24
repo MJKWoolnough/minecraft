@@ -41,7 +41,7 @@ type Block struct {
 	ticks    []Tick
 }
 
-func (b *Block) Equal(e equaler.Equaler) bool {
+func (b Block) Equal(e equaler.Equaler) bool {
 	c, ok := e.(*Block)
 	if !ok {
 		if d, ok := e.(Block); ok {
