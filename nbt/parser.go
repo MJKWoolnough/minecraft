@@ -282,13 +282,11 @@ func NewShort(d int16) *Short {
 }
 
 func (n *Short) ReadFrom(f io.Reader) (total int64, err error) {
-	var (
-		c    int
-		data [2]byte
-	)
-	c, err = io.ReadFull(f, data[:])
+	var c int
+	data := make([]byte, 2)
+	c, err = io.ReadFull(f, data)
 	total += int64(c)
-	*n = Short(bytewrite.BigEndian.Uint16(data[:]))
+	*n = Short(bytewrite.BigEndian.Uint16(data))
 	return
 }
 
@@ -322,13 +320,11 @@ func NewInt(d int32) *Int {
 }
 
 func (n *Int) ReadFrom(f io.Reader) (total int64, err error) {
-	var (
-		c    int
-		data [4]byte
-	)
+	var c int
+	data := make([]byte, 4)
 	c, err = io.ReadFull(f, data[:])
 	total += int64(c)
-	*n = Int(bytewrite.BigEndian.Uint32(data[:]))
+	*n = Int(bytewrite.BigEndian.Uint32(data))
 	return
 }
 
@@ -362,13 +358,11 @@ func NewLong(d int64) *Long {
 }
 
 func (n *Long) ReadFrom(f io.Reader) (total int64, err error) {
-	var (
-		c    int
-		data [8]byte
-	)
-	c, err = io.ReadFull(f, data[:])
+	var c int
+	data := make([]byte, 8)
+	c, err = io.ReadFull(f, data)
 	total += int64(c)
-	*n = Long(bytewrite.BigEndian.Uint64(data[:]))
+	*n = Long(bytewrite.BigEndian.Uint64(data))
 	return
 }
 
@@ -402,13 +396,11 @@ func NewFloat(d float32) *Float {
 }
 
 func (n *Float) ReadFrom(f io.Reader) (total int64, err error) {
-	var (
-		c    int
-		data [4]byte
-	)
-	c, err = io.ReadFull(f, data[:])
+	var c int
+	data := make([]byte, 4)
+	c, err = io.ReadFull(f, data)
 	total += int64(c)
-	*n = Float(bytewrite.BigEndian.Float32(data[:]))
+	*n = Float(bytewrite.BigEndian.Float32(data))
 	return
 }
 
@@ -442,13 +434,11 @@ func NewDouble(d float64) *Double {
 }
 
 func (n *Double) ReadFrom(f io.Reader) (total int64, err error) {
-	var (
-		c    int
-		data [8]byte
-	)
-	c, err = io.ReadFull(f, data[:])
+	var c int
+	data := make([]byte, 8)
+	c, err = io.ReadFull(f, data)
 	total += int64(c)
-	*n = Double(bytewrite.BigEndian.Float64(data[:]))
+	*n = Double(bytewrite.BigEndian.Float64(data))
 	return
 }
 
@@ -482,13 +472,11 @@ func NewByteArray(d []int8) *ByteArray {
 }
 
 func (n *ByteArray) ReadFrom(f io.Reader) (total int64, err error) {
-	var (
-		c    int
-		data [4]byte
-	)
-	c, err = io.ReadFull(f, data[:])
+	var c int
+	data := make([]byte, 4)
+	c, err = io.ReadFull(f, data)
 	total += int64(c)
-	length := bytewrite.BigEndian.Uint32(data[:])
+	length := bytewrite.BigEndian.Uint32(data)
 	bData := make([]byte, length)
 	iData := ByteArray(make([]int8, length))
 	c, err = io.ReadFull(f, bData)
@@ -548,13 +536,11 @@ func NewString(d string) *String {
 }
 
 func (n *String) ReadFrom(f io.Reader) (total int64, err error) {
-	var (
-		c    int
-		data [2]byte
-	)
-	c, err = io.ReadFull(f, data[:])
+	var c int
+	data := make([]byte, 2)
+	c, err = io.ReadFull(f, data)
 	total += int64(c)
-	bData := make([]byte, bytewrite.BigEndian.Uint16(data[:]))
+	bData := make([]byte, bytewrite.BigEndian.Uint16(data))
 	c, err = io.ReadFull(f, bData)
 	total += int64(c)
 	*n = String(bData)
@@ -621,10 +607,10 @@ func NewEmptyList(tagType TagId) *List {
 
 func (n *List) ReadFrom(f io.Reader) (total int64, err error) {
 	var (
-		c    int
-		d    int64
-		data [4]byte
+		c int
+		d int64
 	)
+	data := make([]byte, 4)
 	c, err = io.ReadFull(f, data[:1])
 	total += int64(c)
 	if err != nil {
@@ -632,13 +618,13 @@ func (n *List) ReadFrom(f io.Reader) (total int64, err error) {
 		return
 	}
 	n.tagType = TagId(data[0])
-	c, err = io.ReadFull(f, data[:])
+	c, err = io.ReadFull(f, data)
 	total += int64(c)
 	if err != nil {
 		err = &ReadError{"list length", err}
 		return
 	}
-	length := bytewrite.BigEndian.Uint32(data[:])
+	length := bytewrite.BigEndian.Uint32(data)
 	n.d = make([]Data, length)
 	for i := uint32(0); i < length; i++ {
 		if n.d[i], err = newFromTag(n.tagType); err != nil {
@@ -895,16 +881,14 @@ func NewIntArray(d []int32) *IntArray {
 }
 
 func (n *IntArray) ReadFrom(f io.Reader) (total int64, err error) {
-	var (
-		c    int
-		data [4]byte
-	)
-	c, err = io.ReadFull(f, data[:])
+	var c int
+	data := make([]byte, 4)
+	c, err = io.ReadFull(f, data)
 	total += int64(c)
 	if err != nil {
 		return
 	}
-	length := bytewrite.BigEndian.Uint32(data[:])
+	length := bytewrite.BigEndian.Uint32(data)
 	*n = make([]int32, length)
 	ints := make([]byte, 4*length)
 	c, err = io.ReadFull(f, ints)
