@@ -1,8 +1,6 @@
 package minecraft
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestNewLevel(t *testing.T) {
 	m := NewMemPath()
@@ -90,12 +88,6 @@ func TestNewLevel(t *testing.T) {
 	}
 }
 
-// var (
-// 	stone = &Block{BlockId: 1}
-// 	water = &Block{BlockId: 8}
-// 	glass = &Block{BlockId: 20}
-// }
-
 func TestLightingSimpleSkyLight(t *testing.T) {
 	l, _ := NewLevel(NewMemPath(), LIGHT_SKY_SIMPLE)
 	tests := []struct {
@@ -120,14 +112,232 @@ func TestLightingSimpleSkyLight(t *testing.T) {
 		l.SetBlock(test.x, test.y, test.z, test.Block)
 		for o, light := range test.light {
 			if m, _ := l.getSkyLight(light[0], light[1], light[2]); int32(m) != light[3] {
-				t.Errorf("SimpleSkyLight test %d-%d: sky light level at [%d, %d, %d] does not match expected, got %d, expecting %d", n+1, o+1, light[0], light[1], light[2], m, light[3])
+				t.Errorf("test %d-%d: sky light level at [%d, %d, %d] does not match expected, got %d, expecting %d", n+1, o+1, light[0], light[1], light[2], m, light[3])
+			}
+		}
+	}
+}
+
+func BenchmarkLightingSimpleSkyLight(b *testing.B) {
+	l, _ := NewLevel(NewMemPath(), LIGHT_SKY_SIMPLE)
+	block := &Block{BlockId: 1}
+	for n := 0; n < b.N; n++ {
+		m := int32(n)
+		for i := int32(0); i < 5; i++ {
+			for j := int32(0); j < 5; j++ {
+				l.SetBlock(16*m+i, 20, j, block)
 			}
 		}
 	}
 }
 
 func TestLightingAllSkyLight(t *testing.T) {
+	l, _ := NewLevel(NewMemPath(), LIGHT_SKY_ALL)
+	type posBlock struct {
+		x, y, z int32
+		*Block
+	}
+	tests := []struct {
+		blocks []posBlock
+		light  [][4]int32 //x, y, z, skyLight
+	}{
+		{[]posBlock{ //Test 1
+			{0, 20, 0, &Block{BlockId: 39}},
+		}, [][4]int32{
+			{0, 20, 0, 15},
+			{0, 21, 0, 15},
+			{0, 19, 0, 15},
+			{0, 26, 0, 15},
+			{0, 31, 0, 15},
+			{15, 31, 15, 15},
+			{15, 15, 15, 15},
+			{15, 31, 0, 15},
+			{0, 15, 15, 15},
+			{0, 31, 0, 15},
+			{23, 23, 23, 15},
+		}},
+		{[]posBlock{ //Test 2
+			{0, 20, 0, &Block{BlockId: 1}},
+		}, [][4]int32{
+			{0, 21, 0, 15},
+			{0, 20, 0, 0},
+			{0, 19, 0, 14},
+			{0, 18, 0, 14},
+			{0, 16, 0, 14},
+		}},
+		{[]posBlock{ //Test 3
+			{-1, 20, -1, &Block{BlockId: 1}},
+			{-1, 20, 0, &Block{BlockId: 1}},
+			{-1, 20, 1, &Block{BlockId: 1}},
+			{0, 20, -1, &Block{BlockId: 1}},
+			{0, 20, 1, &Block{BlockId: 1}},
+			{1, 20, -1, &Block{BlockId: 1}},
+			{1, 20, 0, &Block{BlockId: 1}},
+			{1, 20, 1, &Block{BlockId: 1}},
+		}, [][4]int32{
+			{0, 19, 0, 13},
+			{-1, 19, -1, 14},
+			{1, 19, 1, 14},
+			{-1, 19, 1, 14},
+			{1, 19, -1, 14},
+			{0, 18, 0, 13},
+			{-1, 18, -1, 14},
+			{1, 18, 1, 14},
+			{-1, 18, 1, 14},
+			{1, 18, -1, 14},
+		}},
+		{[]posBlock{ //Test 4
+			{0, 20, 0, &Block{}},
+		}, [][4]int32{
+			{0, 20, 0, 15},
+			{0, 19, 0, 15},
+			{0, 18, 0, 15},
+			{0, 16, 0, 15},
+		}},
+		{[]posBlock{ //Test 5
+			{0, 20, 0, &Block{BlockId: 1}},
+		}, [][4]int32{
+			{0, 20, 0, 0},
+			{0, 19, 0, 13},
+			{0, 19, 1, 14},
+			{1, 19, 0, 14},
+			{0, 18, 0, 13},
+			{0, 16, 0, 13},
+		}},
+		{[]posBlock{ //Test 6
+			{10, 20, 10, &Block{BlockId: 1}},
+			{11, 20, 10, &Block{BlockId: 1}},
+			{12, 20, 10, &Block{BlockId: 1}},
+			{13, 20, 10, &Block{BlockId: 1}},
+			{14, 20, 10, &Block{BlockId: 1}},
+			{10, 20, 11, &Block{BlockId: 1}},
+			{11, 20, 11, &Block{BlockId: 1}},
+			{12, 20, 11, &Block{BlockId: 1}},
+			{13, 20, 11, &Block{BlockId: 1}},
+			{14, 20, 11, &Block{BlockId: 1}},
+			{10, 20, 12, &Block{BlockId: 1}},
+			{11, 20, 12, &Block{BlockId: 1}},
+			{12, 20, 12, &Block{BlockId: 1}},
+			{13, 20, 12, &Block{BlockId: 1}},
+			{14, 20, 12, &Block{BlockId: 1}},
+			{10, 20, 13, &Block{BlockId: 1}},
+			{11, 20, 13, &Block{BlockId: 1}},
+			{12, 20, 13, &Block{BlockId: 1}},
+			{13, 20, 13, &Block{BlockId: 1}},
+			{14, 20, 13, &Block{BlockId: 1}},
+			{10, 20, 14, &Block{BlockId: 1}},
+			{11, 20, 14, &Block{BlockId: 1}},
+			{12, 20, 14, &Block{BlockId: 1}},
+			{13, 20, 14, &Block{BlockId: 1}},
+			{14, 20, 14, &Block{BlockId: 1}},
 
+			{10, 19, 10, &Block{BlockId: 1}},
+			{11, 19, 10, &Block{BlockId: 1}},
+			{12, 19, 10, &Block{BlockId: 1}},
+			{13, 19, 10, &Block{BlockId: 1}},
+			{14, 19, 10, &Block{BlockId: 1}},
+			{10, 19, 11, &Block{BlockId: 1}},
+			{14, 19, 11, &Block{BlockId: 1}},
+			{10, 19, 12, &Block{BlockId: 1}},
+			{14, 19, 12, &Block{BlockId: 1}},
+			{10, 19, 13, &Block{BlockId: 1}},
+			{14, 19, 13, &Block{BlockId: 1}},
+			{10, 19, 14, &Block{BlockId: 1}},
+			{11, 19, 14, &Block{BlockId: 1}},
+			{12, 19, 14, &Block{BlockId: 1}},
+			{13, 19, 14, &Block{BlockId: 1}},
+			{14, 19, 14, &Block{BlockId: 1}},
+
+			{10, 18, 10, &Block{BlockId: 1}},
+			{11, 18, 10, &Block{BlockId: 1}},
+			{12, 18, 10, &Block{BlockId: 1}},
+			{13, 18, 10, &Block{BlockId: 1}},
+			{14, 18, 10, &Block{BlockId: 1}},
+			{10, 18, 11, &Block{BlockId: 1}},
+			{14, 18, 11, &Block{BlockId: 1}},
+			{10, 18, 12, &Block{BlockId: 1}},
+			{14, 18, 12, &Block{BlockId: 1}},
+			{10, 18, 13, &Block{BlockId: 1}},
+			{14, 18, 13, &Block{BlockId: 1}},
+			{10, 18, 14, &Block{BlockId: 1}},
+			{11, 18, 14, &Block{BlockId: 1}},
+			{12, 18, 14, &Block{BlockId: 1}},
+			{13, 18, 14, &Block{BlockId: 1}},
+			{14, 18, 14, &Block{BlockId: 1}},
+
+			{10, 17, 10, &Block{BlockId: 1}},
+			{11, 17, 10, &Block{BlockId: 1}},
+			{12, 17, 10, &Block{BlockId: 1}},
+			{13, 17, 10, &Block{BlockId: 1}},
+			{14, 17, 10, &Block{BlockId: 1}},
+			{10, 17, 11, &Block{BlockId: 1}},
+			{14, 17, 11, &Block{BlockId: 1}},
+			{10, 17, 12, &Block{BlockId: 1}},
+			{14, 17, 12, &Block{BlockId: 1}},
+			{10, 17, 13, &Block{BlockId: 1}},
+			{14, 17, 13, &Block{BlockId: 1}},
+			{10, 17, 14, &Block{BlockId: 1}},
+			{11, 17, 14, &Block{BlockId: 1}},
+			{12, 17, 14, &Block{BlockId: 1}},
+			{13, 17, 14, &Block{BlockId: 1}},
+			{14, 17, 14, &Block{BlockId: 1}},
+
+			{10, 16, 10, &Block{BlockId: 1}},
+			{11, 16, 10, &Block{BlockId: 1}},
+			{12, 16, 10, &Block{BlockId: 1}},
+			{13, 16, 10, &Block{BlockId: 1}},
+			{14, 16, 10, &Block{BlockId: 1}},
+			{10, 16, 11, &Block{BlockId: 1}},
+			{11, 16, 11, &Block{BlockId: 1}},
+			{12, 16, 11, &Block{BlockId: 1}},
+			{13, 16, 11, &Block{BlockId: 1}},
+			{14, 16, 11, &Block{BlockId: 1}},
+			{10, 16, 12, &Block{BlockId: 1}},
+			{11, 16, 12, &Block{BlockId: 1}},
+			{12, 16, 12, &Block{BlockId: 1}},
+			{13, 16, 12, &Block{BlockId: 1}},
+			{14, 16, 12, &Block{BlockId: 1}},
+			{10, 16, 13, &Block{BlockId: 1}},
+			{11, 16, 13, &Block{BlockId: 1}},
+			{12, 16, 13, &Block{BlockId: 1}},
+			{13, 16, 13, &Block{BlockId: 1}},
+			{14, 16, 13, &Block{BlockId: 1}},
+			{10, 16, 14, &Block{BlockId: 1}},
+			{11, 16, 14, &Block{BlockId: 1}},
+			{12, 16, 14, &Block{BlockId: 1}},
+			{13, 16, 14, &Block{BlockId: 1}},
+			{14, 16, 14, &Block{BlockId: 1}},
+		}, [][4]int32{
+			{10, 20, 10, 0},
+			{14, 20, 14, 0},
+			{12, 19, 12, 0},
+			{13, 18, 13, 0},
+			{11, 17, 11, 0},
+		}},
+	}
+	for n, test := range tests {
+		for _, b := range test.blocks {
+			l.SetBlock(b.x, b.y, b.z, b.Block)
+		}
+		for o, light := range test.light {
+			if m, _ := l.getSkyLight(light[0], light[1], light[2]); int32(m) != light[3] {
+				t.Errorf("test %d-%d: sky light level at [%d, %d, %d] does not match expected, got %d, expecting %d", n+1, o+1, light[0], light[1], light[2], m, light[3])
+			}
+		}
+	}
+}
+
+func BenchmarkLightingAllSkyLight(b *testing.B) {
+	l, _ := NewLevel(NewMemPath(), LIGHT_SKY_ALL)
+	block := &Block{BlockId: 1}
+	for n := 0; n < b.N; n++ {
+		m := int32(n)
+		for i := int32(0); i < 5; i++ {
+			for j := int32(0); j < 5; j++ {
+				l.SetBlock(16*m+i, 20, j, block)
+			}
+		}
+	}
 }
 
 func (l *Level) getBlockLight(x, y, z int32) (uint8, error) {
@@ -145,7 +355,7 @@ func (l *Level) getSkyLight(x, y, z int32) (uint8, error) {
 	if err != nil {
 		return 0, err
 	} else if c == nil {
-		return 0, nil
+		return 15, nil
 	}
 	return c.GetSkyLight(x, y, z), nil
 }

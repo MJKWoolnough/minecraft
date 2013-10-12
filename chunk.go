@@ -319,6 +319,9 @@ func (c *chunk) SetBiome(x, z int32, b Biome) {
 }
 
 func (c *chunk) GetOpacity(x, y, z int32) uint8 {
+	if y >= (*c.heightMap)[x&15<<4|z&15] {
+		return 1
+	}
 	ys := y >> 4
 	if c.sections[ys] == nil {
 		return 1
@@ -331,8 +334,13 @@ func (c *chunk) GetHeight(x, z int32) int32 {
 }
 
 func (c *chunk) GetBlockLight(x, y, z int32) uint8 {
+	if y > 255 {
+		return 15
+	} else if y < 0 {
+		return 0
+	}
 	ys := y >> 4
-	if c.sections[ys] == nil {
+	if ys < 16 && c.sections[ys] == nil {
 		return 0
 	}
 	return c.sections[ys].GetBlockLight(x, y, z)
@@ -340,19 +348,17 @@ func (c *chunk) GetBlockLight(x, y, z int32) uint8 {
 
 func (c *chunk) SetBlockLight(x, y, z int32, l uint8) {
 	ys := y >> 4
-	if c.sections[ys] != nil {
+	if ys < 16 && c.sections[ys] != nil {
 		c.sections[ys].SetBlockLight(x, y, z, l)
 	}
 }
 
 func (c *chunk) GetSkyLight(x, y, z int32) uint8 {
-	if y >= (*c.heightMap)[x&15<<4|z&15] {
-		return 15
-	} else if y > 255 {
+	if y >= (*c.heightMap)[x&15<<4|z&15] || y > 255 {
 		return 15
 	} else if y < 0 {
 		return 0
-	} else if ys := y >> 4; c.sections[ys] != nil {
+	} else if ys := y >> 4; ys < 16 && c.sections[ys] != nil {
 		return c.sections[ys].GetSkyLight(x, y, z)
 	} else if ys < 15 && c.sections[ys+1] != nil {
 		sl := c.sections[ys+1].GetSkyLight(x, 0, z)
@@ -368,7 +374,7 @@ func (c *chunk) GetSkyLight(x, y, z int32) uint8 {
 
 func (c *chunk) SetSkyLight(x, y, z int32, l uint8) {
 	ys := y >> 4
-	if c.sections[ys] != nil {
+	if ys < 16 && c.sections[ys] != nil {
 		c.sections[ys].SetSkyLight(x, y, z, l)
 	}
 }
