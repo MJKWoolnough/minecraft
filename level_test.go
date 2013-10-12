@@ -372,7 +372,7 @@ func TestLightingAllSkyLight(t *testing.T) {
 			{100, 11, 100, 9},
 			{100, 12, 100, 12},
 		}},
-		{[]posBlock{ //Test 9
+		{[]posBlock{ //Test 10
 			{100, 6, 100, &Block{}},
 		}, [][4]int32{
 			{100, 6, 100, 13},
