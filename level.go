@@ -208,7 +208,7 @@ func (l *Level) SetBlock(x, y, z int32, block *Block) error {
 			for i := baseX; i < baseX+16; i++ {
 				for k := baseZ; k < baseZ+16; k++ {
 					j := baseY + 15
-					if h := c.GetHeight(i, k); h < baseY {
+					if h := c.GetHeight(i, k); h < baseY || h == 0 {
 						for ; j >= baseY; j-- {
 							c.SetSkyLight(i, j, k, 15)
 						}

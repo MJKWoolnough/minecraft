@@ -314,6 +314,75 @@ func TestLightingAllSkyLight(t *testing.T) {
 			{13, 18, 13, 0},
 			{11, 17, 11, 0},
 		}},
+		{[]posBlock{ //Test 7
+			{100, 10, 100, &Block{BlockId: 8}},
+		}, [][4]int32{
+			{100, 10, 100, 12},
+		}},
+		{[]posBlock{ //Test 8
+			{99, 12, 100, &Block{BlockId: 1}},
+			{99, 11, 100, &Block{BlockId: 1}},
+			{99, 10, 100, &Block{BlockId: 1}},
+			{99, 9, 100, &Block{BlockId: 1}},
+			{99, 8, 100, &Block{BlockId: 1}},
+			{99, 7, 100, &Block{BlockId: 1}},
+
+			{101, 12, 100, &Block{BlockId: 1}},
+			{101, 11, 100, &Block{BlockId: 1}},
+			{101, 10, 100, &Block{BlockId: 1}},
+			{101, 9, 100, &Block{BlockId: 1}},
+			{101, 8, 100, &Block{BlockId: 1}},
+			{101, 7, 100, &Block{BlockId: 1}},
+
+			{100, 12, 99, &Block{BlockId: 1}},
+			{100, 11, 99, &Block{BlockId: 1}},
+			{100, 10, 99, &Block{BlockId: 1}},
+			{100, 9, 99, &Block{BlockId: 1}},
+			{100, 8, 99, &Block{BlockId: 1}},
+			{100, 7, 99, &Block{BlockId: 1}},
+
+			{100, 12, 101, &Block{BlockId: 1}},
+			{100, 11, 101, &Block{BlockId: 1}},
+			{100, 10, 101, &Block{BlockId: 1}},
+			{100, 9, 101, &Block{BlockId: 1}},
+			{100, 8, 101, &Block{BlockId: 1}},
+			{100, 7, 101, &Block{BlockId: 1}},
+
+			{100, 8, 100, &Block{BlockId: 8}},
+			{100, 7, 100, &Block{BlockId: 1}},
+
+			{100, 11, 100, &Block{BlockId: 8}},
+			{100, 9, 100, &Block{BlockId: 8}},
+		}, [][4]int32{
+			{100, 8, 100, 3},
+			{100, 9, 100, 6},
+			{100, 10, 100, 9},
+			{100, 11, 100, 12},
+		}},
+		{[]posBlock{ //Test 9
+			{100, 12, 100, &Block{BlockId: 8}},
+			{100, 7, 100, &Block{BlockId: 8}},
+			{100, 6, 100, &Block{BlockId: 1}},
+		}, [][4]int32{
+			{100, 6, 100, 0},
+			{100, 7, 100, 0},
+			{100, 8, 100, 0},
+			{100, 9, 100, 3},
+			{100, 10, 100, 6},
+			{100, 11, 100, 9},
+			{100, 12, 100, 12},
+		}},
+		{[]posBlock{ //Test 9
+			{100, 6, 100, &Block{}},
+		}, [][4]int32{
+			{100, 6, 100, 13},
+			{100, 7, 100, 10},
+			{100, 8, 100, 7},
+			{100, 9, 100, 4},
+			{100, 10, 100, 6},
+			{100, 11, 100, 9},
+			{100, 12, 100, 12},
+		}},
 	}
 	for n, test := range tests {
 		for _, b := range test.blocks {
