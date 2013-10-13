@@ -40,53 +40,16 @@ var (
 	}
 )
 
-type light uint8
-
-func (l light) SkyLight() bool {
-	return l&3 > 0
-}
-
-func (l light) SkyLightSimple() bool {
-	return l&3 == 1
-}
-
-func (l light) SkyLightAll() bool {
-	return l&3 == 3
-}
-
-func (l light) BlockLight() bool {
-	return l&12 > 0
-}
-
-func (l light) BlockLightSimple() bool {
-	return l&12 == 4
-}
-
-func (l light) BlockLightAll() bool {
-	return l&12 == 12
-}
-
-const (
-	LIGHT_SKY_NONE     light = 0
-	LIGHT_SKY_SIMPLE   light = 1
-	LIGHT_SKY_ALL      light = 3
-	LIGHT_BLOCK_NONE   light = 0
-	LIGHT_BLOCK_SIMPLE light = 4
-	LIGHT_BLOCK_ALL    light = 12
-)
-
 type Level struct {
 	path      Path
 	chunks    map[uint64]*chunk
 	changes   boolmap.Map
 	levelData *nbt.Compound
-	lighting  light
 	changed   bool
 }
 
-// Create/Load a minecraft level from the given path. Also takes a light value
-// to determine how it should it should process lighting.
-func NewLevel(location Path, ll light) (*Level, error) {
+// Create/Load a minecraft level from the given path.
+func NewLevel(location Path) (*Level, error) {
 	var (
 		levelDat nbt.Tag
 		data     *nbt.Compound
@@ -144,7 +107,6 @@ func NewLevel(location Path, ll light) (*Level, error) {
 		make(map[uint64]*chunk),
 		boolmap.NewMap(),
 		levelDat.Data().(*nbt.Compound).Get("Data").Data().(*nbt.Compound),
-		ll,
 		changed,
 	}, nil
 }
@@ -201,90 +163,72 @@ func (l *Level) SetBlock(x, y, z int32, block *Block) error {
 			return nil
 		}
 		c.sections[ys] = newSection(y)
-		if l.lighting.SkyLight() {
-			baseX := x &^ 15
-			baseY := y &^ 15
-			baseZ := z &^ 15
-			for i := baseX; i < baseX+16; i++ {
-				for k := baseZ; k < baseZ+16; k++ {
-					j := baseY + 15
-					if h := c.GetHeight(i, k); h < baseY || h == 0 {
-						for ; j >= baseY; j-- {
-							c.SetSkyLight(i, j, k, 15)
-						}
-					} else if l.lighting.SkyLightSimple() {
-						for currLightLevel := c.GetSkyLight(i, j+1, k); j >= baseY; j-- {
-							if currLightLevel > 0 {
-								currLightLevel--
-							}
-							c.SetSkyLight(i, j, k, currLightLevel)
-						}
-					}
-				}
-			}
-			if l.lighting.SkyLightAll() {
-				for a := int32(0); a < 16; a++ {
-					for b := int32(0); b < 16; b++ {
-						if c.GetHeight(baseX+a, baseZ+b) > baseY {
-							if err = l.genLighting(baseX+a, baseY+15, baseZ+b, true, false, 0); err != nil {
-								return err
-							}
-							if err = l.genLighting(baseX+a, baseY, baseZ+b, true, false, 0); err != nil {
-								return err
-							}
-						}
-						if err = l.genLighting(baseX+a, baseY+15-b, baseZ, true, false, 0); err != nil {
-							return err
-						}
-						if err = l.genLighting(baseX, baseY+15-b, baseZ+a, true, false, 0); err != nil {
-							return err
-						}
-						if err = l.genLighting(baseX+a, baseY+15-b, baseZ+15, true, false, 0); err != nil {
-							return err
-						}
-						if err = l.genLighting(baseX+15, baseY+15-b, baseZ+a, true, false, 0); err != nil {
-							return err
-						}
+		baseX := x &^ 15
+		baseY := y &^ 15
+		baseZ := z &^ 15
+		for i := baseX; i < baseX+16; i++ {
+			for k := baseZ; k < baseZ+16; k++ {
+				j := baseY + 15
+				if h := c.GetHeight(i, k); h < baseY || h == 0 {
+					for ; j >= baseY; j-- {
+						c.SetSkyLight(i, j, k, 15)
 					}
 				}
 			}
 		}
+		for a := int32(0); a < 16; a++ {
+			for b := int32(0); b < 16; b++ {
+				//Sky Light
+				if err = l.genLighting(baseX+a, baseY+15, baseZ+b, true, false, 0); err != nil {
+					return err
+				}
+				if err = l.genLighting(baseX+a, baseY, baseZ+b, true, false, 0); err != nil {
+					return err
+				}
+				if err = l.genLighting(baseX+a, baseY+15-b, baseZ, true, false, 0); err != nil {
+					return err
+				}
+				if err = l.genLighting(baseX, baseY+15-b, baseZ+a, true, false, 0); err != nil {
+					return err
+				}
+				if err = l.genLighting(baseX+a, baseY+15-b, baseZ+15, true, false, 0); err != nil {
+					return err
+				}
+				if err = l.genLighting(baseX+15, baseY+15-b, baseZ+a, true, false, 0); err != nil {
+					return err
+				}
+				//Block Light
+				if err = l.genLighting(baseX+a, baseY+15, baseZ+b, false, false, 0); err != nil {
+					return err
+				}
+				if err = l.genLighting(baseX+a, baseY, baseZ+b, false, false, 0); err != nil {
+					return err
+				}
+				if err = l.genLighting(baseX+a, baseY+15-b, baseZ, false, false, 0); err != nil {
+					return err
+				}
+				if err = l.genLighting(baseX, baseY+15-b, baseZ+a, false, false, 0); err != nil {
+					return err
+				}
+				if err = l.genLighting(baseX+a, baseY+15-b, baseZ+15, false, false, 0); err != nil {
+					return err
+				}
+				if err = l.genLighting(baseX+15, baseY+15-b, baseZ+a, false, false, 0); err != nil {
+					return err
+				}
+			}
+		}
 	}
-	var opacity uint8
-	if l.lighting.SkyLight() {
-		opacity = c.GetOpacity(x, y, z)
-	}
+	opacity := c.GetOpacity(x, y, z)
 	c.SetBlock(x, y, z, block)
-	if l.lighting.SkyLight() && block.Opacity() != opacity {
-		if l.lighting.SkyLightSimple() {
-			nY := y
-			for h := c.GetHeight(x, z); nY >= h; nY-- {
-				c.SetSkyLight(x, nY, z, 15)
-			}
-			for currLightLevel := c.GetSkyLight(x, nY+1, z); nY >= 0; nY-- {
-				if currLightLevel > 0 {
-					if o := c.GetOpacity(x, nY, z); o < currLightLevel {
-						currLightLevel -= o
-					} else {
-						currLightLevel = 0
-					}
-				}
-				if c.GetSkyLight(x, nY, z) == currLightLevel {
-					break
-				}
-				c.SetSkyLight(x, nY, z, currLightLevel)
-			}
-		} else if err = l.genLighting(x, y, z, true, block.Opacity() > opacity, 0); err != nil {
+	if block.Opacity() != opacity {
+		if err = l.genLighting(x, y, z, true, block.Opacity() > opacity, 0); err != nil {
 			return err
 		}
 	}
-	if bl := c.GetBlockLight(x, y, z); l.lighting.BlockLight() && (block.Light() != bl || block.Opacity() != opacity) {
-		if l.lighting.BlockLightSimple() {
-			c.SetBlockLight(x, y, z, block.Light())
-		} else {
-			if err = l.genLighting(x, y, z, false, block.Light() < bl, block.Light()); err != nil {
-				return err
-			}
+	if bl := c.GetBlockLight(x, y, z); block.Light() != bl || block.Opacity() != opacity {
+		if err = l.genLighting(x, y, z, false, block.Light() < bl, block.Light()); err != nil {
+			return err
 		}
 	}
 	return nil

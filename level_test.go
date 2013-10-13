@@ -4,7 +4,7 @@ import "testing"
 
 func TestNewLevel(t *testing.T) {
 	m := NewMemPath()
-	l, err := NewLevel(m, 0)
+	l, err := NewLevel(m)
 	if err != nil {
 		t.Error(err.Error())
 		return
@@ -65,7 +65,7 @@ func TestNewLevel(t *testing.T) {
 		}
 	}
 	l.Save()
-	if l, err = NewLevel(m, 0); err != nil {
+	if l, err = NewLevel(m); err != nil {
 		t.Error(err.Error())
 		return
 	}
@@ -88,51 +88,8 @@ func TestNewLevel(t *testing.T) {
 	}
 }
 
-func TestLightingSimpleSkyLight(t *testing.T) {
-	l, _ := NewLevel(NewMemPath(), LIGHT_SKY_SIMPLE)
-	tests := []struct {
-		x, y, z int32
-		*Block
-		light [][4]int32 //x, y, z, skyLight
-	}{
-		{0, 20, 0, &Block{BlockId: 1}, [][4]int32{{0, 20, 0, 0}, {0, 19, 0, 0}, {0, 0, 0, 0}}},
-		{0, 19, 0, &Block{BlockId: 1}, [][4]int32{{0, 20, 0, 0}, {0, 19, 0, 0}, {0, 0, 0, 0}}},
-		{0, 20, 0, &Block{}, [][4]int32{{1, 20, 0, 15}, {0, 19, 0, 0}, {0, 0, 0, 0}}},
-		{1, 20, 0, &Block{BlockId: 8}, [][4]int32{{1, 20, 0, 12}, {1, 19, 0, 11}, {1, 0, 0, 0}}},
-		{1, 19, 0, &Block{BlockId: 8}, [][4]int32{{1, 20, 0, 12}, {1, 19, 0, 9}, {1, 0, 0, 0}}},
-		{1, 20, 0, &Block{}, [][4]int32{{1, 20, 0, 15}, {1, 19, 0, 12}, {1, 0, 0, 0}}},
-		{0, 16, 1, &Block{BlockId: 1}, [][4]int32{{0, 16, 1, 0}, {0, 15, 1, 0}, {0, 0, 1, 0}}},
-		{0, 15, 1, &Block{BlockId: 1}, [][4]int32{{0, 16, 1, 0}, {0, 15, 1, 0}, {0, 0, 1, 0}}},
-		{0, 16, 1, &Block{}, [][4]int32{{0, 16, 1, 15}, {0, 15, 1, 0}, {0, 0, 1, 0}}},
-		{1, 16, 1, &Block{BlockId: 8}, [][4]int32{{1, 16, 1, 12}, {1, 15, 1, 11}, {1, 0, 1, 0}}},
-		{1, 15, 1, &Block{BlockId: 8}, [][4]int32{{1, 16, 1, 12}, {1, 15, 1, 9}, {1, 0, 1, 0}}},
-		{1, 16, 1, &Block{}, [][4]int32{{1, 16, 1, 15}, {1, 15, 1, 12}, {1, 0, 1, 0}}},
-	}
-	for n, test := range tests {
-		l.SetBlock(test.x, test.y, test.z, test.Block)
-		for o, light := range test.light {
-			if m, _ := l.getSkyLight(light[0], light[1], light[2]); int32(m) != light[3] {
-				t.Errorf("test %d-%d: sky light level at [%d, %d, %d] does not match expected, got %d, expecting %d", n+1, o+1, light[0], light[1], light[2], m, light[3])
-			}
-		}
-	}
-}
-
-func BenchmarkLightingSimpleSkyLight(b *testing.B) {
-	l, _ := NewLevel(NewMemPath(), LIGHT_SKY_SIMPLE)
-	block := &Block{BlockId: 1}
-	for n := 0; n < b.N; n++ {
-		m := int32(n)
-		for i := int32(0); i < 5; i++ {
-			for j := int32(0); j < 5; j++ {
-				l.SetBlock(16*m+i, 20, j, block)
-			}
-		}
-	}
-}
-
-func TestLightingAllSkyLight(t *testing.T) {
-	l, _ := NewLevel(NewMemPath(), LIGHT_SKY_ALL)
+func TestSkyLight(t *testing.T) {
+	l, _ := NewLevel(NewMemPath())
 	type posBlock struct {
 		x, y, z int32
 		*Block
@@ -391,19 +348,6 @@ func TestLightingAllSkyLight(t *testing.T) {
 		for o, light := range test.light {
 			if m, _ := l.getSkyLight(light[0], light[1], light[2]); int32(m) != light[3] {
 				t.Errorf("test %d-%d: sky light level at [%d, %d, %d] does not match expected, got %d, expecting %d", n+1, o+1, light[0], light[1], light[2], m, light[3])
-			}
-		}
-	}
-}
-
-func BenchmarkLightingAllSkyLight(b *testing.B) {
-	l, _ := NewLevel(NewMemPath(), LIGHT_SKY_ALL)
-	block := &Block{BlockId: 1}
-	for n := 0; n < b.N; n++ {
-		m := int32(n)
-		for i := int32(0); i < 5; i++ {
-			for j := int32(0); j < 5; j++ {
-				l.SetBlock(16*m+i, 20, j, block)
 			}
 		}
 	}
