@@ -341,13 +341,7 @@ func TestSkyLight(t *testing.T) {
 			{100, 12, 100, 12},
 		}},
 	}
-	// 	debug = true
 	for n, test := range tests {
-		// 		debug = false
-		// 		if n == 4 {
-		// 			debug = true
-		// 			dbg.Printf("=====Testing Sky Light (%d)=====\n", n + 1)
-		// 		}
 		for _, b := range test.blocks {
 			l.SetBlock(b.x, b.y, b.z, b.Block)
 		}
@@ -357,7 +351,6 @@ func TestSkyLight(t *testing.T) {
 			}
 		}
 	}
-	// 	debug = false
 }
 
 func TestBlockLight(t *testing.T) {
@@ -432,11 +425,6 @@ func TestBlockLight(t *testing.T) {
 		}},
 	}
 	for n, test := range tests {
-		// 		debug = false
-		// 		if n == 3 {
-		// 			debug = true
-		// 			dbg.Printf("=====Testing Block Light (%d)=====\n", n + 1)
-		// 		}
 		for _, b := range test.blocks {
 			l.SetBlock(b.x, b.y, b.z, b.Block)
 		}
@@ -446,7 +434,6 @@ func TestBlockLight(t *testing.T) {
 			}
 		}
 	}
-	// 	debug = false
 }
 
 func BenchmarkSkyLight(b *testing.B) {
