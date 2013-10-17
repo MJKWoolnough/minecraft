@@ -98,7 +98,7 @@ func TestSkyLight(t *testing.T) {
 		blocks []posBlock
 		light  [][4]int32 //x, y, z, skyLight
 	}{
-		{[]posBlock{ //Test 1
+		{[]posBlock{
 			{0, 20, 0, &Block{BlockId: 39}},
 		}, [][4]int32{
 			{0, 20, 0, 15},
@@ -113,7 +113,7 @@ func TestSkyLight(t *testing.T) {
 			{0, 31, 0, 15},
 			{23, 23, 23, 15},
 		}},
-		{[]posBlock{ //Test 2
+		{[]posBlock{
 			{0, 20, 0, &Block{BlockId: 1}},
 		}, [][4]int32{
 			{0, 21, 0, 15},
@@ -122,7 +122,7 @@ func TestSkyLight(t *testing.T) {
 			{0, 18, 0, 14},
 			{0, 16, 0, 14},
 		}},
-		{[]posBlock{ //Test 3
+		{[]posBlock{
 			{-1, 20, -1, &Block{BlockId: 1}},
 			{-1, 20, 0, &Block{BlockId: 1}},
 			{-1, 20, 1, &Block{BlockId: 1}},
@@ -143,7 +143,7 @@ func TestSkyLight(t *testing.T) {
 			{-1, 18, 1, 14},
 			{1, 18, -1, 14},
 		}},
-		{[]posBlock{ //Test 4
+		{[]posBlock{
 			{0, 20, 0, &Block{}},
 		}, [][4]int32{
 			{0, 20, 0, 15},
@@ -151,7 +151,7 @@ func TestSkyLight(t *testing.T) {
 			{0, 18, 0, 15},
 			{0, 16, 0, 15},
 		}},
-		{[]posBlock{ //Test 5
+		{[]posBlock{
 			{0, 20, 0, &Block{BlockId: 1}},
 		}, [][4]int32{
 			{0, 20, 0, 0},
@@ -161,7 +161,7 @@ func TestSkyLight(t *testing.T) {
 			{0, 18, 0, 13},
 			{0, 16, 0, 13},
 		}},
-		{[]posBlock{ //Test 6
+		{[]posBlock{
 			{10, 20, 10, &Block{BlockId: 1}},
 			{11, 20, 10, &Block{BlockId: 1}},
 			{12, 20, 10, &Block{BlockId: 1}},
@@ -271,12 +271,12 @@ func TestSkyLight(t *testing.T) {
 			{13, 18, 13, 0},
 			{11, 17, 11, 0},
 		}},
-		{[]posBlock{ //Test 7
+		{[]posBlock{
 			{100, 10, 100, &Block{BlockId: 8}},
 		}, [][4]int32{
 			{100, 10, 100, 12},
 		}},
-		{[]posBlock{ //Test 8
+		{[]posBlock{
 			{99, 12, 100, &Block{BlockId: 1}},
 			{99, 11, 100, &Block{BlockId: 1}},
 			{99, 10, 100, &Block{BlockId: 1}},
@@ -316,7 +316,7 @@ func TestSkyLight(t *testing.T) {
 			{100, 10, 100, 9},
 			{100, 11, 100, 12},
 		}},
-		{[]posBlock{ //Test 9
+		{[]posBlock{
 			{100, 12, 100, &Block{BlockId: 8}},
 			{100, 7, 100, &Block{BlockId: 8}},
 			{100, 6, 100, &Block{BlockId: 1}},
@@ -329,7 +329,7 @@ func TestSkyLight(t *testing.T) {
 			{100, 11, 100, 9},
 			{100, 12, 100, 12},
 		}},
-		{[]posBlock{ //Test 10
+		{[]posBlock{
 			{100, 6, 100, &Block{}},
 		}, [][4]int32{
 			{100, 6, 100, 13},
@@ -341,13 +341,122 @@ func TestSkyLight(t *testing.T) {
 			{100, 12, 100, 12},
 		}},
 	}
+	// 	debug = true
 	for n, test := range tests {
+		// 		debug = false
+		// 		if n == 4 {
+		// 			debug = true
+		// 			dbg.Printf("=====Testing Sky Light (%d)=====\n", n + 1)
+		// 		}
 		for _, b := range test.blocks {
 			l.SetBlock(b.x, b.y, b.z, b.Block)
 		}
 		for o, light := range test.light {
 			if m, _ := l.getSkyLight(light[0], light[1], light[2]); int32(m) != light[3] {
 				t.Errorf("test %d-%d: sky light level at [%d, %d, %d] does not match expected, got %d, expecting %d", n+1, o+1, light[0], light[1], light[2], m, light[3])
+			}
+		}
+	}
+	// 	debug = false
+}
+
+func TestBlockLight(t *testing.T) {
+	l, _ := NewLevel(NewMemPath())
+	type posBlock struct {
+		x, y, z int32
+		*Block
+	}
+	tests := []struct {
+		blocks []posBlock
+		light  [][4]int32 //x, y, z, skyLight
+	}{
+		{[]posBlock{ //Test 1
+			{0, 10, 0, &Block{BlockId: 89}},
+		}, [][4]int32{
+			{0, 10, 0, 15},
+			{0, 9, 0, 14},
+			{0, 8, 0, 13},
+			{0, 7, 0, 12},
+			{0, 6, 0, 11},
+			{0, 5, 0, 10},
+			{0, 4, 0, 9},
+			{0, 3, 0, 8},
+			{0, 2, 0, 7},
+			{0, 1, 0, 6},
+			{0, 0, 0, 5},
+			{0, 11, 0, 14},
+			{0, 12, 0, 13},
+			{0, 13, 0, 12},
+			{0, 14, 0, 11},
+			{0, 15, 0, 10},
+			{1, 10, 0, 14},
+			{0, 10, 1, 14},
+			{1, 10, 1, 13},
+		}},
+		{[]posBlock{ //Test 2
+			{-16, 15, 15, &Block{BlockId: 20}},
+		}, [][4]int32{
+			{-1, 10, 0, 14},
+			{-2, 10, 0, 13},
+			{-3, 10, 0, 12},
+			{-1, 10, 1, 13},
+			{-1, 10, 2, 12},
+			{-1, 10, 3, 11},
+			{-1, 11, 0, 13},
+			{-2, 11, 0, 12},
+		}},
+		{[]posBlock{ //Test 3
+			{-16, 15, 15, &Block{}},
+			{-1, 10, 0, &Block{BlockId: 20}},
+		}, [][4]int32{
+			{-1, 10, 0, 14},
+			{-2, 10, 0, 13},
+			{-3, 10, 0, 12},
+			{-1, 10, 1, 13},
+			{-1, 10, 2, 12},
+			{-1, 10, 3, 11},
+			{-1, 11, 0, 13},
+			{-2, 11, 0, 12},
+		}},
+		{[]posBlock{ //Test 4
+			{1, 10, 0, &Block{BlockId: 1}},
+		}, [][4]int32{
+			{1, 10, 0, 0},
+			{2, 10, 0, 11},
+			{3, 10, 0, 10},
+			{2, 10, 1, 12},
+			{3, 10, 1, 11},
+			{1, 9, 0, 13},
+			{1, 11, 0, 13},
+			{1, 9, 1, 12},
+		}},
+	}
+	for n, test := range tests {
+		// 		debug = false
+		// 		if n == 3 {
+		// 			debug = true
+		// 			dbg.Printf("=====Testing Block Light (%d)=====\n", n + 1)
+		// 		}
+		for _, b := range test.blocks {
+			l.SetBlock(b.x, b.y, b.z, b.Block)
+		}
+		for o, light := range test.light {
+			if m, _ := l.getBlockLight(light[0], light[1], light[2]); int32(m) != light[3] {
+				t.Errorf("test %d-%d: block light level at [%d, %d, %d] does not match expected, got %d, expecting %d", n+1, o+1, light[0], light[1], light[2], m, light[3])
+			}
+		}
+	}
+	// 	debug = false
+}
+
+func BenchmarkSkyLight(b *testing.B) {
+	l, _ := NewLevel(NewMemPath())
+	block := &Block{BlockId: 1}
+	for n := 0; n < b.N; n++ {
+		m := int32(n)
+		for i := int32(0); i < 5; i++ {
+			for j := int32(0); j < 5; j++ {
+				l.SetBlock(16*m+i, 20, j, block)
 			}
 		}
 	}

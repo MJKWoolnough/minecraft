@@ -70,7 +70,11 @@ func newSection(y int32) *section {
 	s.add = nbt.NewByteArray(make([]int8, 2048))
 	s.data = nbt.NewByteArray(make([]int8, 2048))
 	s.blockLight = nbt.NewByteArray(make([]int8, 2048))
-	s.skyLight = nbt.NewByteArray(make([]int8, 2048))
+	sl := make([]int8, 2048)
+	for i := 0; i < 2048; i++ {
+		sl[i] = -1
+	}
+	s.skyLight = nbt.NewByteArray(sl)
 	s.section = nbt.NewCompound([]nbt.Tag{
 		nbt.NewTag("Blocks", s.blocks),
 		nbt.NewTag("Add", s.add),
@@ -182,13 +186,4 @@ func (s *section) SetSkyLight(x, y, z int32, l uint8) {
 
 func (s *section) SetY(y int32) {
 	s.section.Set(nbt.NewTag("Y", nbt.NewByte(int8(y>>4))))
-}
-
-func (s *section) IsEmpty() bool {
-	for _, b := range *s.blocks {
-		if b != 0 {
-			return false
-		}
-	}
-	return true
 }

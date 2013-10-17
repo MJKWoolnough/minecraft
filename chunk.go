@@ -334,13 +334,12 @@ func (c *chunk) GetHeight(x, z int32) int32 {
 }
 
 func (c *chunk) GetBlockLight(x, y, z int32) uint8 {
-	if y > 255 {
-		return 15
-	} else if y < 0 {
-		return 0
-	}
 	ys := y >> 4
 	if ys < 16 && c.sections[ys] == nil {
+		return 0
+	} else if y > 255 {
+		return 15
+	} else if y < 0 {
 		return 0
 	}
 	return c.sections[ys].GetBlockLight(x, y, z)
@@ -354,12 +353,12 @@ func (c *chunk) SetBlockLight(x, y, z int32, l uint8) {
 }
 
 func (c *chunk) GetSkyLight(x, y, z int32) uint8 {
-	if y >= (*c.heightMap)[x&15<<4|z&15] || y > 255 {
+	if ys := y >> 4; ys >= 0 && ys < 16 && c.sections[ys] != nil {
+		return c.sections[ys].GetSkyLight(x, y, z)
+	} else if y >= (*c.heightMap)[x&15<<4|z&15] || y > 255 {
 		return 15
 	} else if y < 0 {
 		return 0
-	} else if ys := y >> 4; ys < 16 && c.sections[ys] != nil {
-		return c.sections[ys].GetSkyLight(x, y, z)
 	} else if ys < 15 && c.sections[ys+1] != nil {
 		sl := c.sections[ys+1].GetSkyLight(x, 0, z)
 		if d := uint8((ys+1)<<4 - y); d < sl {
@@ -379,15 +378,12 @@ func (c *chunk) SetSkyLight(x, y, z int32, l uint8) {
 	}
 }
 
-func (c *chunk) IsEmpty() bool {
-	for i := 0; i < 16; i++ {
-		if c.sections[i] != nil {
-			if !c.sections[i].IsEmpty() {
-				return false
-			}
-		}
+func (c *chunk) createSection(y int32) bool {
+	if ys := y >> 4; ys >= 0 && ys < 16 && c.sections[ys] == nil {
+		c.sections[ys] = newSection(y)
+		return true
 	}
-	return true
+	return false
 }
 
 func xyz(x, y, z int32) uint16 {

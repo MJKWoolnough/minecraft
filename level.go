@@ -154,71 +154,23 @@ func (l *Level) GetBlock(x, y, z int32) (*Block, error) {
 
 // Sets the block at coordinates x, y, z. Also processes any lighting updates if applicable.
 func (l *Level) SetBlock(x, y, z int32, block *Block) error {
-	c, err := l.getChunk(x, z, true)
-	if err != nil {
-		return err
-	}
-	if ys := y >> 4; c.sections[ys] == nil { //crossing the object boundary for lighting
-		if block.Equal(&Block{}) {
-			return nil
-		}
-		c.sections[ys] = newSection(y)
-		baseX := x &^ 15
-		baseY := y &^ 15
-		baseZ := z &^ 15
-		for i := baseX; i < baseX+16; i++ {
-			for k := baseZ; k < baseZ+16; k++ {
-				j := baseY + 15
-				if h := c.GetHeight(i, k); h < baseY || h == 0 {
-					for ; j >= baseY; j-- {
-						c.SetSkyLight(i, j, k, 15)
-					}
-				}
+	var (
+		c   *chunk
+		err error
+	)
+	for mx := x - 1; mx <= x+1; mx++ {
+		for mz := z - 1; mz <= z+1; mz++ {
+			if c, err = l.getChunk(mx, mz, true); err != nil {
+				return err
 			}
-		}
-		for a := int32(0); a < 16; a++ {
-			for b := int32(0); b < 16; b++ {
-				//Sky Light
-				if err = l.genLighting(baseX+a, baseY+15, baseZ+b, true, false, 0); err != nil {
-					return err
-				}
-				if err = l.genLighting(baseX+a, baseY, baseZ+b, true, false, 0); err != nil {
-					return err
-				}
-				if err = l.genLighting(baseX+a, baseY+15-b, baseZ, true, false, 0); err != nil {
-					return err
-				}
-				if err = l.genLighting(baseX, baseY+15-b, baseZ+a, true, false, 0); err != nil {
-					return err
-				}
-				if err = l.genLighting(baseX+a, baseY+15-b, baseZ+15, true, false, 0); err != nil {
-					return err
-				}
-				if err = l.genLighting(baseX+15, baseY+15-b, baseZ+a, true, false, 0); err != nil {
-					return err
-				}
-				//Block Light
-				if err = l.genLighting(baseX+a, baseY+15, baseZ+b, false, false, 0); err != nil {
-					return err
-				}
-				if err = l.genLighting(baseX+a, baseY, baseZ+b, false, false, 0); err != nil {
-					return err
-				}
-				if err = l.genLighting(baseX+a, baseY+15-b, baseZ, false, false, 0); err != nil {
-					return err
-				}
-				if err = l.genLighting(baseX, baseY+15-b, baseZ+a, false, false, 0); err != nil {
-					return err
-				}
-				if err = l.genLighting(baseX+a, baseY+15-b, baseZ+15, false, false, 0); err != nil {
-					return err
-				}
-				if err = l.genLighting(baseX+15, baseY+15-b, baseZ+a, false, false, 0); err != nil {
-					return err
+			for my := y + 16; my >= 0; my -= 16 {
+				if c.createSection(my) {
+					break
 				}
 			}
 		}
 	}
+	c, _ = l.getChunk(x, z, false)
 	opacity := c.GetOpacity(x, y, z)
 	c.SetBlock(x, y, z, block)
 	if block.Opacity() != opacity {
@@ -274,9 +226,13 @@ func (l *Level) genLighting(x, y, z int32, skyLight, darker bool, source uint8) 
 					return err
 				} else if c == nil {
 					continue
+				} else if ys := my >> 4; my < 16 && c.sections[ys] == nil {
+					changed.Set(pos, true)
+					continue
 				}
 				shouldBe := list[i].lightLevel
-				if opacity := c.GetOpacity(mx, my, mz); opacity > shouldBe {
+				opacity := c.GetOpacity(mx, my, mz)
+				if opacity > shouldBe {
 					shouldBe = 0
 				} else {
 					shouldBe -= opacity
@@ -291,18 +247,39 @@ func (l *Level) genLighting(x, y, z int32, skyLight, darker bool, source uint8) 
 			}
 		}
 	} // end lighting reset
-	if !skyLight && source > 0 {
+	if source > 0 { //If this is the source of light
 		c, _ = l.getChunk(x, z, false)
 		c.SetBlockLight(x, y, z, source)
 		list = list[1:]
+		for _, s := range surroundingBlocks(x, y, z) {
+			mx, my, mz := s[0], s[1], s[2]
+			pos := (uint64(my) << 10) | (uint64(mz&31) << 5) | uint64(mx&31)
+			if changed.Get(pos) {
+				continue
+			}
+			if c, err = l.getChunk(mx, mz, false); err != nil {
+				return err
+			} else if c == nil {
+				dbg.Println("nil")
+				continue
+			} else if ys := my >> 4; my < 16 && c.sections[ys] == nil {
+				changed.Set(pos, true)
+				continue
+			}
+			if thisLight := getLight(c, mx, my, mz); thisLight < source {
+				list = append(list, &lightCoords{mx, my, mz, thisLight})
+				changed.Set(pos, true)
+			}
+		}
 	}
 	for ; len(list) > 0; list = list[1:] {
 		mx, my, mz := list[0].x, list[0].y, list[0].z
+		changed.Set((uint64(my)<<10)|(uint64(mz&31)<<5)|uint64(mx&31), false)
 		newLight := uint8(0)
 		c, _ = l.getChunk(mx, mz, false)
-		if opacity := c.GetOpacity(mx, my, mz); skyLight && my >= c.GetHeight(mx, mz) { //Determine correct light level...
+		if skyLight && my >= c.GetHeight(mx, mz) { //Determine correct light level...
 			newLight = 15
-		} else if opacity == 15 {
+		} else if opacity := c.GetOpacity(mx, my, mz); opacity == 15 {
 			newLight = 0
 		} else {
 			var d *chunk
@@ -320,11 +297,14 @@ func (l *Level) genLighting(x, y, z int32, skyLight, darker bool, source uint8) 
 				curr -= opacity
 				if curr > newLight {
 					newLight = curr
+					dbg.Printf("new light - %d\n", curr)
+				} else {
+					dbg.Printf("too dark - %d\n", curr)
 				}
 			}
 		} // ...end determining light level
 		setLight(c, mx, my, mz, newLight)
-		if newLight > list[0].lightLevel {
+		if newLight > list[0].lightLevel || (darker && newLight == list[0].lightLevel) {
 			for _, s := range surroundingBlocks(mx, my, mz) {
 				mx, my, mz = s[0], s[1], s[2]
 				pos := (uint64(my) << 10) | (uint64(mz&31) << 5) | uint64(mx&31)
@@ -334,6 +314,9 @@ func (l *Level) genLighting(x, y, z int32, skyLight, darker bool, source uint8) 
 				if c, err = l.getChunk(mx, mz, false); err != nil {
 					return err
 				} else if c == nil {
+					continue
+				} else if ys := my >> 4; ys < 16 && c.sections[ys] == nil {
+					changed.Set(pos, true)
 					continue
 				}
 				if thisLight := getLight(c, mx, my, mz); thisLight < newLight {
