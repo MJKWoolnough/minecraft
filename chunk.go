@@ -64,7 +64,7 @@ type chunk struct {
 	tileTicks    map[uint16][]*nbt.Compound
 }
 
-func (c *chunk) GetNBT() nbt.Tag {
+func (c *chunk) GetNBT() *nbt.Tag {
 	data := c.data.Copy().(*nbt.Compound)
 	sections := make([]nbt.Data, 0, 16)
 	for i := 0; i < 16; i++ {
@@ -93,17 +93,17 @@ func (c *chunk) GetNBT() nbt.Tag {
 	} else {
 		data.Set(nbt.NewTag("TileTicks", nbt.NewList(tileTicks)))
 	}
-	return nbt.NewTag("", nbt.NewCompound([]nbt.Tag{nbt.NewTag("Level", data)}))
+	return nbt.NewTag("", nbt.NewCompound([]*nbt.Tag{nbt.NewTag("Level", data)}))
 }
 
-func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
+func newChunk(x, z int32, data *nbt.Tag) (*chunk, error) {
 	if data == nil {
 		biomes := make([]int8, 256)
 		for i := 0; i < 256; i++ {
 			biomes[i] = -1
 		}
-		data = nbt.NewTag("", nbt.NewCompound([]nbt.Tag{
-			nbt.NewTag("Level", nbt.NewCompound([]nbt.Tag{
+		data = nbt.NewTag("", nbt.NewCompound([]*nbt.Tag{
+			nbt.NewTag("Level", nbt.NewCompound([]*nbt.Tag{
 				nbt.NewTag("xPos", nbt.NewInt(x)),
 				nbt.NewTag("zPos", nbt.NewInt(z)),
 				nbt.NewTag("Biomes", nbt.NewByteArray(biomes)),
@@ -244,7 +244,7 @@ func (c *chunk) GetBlock(x, y, z int32) *Block {
 	b := c.sections[ys].GetBlock(x, y, z)
 	pos := xyz(x, y, z)
 	if md, ok := c.tileEntities[pos]; ok && md != nil {
-		b.SetMetadata([]nbt.Tag(*md))
+		b.SetMetadata([]*nbt.Tag(*md))
 	}
 	if tt, ok := c.tileTicks[pos]; ok && tt != nil {
 		b.ticks = make([]Tick, len(tt))
@@ -296,7 +296,7 @@ func (c *chunk) SetBlock(x, y, z int32, b *Block) {
 		ticks := b.GetTicks()
 		c.tileTicks[pos] = make([]*nbt.Compound, len(ticks))
 		for n, tick := range ticks {
-			c.tileTicks[pos][n] = nbt.NewCompound([]nbt.Tag{
+			c.tileTicks[pos][n] = nbt.NewCompound([]*nbt.Tag{
 				nbt.NewTag("i", nbt.NewInt(tick.I)),
 				nbt.NewTag("p", nbt.NewInt(tick.P)),
 				nbt.NewTag("t", nbt.NewInt(tick.T)),

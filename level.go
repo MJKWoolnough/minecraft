@@ -51,7 +51,7 @@ type Level struct {
 // Create/Load a minecraft level from the given path.
 func NewLevel(location Path) (*Level, error) {
 	var (
-		levelDat nbt.Tag
+		levelDat *nbt.Tag
 		data     *nbt.Compound
 		changed  bool
 	)
@@ -59,8 +59,8 @@ func NewLevel(location Path) (*Level, error) {
 	if err != nil {
 		return nil, err
 	} else if levelDat == nil {
-		levelDat = nbt.NewTag("", nbt.NewCompound([]nbt.Tag{
-			nbt.NewTag("Data", nbt.NewCompound([]nbt.Tag{
+		levelDat = nbt.NewTag("", nbt.NewCompound([]*nbt.Tag{
+			nbt.NewTag("Data", nbt.NewCompound([]*nbt.Tag{
 				nbt.NewTag("GameType", nbt.NewInt(1)),
 				nbt.NewTag("generatorName", nbt.NewString("flat")),
 				nbt.NewTag("generatorVersion", nbt.NewInt(0)),
@@ -260,7 +260,6 @@ func (l *Level) genLighting(x, y, z int32, skyLight, darker bool, source uint8) 
 			if c, err = l.getChunk(mx, mz, false); err != nil {
 				return err
 			} else if c == nil {
-				dbg.Println("nil")
 				continue
 			} else if ys := my >> 4; my < 16 && c.sections[ys] == nil {
 				changed.Set(pos, true)
@@ -297,9 +296,6 @@ func (l *Level) genLighting(x, y, z int32, skyLight, darker bool, source uint8) 
 				curr -= opacity
 				if curr > newLight {
 					newLight = curr
-					dbg.Printf("new light - %d\n", curr)
-				} else {
-					dbg.Printf("too dark - %d\n", curr)
 				}
 			}
 		} // ...end determining light level
@@ -390,12 +386,12 @@ func (l *Level) getChunk(x, z int32, create bool) (*chunk, error) {
 // Saves all open chunks, but does not close them.
 func (l *Level) Save() error {
 	if l.changed {
-		if err := l.path.WriteLevelDat(nbt.NewTag("", nbt.NewCompound([]nbt.Tag{nbt.NewTag("Data", l.levelData)}))); err != nil {
+		if err := l.path.WriteLevelDat(nbt.NewTag("", nbt.NewCompound([]*nbt.Tag{nbt.NewTag("Data", l.levelData)}))); err != nil {
 			return err
 		}
 		l.changed = false
 	}
-	toSave := make([]nbt.Tag, 0)
+	toSave := make([]*nbt.Tag, 0)
 	for n, c := range l.chunks {
 		if l.changes.Get(uint64(n)) {
 			toSave = append(toSave, c.GetNBT())

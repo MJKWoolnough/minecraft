@@ -47,11 +47,11 @@ var filename *regexp.Regexp
 // to different formats.
 type Path interface {
 	// Returns a nil nbt.Tag when chunk does not exists
-	GetChunk(int32, int32) (nbt.Tag, error)
-	SetChunk(...nbt.Tag) error
+	GetChunk(int32, int32) (*nbt.Tag, error)
+	SetChunk(...*nbt.Tag) error
 	RemoveChunk(int32, int32) error
-	ReadLevelDat() (nbt.Tag, error)
-	WriteLevelDat(nbt.Tag) error
+	ReadLevelDat() (*nbt.Tag, error)
+	WriteLevelDat(*nbt.Tag) error
 }
 
 const (
@@ -81,7 +81,7 @@ func NewFilePath(dirname string) (*FilePath, error) {
 }
 
 // Returns the chunk at chunk coords x, z.
-func (p *FilePath) GetChunk(x, z int32) (nbt.Tag, error) {
+func (p *FilePath) GetChunk(x, z int32) (*nbt.Tag, error) {
 	if !p.lock {
 		return nil, &NoLock{}
 	}
@@ -147,7 +147,7 @@ type rc struct {
 
 // Saves multiple chunks at once, possibly returning a MultiError if
 // multiple errors were encountered.
-func (p *FilePath) SetChunk(data ...nbt.Tag) error {
+func (p *FilePath) SetChunk(data ...*nbt.Tag) error {
 	if !p.lock {
 		return &NoLock{}
 	}
@@ -335,7 +335,7 @@ func (p *FilePath) RemoveChunk(x, z int32) error {
 }
 
 // Returns the level data.
-func (p *FilePath) ReadLevelDat() (nbt.Tag, error) {
+func (p *FilePath) ReadLevelDat() (*nbt.Tag, error) {
 	if !p.lock {
 		return nil, &NoLock{}
 	}
@@ -355,7 +355,7 @@ func (p *FilePath) ReadLevelDat() (nbt.Tag, error) {
 }
 
 // Writes the level data.
-func (p *FilePath) WriteLevelDat(data nbt.Tag) error {
+func (p *FilePath) WriteLevelDat(data *nbt.Tag) error {
 	if !p.lock {
 		return &NoLock{}
 	}
@@ -459,7 +459,7 @@ func NewMemPath() *MemPath {
 }
 
 // Returns the chunk at chunk coords x, z.
-func (m *MemPath) GetChunk(x, z int32) (nbt.Tag, error) {
+func (m *MemPath) GetChunk(x, z int32) (*nbt.Tag, error) {
 	pos := uint64(z)<<32 | uint64(uint32(x))
 	if m.chunks[pos] == nil {
 		return nil, nil
@@ -468,7 +468,7 @@ func (m *MemPath) GetChunk(x, z int32) (nbt.Tag, error) {
 }
 
 // Saves multiple chunks at once.
-func (m *MemPath) SetChunk(data ...nbt.Tag) error {
+func (m *MemPath) SetChunk(data ...*nbt.Tag) error {
 	for _, d := range data {
 		x, z, err := chunkCoords(d)
 		if err != nil {
@@ -492,7 +492,7 @@ func (m *MemPath) RemoveChunk(x, z int32) error {
 }
 
 // Returns the level data.
-func (m *MemPath) ReadLevelDat() (nbt.Tag, error) {
+func (m *MemPath) ReadLevelDat() (*nbt.Tag, error) {
 	if len(m.level) == 0 {
 		return nil, nil
 	}
@@ -500,11 +500,11 @@ func (m *MemPath) ReadLevelDat() (nbt.Tag, error) {
 }
 
 // Writes the level data.
-func (m *MemPath) WriteLevelDat(data nbt.Tag) error {
+func (m *MemPath) WriteLevelDat(data *nbt.Tag) error {
 	return m.write(data, &m.level)
 }
 
-func (m *MemPath) read(buf []byte) (nbt.Tag, error) {
+func (m *MemPath) read(buf []byte) (*nbt.Tag, error) {
 	z, err := zlib.NewReader(memio.Open(buf))
 	if err != nil {
 		return nil, err
@@ -513,14 +513,14 @@ func (m *MemPath) read(buf []byte) (nbt.Tag, error) {
 	return data, err
 }
 
-func (m *MemPath) write(data nbt.Tag, buf *[]byte) error {
+func (m *MemPath) write(data *nbt.Tag, buf *[]byte) error {
 	z := zlib.NewWriter(memio.Create(buf))
 	defer z.Close()
 	_, err := data.WriteTo(z)
 	return err
 }
 
-func chunkCoords(data nbt.Tag) (x int32, z int32, err error) {
+func chunkCoords(data *nbt.Tag) (x int32, z int32, err error) {
 	if data.TagId() != nbt.Tag_Compound {
 		err = &WrongTypeError{"[Chunk Base]", nbt.Tag_Compound, data.TagId()}
 		return

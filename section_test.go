@@ -38,7 +38,7 @@ func TestGetBlock(t *testing.T) {
 	add[2027] = 5
 	data[1737] = b2i(9 << 4)
 	data[2027] = 8
-	section, _ := loadSection(nbt.NewCompound([]nbt.Tag{
+	section, _ := loadSection(nbt.NewCompound([]*nbt.Tag{
 		nbt.NewTag("Blocks", nbt.NewByteArray(blocks)),
 		nbt.NewTag("Add", nbt.NewByteArray(add)),
 		nbt.NewTag("Data", nbt.NewByteArray(data)),

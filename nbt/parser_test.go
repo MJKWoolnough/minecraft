@@ -21,7 +21,7 @@ func TestSize(t *testing.T) {
 
 func TestSmall(t *testing.T) { //test.nbt
 	testNBT(`CgALaGVsbG8gd29ybGQIAARuYW1lAAlCYW5hbnJhbWEA`,
-		NewTag("hello world", NewCompound([]Tag{
+		NewTag("hello world", NewCompound([]*Tag{
 			NewTag("name", NewString("Bananrama")),
 		})), t)
 }
@@ -59,18 +59,18 @@ func TestLarge(t *testing.T) { //bigtest.nbt
 		`EAgKFixMEkYgBFZOUFwOLlgoAko4MDI+VBA6CkgsGhIUIDZWHFAqDmBYWgIYOGIyDFRCOjxIXhpE`+
 		`FFI2JBweKkBgJlo0GAZiAAwiQgg8Fl5MREZSBCROHlxALiYoNEoGMAYACmRvdWJsZVRlc3Q/349r`+
 		`u/9qXgA=`,
-		NewTag("Level", NewCompound([]Tag{
+		NewTag("Level", NewCompound([]*Tag{
 			NewTag("longTest", NewLong(9223372036854775807)),
 			NewTag("shortTest", NewShort(32767)),
 			NewTag("stringTest", NewString("HELLO WORLD THIS IS A TEST STRING ÅÄÖ!")),
 			NewTag("floatTest", NewFloat(0.49823147)),
 			NewTag("intTest", NewInt(2147483647)),
-			NewTag("nested compound test", NewCompound([]Tag{
-				NewTag("ham", NewCompound([]Tag{
+			NewTag("nested compound test", NewCompound([]*Tag{
+				NewTag("ham", NewCompound([]*Tag{
 					NewTag("name", NewString("Hampus")),
 					NewTag("value", NewFloat(0.75)),
 				})),
-				NewTag("egg", NewCompound([]Tag{
+				NewTag("egg", NewCompound([]*Tag{
 					NewTag("name", NewString("Eggbert")),
 					NewTag("value", NewFloat(0.5)),
 				})),
@@ -83,11 +83,11 @@ func TestLarge(t *testing.T) { //bigtest.nbt
 				NewLong(15),
 			})),
 			NewTag("listTest (compound)", NewList([]Data{
-				NewCompound([]Tag{
+				NewCompound([]*Tag{
 					NewTag("name", NewString("Compound tag #0")),
 					NewTag("created-on", NewLong(1264099775885)),
 				}),
-				NewCompound([]Tag{
+				NewCompound([]*Tag{
 					NewTag("name", NewString("Compound tag #1")),
 					NewTag("created-on", NewLong(1264099775885)),
 				}),
@@ -98,7 +98,7 @@ func TestLarge(t *testing.T) { //bigtest.nbt
 		})), t)
 }
 
-func testNBT(input string, middle Tag, t *testing.T) {
+func testNBT(input string, middle *Tag, t *testing.T) {
 	n, c, err := ReadNBTFrom(base64.NewDecoder(base64.StdEncoding, bytes.NewBufferString(input)))
 	if err != nil {
 		t.Errorf("error encountered while reading nbt data: %q", err)

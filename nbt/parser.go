@@ -72,17 +72,6 @@ type Data interface {
 	String() string
 }
 
-type Tag interface {
-	io.ReaderFrom
-	io.WriterTo
-	equaler.Equaler
-	Data() Data
-	Name() string
-	String() string
-	TagId() TagId
-	Copy() Tag
-}
-
 type TagId uint8
 
 func (t TagId) String() string {
@@ -92,25 +81,25 @@ func (t TagId) String() string {
 	return ""
 }
 
-type namedTag struct {
+type Tag struct {
 	tagType TagId
 	name    String
 	d       Data
 }
 
-func ReadNBTFrom(f io.Reader) (Tag, int64, error) {
-	n := new(namedTag)
+func ReadNBTFrom(f io.Reader) (*Tag, int64, error) {
+	n := new(Tag)
 	count, err := n.ReadFrom(f)
 	return n, count, err
 
 }
 
-func NewTag(name string, d Data) (n Tag) {
+func NewTag(name string, d Data) (n *Tag) {
 	tagType, err := idFromData(d)
 	if err != nil {
 		return nil
 	}
-	m := namedTag{
+	m := Tag{
 		tagType,
 		String(name),
 		d,
@@ -118,7 +107,7 @@ func NewTag(name string, d Data) (n Tag) {
 	return &m
 }
 
-func (n *namedTag) ReadFrom(f io.Reader) (total int64, err error) {
+func (n *Tag) ReadFrom(f io.Reader) (total int64, err error) {
 	var (
 		c    int
 		d    int64
@@ -154,7 +143,7 @@ func (n *namedTag) ReadFrom(f io.Reader) (total int64, err error) {
 	return
 }
 
-func (n *namedTag) WriteTo(f io.Writer) (total int64, err error) {
+func (n *Tag) WriteTo(f io.Writer) (total int64, err error) {
 	var (
 		c int
 		d int64
@@ -178,16 +167,16 @@ func (n *namedTag) WriteTo(f io.Writer) (total int64, err error) {
 	return
 }
 
-func (n *namedTag) Copy() Tag {
-	return &namedTag{
+func (n *Tag) Copy() *Tag {
+	return &Tag{
 		n.tagType,
 		n.name,
 		n.d.Copy(),
 	}
 }
 
-func (n *namedTag) Equal(e equaler.Equaler) bool {
-	if m, ok := e.(*namedTag); ok {
+func (n *Tag) Equal(e equaler.Equaler) bool {
+	if m, ok := e.(*Tag); ok {
 		if n.tagType == m.tagType && n.name == m.name {
 			return n.d.Equal(m.d)
 		}
@@ -195,19 +184,19 @@ func (n *namedTag) Equal(e equaler.Equaler) bool {
 	return false
 }
 
-func (n *namedTag) Data() Data {
+func (n *Tag) Data() Data {
 	return n.d
 }
 
-func (n *namedTag) Name() string {
+func (n *Tag) Name() string {
 	return string(n.name)
 }
 
-func (n *namedTag) TagId() TagId {
+func (n *Tag) TagId() TagId {
 	return n.tagType
 }
 
-func (n *namedTag) String() string {
+func (n *Tag) String() string {
 	return fmt.Sprintf("%s(%q): %s", n.tagType, n.name, n.d)
 }
 
@@ -764,18 +753,18 @@ func (n *List) valid(d ...Data) error {
 	return nil
 }
 
-type Compound []Tag
+type Compound []*Tag
 
-func NewCompound(d []Tag) *Compound {
+func NewCompound(d []*Tag) *Compound {
 	e := Compound(d)
 	return &e
 }
 
 func (n *Compound) ReadFrom(f io.Reader) (total int64, err error) {
 	var d int64
-	*n = Compound(make([]Tag, 0))
+	*n = Compound(make([]*Tag, 0))
 	for {
-		data := new(namedTag)
+		data := new(Tag)
 		d, err = data.ReadFrom(f)
 		total += d
 		if err != nil {
@@ -810,7 +799,7 @@ func (n Compound) WriteTo(f io.Writer) (total int64, err error) {
 }
 
 func (n Compound) Copy() Data {
-	c := Compound(make([]Tag, len(n)))
+	c := Compound(make([]*Tag, len(n)))
 	for i, d := range n {
 		c[i] = d.Copy()
 	}
@@ -839,7 +828,7 @@ func (n Compound) String() string {
 	return s + "\n}"
 }
 
-func (n Compound) Get(name string) Tag {
+func (n Compound) Get(name string) *Tag {
 	for _, t := range n {
 		if t.Name() == name {
 			return t
@@ -859,7 +848,7 @@ func (n *Compound) Remove(name string) {
 	}
 }
 
-func (n *Compound) Set(tag Tag) {
+func (n *Compound) Set(tag *Tag) {
 	if tag.TagId() == Tag_End {
 		return
 	}

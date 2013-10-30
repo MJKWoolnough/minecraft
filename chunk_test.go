@@ -17,14 +17,14 @@ func TestNew(t *testing.T) {
 			biome = -1
 		}
 	}
-	dataTag := nbt.NewTag("", nbt.NewCompound([]nbt.Tag{
-		nbt.NewTag("Level", nbt.NewCompound([]nbt.Tag{
+	dataTag := nbt.NewTag("", nbt.NewCompound([]*nbt.Tag{
+		nbt.NewTag("Level", nbt.NewCompound([]*nbt.Tag{
 			nbt.NewTag("Biomes", nbt.NewByteArray(biomes)),
 			nbt.NewTag("HeightMap", nbt.NewIntArray(make([]int32, 256))),
 			nbt.NewTag("InhabitedTime", nbt.NewLong(0)),
 			nbt.NewTag("LastUpdate", nbt.NewLong(0)),
 			nbt.NewTag("Sections", nbt.NewList([]nbt.Data{
-				nbt.NewCompound([]nbt.Tag{
+				nbt.NewCompound([]*nbt.Tag{
 					nbt.NewTag("Blocks", nbt.NewByteArray(blocks)),
 					nbt.NewTag("Add", nbt.NewByteArray(add)),
 					nbt.NewTag("Data", nbt.NewByteArray(data)),
@@ -32,7 +32,7 @@ func TestNew(t *testing.T) {
 					nbt.NewTag("SkyLight", nbt.NewByteArray(make([]int8, 2048))),
 					nbt.NewTag("Y", nbt.NewByte(0)),
 				}),
-				nbt.NewCompound([]nbt.Tag{
+				nbt.NewCompound([]*nbt.Tag{
 					nbt.NewTag("Blocks", nbt.NewByteArray(blocks)),
 					nbt.NewTag("Add", nbt.NewByteArray(add)),
 					nbt.NewTag("Data", nbt.NewByteArray(data)),
@@ -40,7 +40,7 @@ func TestNew(t *testing.T) {
 					nbt.NewTag("SkyLight", nbt.NewByteArray(make([]int8, 2048))),
 					nbt.NewTag("Y", nbt.NewByte(1)),
 				}),
-				nbt.NewCompound([]nbt.Tag{
+				nbt.NewCompound([]*nbt.Tag{
 					nbt.NewTag("Blocks", nbt.NewByteArray(blocks)),
 					nbt.NewTag("Add", nbt.NewByteArray(add)),
 					nbt.NewTag("Data", nbt.NewByteArray(data)),
@@ -48,7 +48,7 @@ func TestNew(t *testing.T) {
 					nbt.NewTag("SkyLight", nbt.NewByteArray(make([]int8, 2048))),
 					nbt.NewTag("Y", nbt.NewByte(3)),
 				}),
-				nbt.NewCompound([]nbt.Tag{
+				nbt.NewCompound([]*nbt.Tag{
 					nbt.NewTag("Blocks", nbt.NewByteArray(blocks)),
 					nbt.NewTag("Add", nbt.NewByteArray(add)),
 					nbt.NewTag("Data", nbt.NewByteArray(data)),
@@ -58,14 +58,14 @@ func TestNew(t *testing.T) {
 				}),
 			})),
 			nbt.NewTag("TileEntities", nbt.NewList([]nbt.Data{
-				nbt.NewCompound([]nbt.Tag{
+				nbt.NewCompound([]*nbt.Tag{
 					nbt.NewTag("id", nbt.NewString("test1")),
 					nbt.NewTag("x", nbt.NewInt(-191)),
 					nbt.NewTag("y", nbt.NewInt(13)),
 					nbt.NewTag("z", nbt.NewInt(379)),
 					nbt.NewTag("testTag", nbt.NewByte(1)),
 				}),
-				nbt.NewCompound([]nbt.Tag{
+				nbt.NewCompound([]*nbt.Tag{
 					nbt.NewTag("id", nbt.NewString("test2")),
 					nbt.NewTag("x", nbt.NewInt(-191)),
 					nbt.NewTag("y", nbt.NewInt(17)),
@@ -74,7 +74,7 @@ func TestNew(t *testing.T) {
 				}),
 			})),
 			nbt.NewTag("Entities", nbt.NewList([]nbt.Data{
-				nbt.NewCompound([]nbt.Tag{
+				nbt.NewCompound([]*nbt.Tag{
 					nbt.NewTag("id", nbt.NewString("testEntity1")),
 					nbt.NewTag("Pos", nbt.NewList([]nbt.Data{
 						nbt.NewDouble(-190),
@@ -99,9 +99,9 @@ func TestNew(t *testing.T) {
 					nbt.NewTag("PortalCooldown", nbt.NewInt(0)),
 					nbt.NewTag("UUIDMost", nbt.NewLong(0)),
 					nbt.NewTag("UUIDLease", nbt.NewLong(0)),
-					nbt.NewTag("Riding", nbt.NewCompound([]nbt.Tag{})),
+					nbt.NewTag("Riding", nbt.NewCompound([]*nbt.Tag{})),
 				}),
-				nbt.NewCompound([]nbt.Tag{
+				nbt.NewCompound([]*nbt.Tag{
 					nbt.NewTag("id", nbt.NewString("testEntity2")),
 					nbt.NewTag("Pos", nbt.NewList([]nbt.Data{
 						nbt.NewDouble(-186),
@@ -126,11 +126,11 @@ func TestNew(t *testing.T) {
 					nbt.NewTag("PortalCooldown", nbt.NewInt(10)),
 					nbt.NewTag("UUIDMost", nbt.NewLong(1450)),
 					nbt.NewTag("UUIDLease", nbt.NewLong(6435)),
-					nbt.NewTag("Riding", nbt.NewCompound([]nbt.Tag{})),
+					nbt.NewTag("Riding", nbt.NewCompound([]*nbt.Tag{})),
 				}),
 			})),
 			nbt.NewTag("TileTicks", nbt.NewList([]nbt.Data{
-				nbt.NewCompound([]nbt.Tag{
+				nbt.NewCompound([]*nbt.Tag{
 					nbt.NewTag("i", nbt.NewInt(0)),
 					nbt.NewTag("t", nbt.NewInt(0)),
 					nbt.NewTag("p", nbt.NewInt(0)),
@@ -138,7 +138,7 @@ func TestNew(t *testing.T) {
 					nbt.NewTag("y", nbt.NewInt(0)),
 					nbt.NewTag("z", nbt.NewInt(368)),
 				}),
-				nbt.NewCompound([]nbt.Tag{
+				nbt.NewCompound([]*nbt.Tag{
 					nbt.NewTag("i", nbt.NewInt(1)),
 					nbt.NewTag("t", nbt.NewInt(34)),
 					nbt.NewTag("p", nbt.NewInt(12)),
@@ -239,7 +239,7 @@ func TestBlock(t *testing.T) {
 		//Test metadata [un]set
 		{
 			Block{
-				metadata: []nbt.Tag{
+				metadata: []*nbt.Tag{
 					nbt.NewTag("testInt2", nbt.NewInt(1743)),
 					nbt.NewTag("testString2", nbt.NewString("world")),
 				},
@@ -249,7 +249,7 @@ func TestBlock(t *testing.T) {
 		},
 		{
 			Block{
-				metadata: []nbt.Tag{
+				metadata: []*nbt.Tag{
 					nbt.NewTag("testInt", nbt.NewInt(15)),
 					nbt.NewTag("testString", nbt.NewString("hello")),
 				},
