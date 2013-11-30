@@ -69,53 +69,53 @@ func (b Biome) Equal(e equaler.Equaler) bool {
 
 func (b Biome) String() string {
 	switch b {
-	case -1:
+	case Biome_Auto:
 		return "Auto"
-	case 0:
+	case Biome_Ocean:
 		return "Ocean"
-	case 1:
+	case Biome_Plains:
 		return "Plains"
-	case 2:
+	case Biome_Desert:
 		return "Desert"
-	case 3:
+	case Biome_ExtremeHills:
 		return "Extreme Hills"
-	case 4:
+	case Biome_Forest:
 		return "Forest"
-	case 5:
+	case Biome_Taiga:
 		return "Taiga"
-	case 6:
+	case Biome_Swampland:
 		return "Swampland"
-	case 7:
+	case Biome_River:
 		return "River"
-	case 8:
+	case Biome_Hell:
 		return "Hell"
-	case 9:
+	case Biome_Sky:
 		return "Sky"
-	case 10:
+	case Biome_FrozenOcean:
 		return "Frozen Ocean"
-	case 11:
+	case Biome_FrozenRiver:
 		return "Frozen River"
-	case 12:
+	case Biome_IcePlains:
 		return "Ice Plains"
-	case 13:
+	case Biome_IceMountains:
 		return "Ice Mountains"
-	case 14:
+	case Biome_MushroomIsland:
 		return "Mushroom Island"
-	case 15:
+	case Biome_MushroomIslandShore:
 		return "Mushroom Island Shore"
-	case 16:
+	case Biome_Beach:
 		return "Beach"
-	case 17:
+	case Biome_DesertHills:
 		return "Desert Hills"
-	case 18:
+	case Biome_ForestHills:
 		return "Forest Hills"
-	case 19:
+	case Biome_TaigaHills:
 		return "Taiga Hills"
-	case 20:
+	case Biome_ExtremeHillsEdge:
 		return "Extreme Hills Edge"
-	case 21:
+	case Biome_Jungle:
 		return "Jungle"
-	case 22:
+	case Biome_JungleHills:
 		return "Jungle Hills"
 	}
 	return "Unrecognised Biome ID - " + strconv.Itoa(int(b))
