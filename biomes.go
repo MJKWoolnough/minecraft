@@ -54,6 +54,53 @@ const (
 	Biome_ExtremeHillsEdge
 	Biome_Jungle
 	Biome_JungleHills
+	Biome_JungleEdge
+	Biome_DeepOcean
+	Biome_StoneBeach
+	Biome_ColdBeach
+	Biome_BirchForest
+	Biome_BirchForestHills
+	Biome_RoofedForest
+	Biome_ColdTaiga
+	Biome_ColdTaigaHills
+	Biome_MegaTaiga
+	Biome_MegaTaigaHills
+	Biome_ExtremeHillsPlus
+	Biome_Savanna
+	Biome_SavannaPlateau
+	Biome_Mesa
+	Biome_MesaPlateauF
+	Biome_MesaPlateau
+)
+
+const (
+	Biome_SunflowerPlains Biome = iota + 129
+	Biome_DeserM
+	Biome_ExtremeHillsM
+	Biome_FlowerForest
+	Biome_TaigaM
+	Biome_SwamplandM
+)
+const (
+	Biome_IcePlainsSpikes Biome = 140
+	Biome_JungleM         Biome = 149
+	Biome_JungleEdgeM     Biome = 151
+)
+const (
+	Biome_BirchForestM      Biome = iota + 155
+	Biome_BirchForestHillsM Biome = 156
+	Biome_RoofedForest      Biome = 157
+	Biome_ColdTaiga         Biome = 158
+)
+const (
+	Biome_MegaSpruceTaiga Biome = iota + 160
+	Biome_MegaSpruceTaigaHills
+	Biome_ExtremeHillsPlusM
+	Biome_SavannaM
+	Biome_SavannaPlateauM
+	Biome_MesaBryce
+	Biome_MesaPlateauFM
+	Biome_MesaPlateauM
 )
 
 type Biome int8
@@ -117,6 +164,82 @@ func (b Biome) String() string {
 		return "Jungle"
 	case Biome_JungleHills:
 		return "Jungle Hills"
+	case Biome_JungleEdge:
+		return "Jungle Edge"
+	case Biome_DeepOcean:
+		return "Deep Ocean"
+	case Biome_StoneBeach:
+		return "Stone Beach"
+	case Biome_ColdBeach:
+		return "Cold Beach"
+	case Biome_BirchForest:
+		return "Birch Forest"
+	case Biome_BirchForestHills:
+		return "Birch Forest Hills"
+	case Biome_RoofedForest:
+		return "Roofed Forest"
+	case Biome_ColdTaiga:
+		return "Cold Taiga"
+	case Biome_ColdTaigaHills:
+		return "Cold Taiga Hills"
+	case Biome_MegaTaiga:
+		return "Mega Taiga"
+	case Biome_MegaTaigaHills:
+		return "Mega Taiga Hills"
+	case Biome_ExtremeHillsPlus:
+		return "Extreme Hills+"
+	case Biome_Savanna:
+		return "Savanna"
+	case Biome_SavannaPlateau:
+		return "Savanna Plateau"
+	case Biome_Mesa:
+		return "Mesa"
+	case Biome_MesaPlateauF:
+		return "Mesa Plateau F"
+	case Biome_MesaPlateau:
+		return "Mesa Plateau"
+	case Biome_SunflowerPlains:
+		return "Sunflower Plains"
+	case Biome_DeserM:
+		return "Desert M"
+	case Biome_ExtremeHillsM:
+		return "Extreme Hills M"
+	case Biome_FlowerForest:
+		return "Flower Forest"
+	case Biome_TaigaM:
+		return "Taiga M"
+	case Biome_SwamplandM:
+		return "Swampland M"
+	case Biome_IcePlainsSpikes:
+		return "Ice Plains Spikes"
+	case Biome_JungleM:
+		return "Jungle M"
+	case Biome_JungleEdgeM:
+		return "Jungle Edge M"
+	case Biome_BirchForestM:
+		return "BirchForestM"
+	case Biome_BirchForestHillsM:
+		return "BirchForestHillsM"
+	case Biome_RoofedForest:
+		return "RoofedForest"
+	case Biome_ColdTaiga:
+		return "ColdTaiga"
+	case Biome_MegaSpruceTaiga:
+		return "Mega Spruce Taiga"
+	case Biome_MegaSpruceTaigaHills:
+		return "Mega Spruce Taiga Hills"
+	case Biome_ExtremeHillsPlusM:
+		return "Extreme Hills Plus M"
+	case Biome_SavannaM:
+		return "Savanna M"
+	case Biome_SavannaPlateauM:
+		return "Savanna Plateau M"
+	case Biome_MesaBryce:
+		return "Mesa Bryce"
+	case Biome_MesaPlateauFM:
+		return "Mesa Plateau F M"
+	case Biome_MesaPlateauM:
+		return "Mesa Plateau M"
 	}
 	return "Unrecognised Biome ID - " + strconv.Itoa(int(b))
 }
