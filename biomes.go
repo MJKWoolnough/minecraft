@@ -89,8 +89,8 @@ const (
 const (
 	Biome_BirchForestM      Biome = iota + 155
 	Biome_BirchForestHillsM Biome = 156
-	Biome_RoofedForest      Biome = 157
-	Biome_ColdTaiga         Biome = 158
+	Biome_RoofedForestM     Biome = 157
+	Biome_ColdTaigaM        Biome = 158
 )
 const (
 	Biome_MegaSpruceTaiga Biome = iota + 160
@@ -103,7 +103,7 @@ const (
 	Biome_MesaPlateauM
 )
 
-type Biome int8
+type Biome int16
 
 func (b Biome) Equal(e equaler.Equaler) bool {
 	if c, ok := e.(*Biome); ok {
@@ -220,10 +220,10 @@ func (b Biome) String() string {
 		return "BirchForestM"
 	case Biome_BirchForestHillsM:
 		return "BirchForestHillsM"
-	case Biome_RoofedForest:
-		return "RoofedForest"
-	case Biome_ColdTaiga:
-		return "ColdTaiga"
+	case Biome_RoofedForestM:
+		return "Roofed Forest M"
+	case Biome_ColdTaigaM:
+		return "Cold Taiga M"
 	case Biome_MegaSpruceTaiga:
 		return "Mega Spruce Taiga"
 	case Biome_MegaSpruceTaigaHills:
