@@ -24,14 +24,10 @@
 
 package minecraft
 
-import (
-	"github.com/MJKWoolnough/equaler"
-	"strconv"
-)
+import "github.com/MJKWoolnough/equaler"
 
 const (
-	Biome_Auto Biome = iota - 1
-	Biome_Ocean
+	Biome_Ocean Biome = iota
 	Biome_Plains
 	Biome_Desert
 	Biome_ExtremeHills
@@ -85,12 +81,13 @@ const (
 	Biome_IcePlainsSpikes Biome = 140
 	Biome_JungleM         Biome = 149
 	Biome_JungleEdgeM     Biome = 151
+	Biome_Auto            Biome = 255
 )
 const (
-	Biome_BirchForestM      Biome = iota + 155
-	Biome_BirchForestHillsM Biome = 156
-	Biome_RoofedForestM     Biome = 157
-	Biome_ColdTaigaM        Biome = 158
+	Biome_BirchForestM Biome = iota + 155
+	Biome_BirchForestHillsM
+	Biome_RoofedForestM
+	Biome_ColdTaigaM
 )
 const (
 	Biome_MegaSpruceTaiga Biome = iota + 160
@@ -103,7 +100,7 @@ const (
 	Biome_MesaPlateauM
 )
 
-type Biome int16
+type Biome uint8
 
 func (b Biome) Equal(e equaler.Equaler) bool {
 	if c, ok := e.(*Biome); ok {
@@ -116,8 +113,6 @@ func (b Biome) Equal(e equaler.Equaler) bool {
 
 func (b Biome) String() string {
 	switch b {
-	case Biome_Auto:
-		return "Auto"
 	case Biome_Ocean:
 		return "Ocean"
 	case Biome_Plains:
@@ -240,6 +235,17 @@ func (b Biome) String() string {
 		return "Mesa Plateau F M"
 	case Biome_MesaPlateauM:
 		return "Mesa Plateau M"
+	case Biome_Auto:
+		return "Auto"
 	}
-	return "Unrecognised Biome ID - " + strconv.Itoa(int(b))
+	place := 0
+	for n := b; n > 0; n /= 10 {
+		place++
+	}
+	digits := make([]byte, place)
+	for n := b; n > 0; n /= 10 {
+		place--
+		digits[place] = '0' + byte(n%10)
+	}
+	return "Unrecognised Biome ID - " + string(digits)
 }
