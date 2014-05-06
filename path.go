@@ -409,14 +409,12 @@ func (p *FilePath) GetChunks(x, z int32) ([][2]int32, error) {
 	baseZ := z << 5
 
 	var toRet [][2]int32
-	fmt.Println(pBytes)
 	for i := 0; i < 1024; i++ {
 		if bytewrite.BigEndian.Uint32(pBytes[:4]) > 0 {
 			toRet = append(toRet, [2]int32{baseX + int32(i&31), baseZ + int32(i>>5)})
 		}
 		pBytes = pBytes[4:]
 	}
-	fmt.Println(pBytes)
 	return toRet, nil
 }
 
