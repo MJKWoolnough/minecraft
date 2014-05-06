@@ -64,7 +64,7 @@ func (w WrongTag) Error() string {
 
 type BadRange struct{}
 
-func (b BadRange) Error() string {
+func (BadRange) Error() string {
 	return "given index was out-of-range"
 }
 
