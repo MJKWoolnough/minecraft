@@ -13,9 +13,9 @@ func TestNew(t *testing.T) {
 	data := make([]int8, 2048)
 	for i := 0; i < 256; i++ {
 		biomes[i] = biome
-		if biome++; biome >= 23 {
-			biome = -1
-		}
+		//if biome++; biome >= 23 {
+		//	biome = -1
+		//}
 	}
 	dataTag := nbt.NewTag("", nbt.NewCompound([]*nbt.Tag{
 		nbt.NewTag("Level", nbt.NewCompound([]*nbt.Tag{
@@ -159,15 +159,13 @@ func TestNew(t *testing.T) {
 
 func TestBiomes(t *testing.T) {
 	chunk, _ := newChunk(0, 0, nil)
-	for b := Biome(-1); b < 23; b++ {
+	for b := Biome(0); b < 23; b++ {
 		biome := b
 		for x := int32(0); x < 16; x++ {
 			for z := int32(0); z < 16; z++ {
 				chunk.SetBiome(x, z, biome)
 				if newB := chunk.GetBiome(x, z); newB != biome {
 					t.Errorf("error setting biome at co-ordinates, expecting %q, got %q", biome.String(), newB.String())
-				} else if biome++; biome >= 23 {
-					biome = -1
 				}
 			}
 		}
