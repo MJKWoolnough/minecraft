@@ -392,35 +392,35 @@ func (p *FilePath) GetChunks(x, z int32) ([][2]int32, error) {
 	if !p.lock {
 		return nil, &NoLock{}
 	}
-	f, err := os.Open(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x>>5, z>>5)))
+	f, err := os.Open(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x, z)))
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
-	var (
-		bytes     [4096]byte
-		positions [1024]uint32
-	)
+
+	var bytes [4096]byte
+
 	pBytes := bytes[:]
 	if _, err = io.ReadFull(f, pBytes); err != nil {
 		return nil, err
 	}
-	for i := 0; i < 1024; i++ {
-		positions[i] = bytewrite.BigEndian.Uint32(pBytes[:4])
-		pBytes = pBytes[4:]
-	}
+
 	baseX := x << 5
 	baseZ := z << 5
+
 	var toRet [][2]int32
-	for i := uint(0); i < 1024; i++ {
-		if positions[i] != 0 {
+	fmt.Println(pBytes)
+	for i := 0; i < 1024; i++ {
+		if bytewrite.BigEndian.Uint32(pBytes[:4]) > 0 {
 			toRet = append(toRet, [2]int32{baseX + int32(i&31), baseZ + int32(i>>5)})
 		}
+		pBytes = pBytes[4:]
 	}
+	fmt.Println(pBytes)
 	return toRet, nil
 }
 
-// Update tracks the lock file for updates to remove the lock. Should not be cause by a client.
+// Update tracks the lock file for updates to remove the lock. Should not be called by a client.
 func (p *FilePath) Update(filname string, mode uint8) {
 	p.lock = false
 	watcher.StopWatch(p.dirname)
