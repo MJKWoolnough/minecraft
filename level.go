@@ -361,7 +361,7 @@ func (l *Level) SetName(name string) {
 func (l *Level) getChunk(x, z int32, create bool) (*chunk, error) {
 	x >>= 4
 	z >>= 4
-	pos := uint64(z)<<28 | uint64(uint32(x))
+	pos := uint64(z)<<32 | uint64(uint32(x))
 	if l.chunks[pos] == nil {
 		chunkData, err := l.path.GetChunk(x, z)
 		if err != nil {
