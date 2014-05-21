@@ -29,7 +29,6 @@ import (
 	"compress/zlib"
 	"fmt"
 	"github.com/MJKWoolnough/bytewrite"
-	"github.com/MJKWoolnough/io-watcher"
 	"github.com/MJKWoolnough/memio"
 	"github.com/MJKWoolnough/minecraft/nbt"
 	"io"
@@ -63,7 +62,7 @@ const (
 // save format.
 type FilePath struct {
 	dirname string
-	lock    bool
+	lock    string
 }
 
 // NewFilePath constructs a new directory based path to read from.
@@ -72,17 +71,13 @@ func NewFilePath(dirname string) (*FilePath, error) {
 	if err := os.MkdirAll(dirname, 0755); err != nil {
 		return nil, err
 	}
-	p := &FilePath{
-		dirname,
-		false,
-	}
-	p.Lock()
-	return p, nil
+	p := &FilePath{dirname: dirname}
+	return p, p.Lock()
 }
 
 // Returns the chunk at chunk coords x, z.
 func (p *FilePath) GetChunk(x, z int32) (*nbt.Tag, error) {
-	if !p.lock {
+	if !p.HasLock() {
 		return nil, &NoLock{}
 	}
 	f, err := os.Open(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x>>5, z>>5)))
@@ -148,7 +143,7 @@ type rc struct {
 // Saves multiple chunks at once, possibly returning a MultiError if
 // multiple errors were encountered.
 func (p *FilePath) SetChunk(data ...*nbt.Tag) error {
-	if !p.lock {
+	if !p.HasLock() {
 		return &NoLock{}
 	}
 	regions := make(map[uint64][]rc)
@@ -316,6 +311,9 @@ func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
 
 // Deletes the chunk at chunk coords x, z.
 func (p *FilePath) RemoveChunk(x, z int32) error {
+	if !p.HasLock() {
+		return &NoLock{}
+	}
 	chunkX := x & 31
 	regionX := x >> 5
 	chunkZ := z & 31
@@ -336,7 +334,7 @@ func (p *FilePath) RemoveChunk(x, z int32) error {
 
 // Returns the level data.
 func (p *FilePath) ReadLevelDat() (*nbt.Tag, error) {
-	if !p.lock {
+	if !p.HasLock() {
 		return nil, &NoLock{}
 	}
 	f, err := os.Open(path.Join(p.dirname, "level.dat"))
@@ -356,7 +354,7 @@ func (p *FilePath) ReadLevelDat() (*nbt.Tag, error) {
 
 // Writes the level data.
 func (p *FilePath) WriteLevelDat(data *nbt.Tag) error {
-	if !p.lock {
+	if !p.HasLock() {
 		return &NoLock{}
 	}
 	f, err := os.OpenFile(path.Join(p.dirname, "level.dat"), os.O_WRONLY|os.O_CREATE, 0666)
@@ -389,7 +387,7 @@ func (p *FilePath) GetRegions() [][2]int32 {
 
 // GetChunks returns a list of all chunks within a region with coords x,z
 func (p *FilePath) GetChunks(x, z int32) ([][2]int32, error) {
-	if !p.lock {
+	if !p.HasLock() {
 		return nil, &NoLock{}
 	}
 	f, err := os.Open(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x, z)))
@@ -418,26 +416,43 @@ func (p *FilePath) GetChunks(x, z int32) ([][2]int32, error) {
 	return toRet, nil
 }
 
-// Update tracks the lock file for updates to remove the lock. Should not be called by a client.
-func (p *FilePath) Update(filname string, mode uint8) {
-	p.lock = false
-	watcher.StopWatch(p.dirname)
+// Returns whether or not the Z
+func (p *FilePath) HasLock() bool {
+	r, err := os.Open(path.Join(p.dirname, "session.lock"))
+	if err != nil {
+		return false
+	}
+	defer r.Close()
+	buf := make([]byte, len(p.lock)+1)
+	n, err := io.ReadFull(r, buf)
+	if n != len(p.lock) || err != io.ErrUnexpectedEOF {
+		return false
+	}
+	for i := 0; i < len(p.lock); i++ {
+		if buf[i] != p.lock[i] {
+			return false
+		}
+	}
+	return true
 }
 
 // Lock will retake the lock file if it has been lost. May cause corruption.
-func (p *FilePath) Lock() {
-	if p.lock {
-		return
+func (p *FilePath) Lock() error {
+	if p.HasLock() {
+		return nil
 	}
+	p.lock = fmt.Sprintf("%d", time.Now().UnixNano()/1000000) // ms
 	session := path.Join(p.dirname, "session.lock")
 	if f, err := os.Create(session); err != nil {
-		return //??
+		return err
 	} else {
-		fmt.Fprintf(f, "%d", time.Now().Unix()*1000)
+		_, err = f.Write([]byte(p.lock))
 		f.Close()
+		if err != nil {
+			return err
+		}
 	}
-	watcher.Watch(session, p)
-	p.lock = true
+	return nil
 }
 
 // Defrag rewrites a region file to reduce wasted space.

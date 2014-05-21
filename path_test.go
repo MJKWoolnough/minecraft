@@ -8,6 +8,7 @@ import (
 	"os"
 	"path"
 	"testing"
+	"time"
 )
 
 func testPathChunkSetGet(t *testing.T, path Path) {
@@ -209,6 +210,58 @@ func TestFilePath(t *testing.T) {
 		} else if s := fi.Size(); s%4096 != 0 {
 			t.Errorf("regions %d,%d filesize not divisible by 4096, got %d", region[0], region[1], s)
 		}
+	}
+
+	if err = os.RemoveAll(tempDir); err != nil {
+		t.Error(err.Error())
+	}
+}
+
+func TestFilePathLock(t *testing.T) {
+
+	var (
+		tempDir string
+		err     error
+		f, g    *FilePath
+	)
+
+	if tempDir, err = ioutil.TempDir("", "minecraft-path-lock-test"); err != nil {
+		t.Error(err.Error())
+	} else if f, err = NewFilePath(tempDir); err != nil {
+		t.Error(err.Error())
+	}
+	<-time.After(time.Millisecond * 2)
+	if g, err = NewFilePath(tempDir); err != nil {
+		t.Error(err.Error())
+	}
+
+	<-time.After(time.Millisecond * 2)
+
+	_, err = f.GetChunks(0, 0)
+	if err == nil {
+		t.Errorf("expecting error, got nil")
+	} else if _, ok := err.(*NoLock); !ok {
+		t.Errorf("expecting NoLock error, got %q", err)
+	}
+	f.Lock()
+
+	<-time.After(time.Millisecond * 2)
+
+	_, err = g.GetChunks(0, 0)
+	if err == nil {
+		t.Errorf("expecting error, got nil")
+	} else if _, ok := err.(*NoLock); !ok {
+		t.Errorf("expecting NoLock error, got %q", err)
+	}
+	g.Lock()
+
+	<-time.After(time.Millisecond * 2)
+
+	_, err = f.GetChunks(0, 0)
+	if err == nil {
+		t.Errorf("expecting error, got nil")
+	} else if _, ok := err.(*NoLock); !ok {
+		t.Errorf("expecting NoLock error, got %q", err)
 	}
 
 	if err = os.RemoveAll(tempDir); err != nil {
