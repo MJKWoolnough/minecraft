@@ -416,7 +416,7 @@ func (p *FilePath) GetChunks(x, z int32) ([][2]int32, error) {
 	return toRet, nil
 }
 
-// Returns whether or not the Z
+// Returns whether or not another program has taken the lock.
 func (p *FilePath) HasLock() bool {
 	r, err := os.Open(path.Join(p.dirname, "session.lock"))
 	if err != nil {
