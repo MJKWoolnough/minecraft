@@ -62,7 +62,7 @@ const (
 // save format.
 type FilePath struct {
 	dirname string
-	lock    string
+	lock    int64
 }
 
 // NewFilePath constructs a new directory based path to read from.
@@ -423,17 +423,12 @@ func (p *FilePath) HasLock() bool {
 		return false
 	}
 	defer r.Close()
-	buf := make([]byte, len(p.lock)+1)
+	buf := make([]byte, 9)
 	n, err := io.ReadFull(r, buf)
-	if n != len(p.lock) || err != io.ErrUnexpectedEOF {
+	if n != 8 || err != io.ErrUnexpectedEOF {
 		return false
 	}
-	for i := 0; i < len(p.lock); i++ {
-		if buf[i] != p.lock[i] {
-			return false
-		}
-	}
-	return true
+	return int64(bytewrite.BigEndian.Uint64(buf)) == p.lock
 }
 
 // Lock will retake the lock file if it has been lost. May cause corruption.
@@ -441,12 +436,12 @@ func (p *FilePath) Lock() error {
 	if p.HasLock() {
 		return nil
 	}
-	p.lock = fmt.Sprintf("%d", time.Now().UnixNano()/1000000) // ms
+	p.lock = time.Now().UnixNano() / 1000000 // ms
 	session := path.Join(p.dirname, "session.lock")
 	if f, err := os.Create(session); err != nil {
 		return err
 	} else {
-		_, err = f.Write([]byte(p.lock))
+		_, err = f.Write(bytewrite.BigEndian.PutUint64(uint64(p.lock)))
 		f.Close()
 		if err != nil {
 			return err
