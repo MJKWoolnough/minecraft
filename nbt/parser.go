@@ -883,7 +883,7 @@ func (n *IntArray) ReadFrom(f io.Reader) (total int64, err error) {
 	c, err = io.ReadFull(f, ints)
 	total += int64(c)
 	for i := uint32(0); i < length; i++ {
-		(*n)[i] = int32(bytewrite.BigEndian.Uint32(ints[:4]))
+		(*n)[i] = int32(bytewrite.BigEndian.Uint32(ints))
 		ints = ints[4:]
 	}
 	return
