@@ -111,6 +111,11 @@ func NewLevel(location Path) (*Level, error) {
 	}, nil
 }
 
+func (l *Level) LevelData() *nbt.Compound {
+	l.changed = true
+	return l.levelData
+}
+
 // Returns the x, y, z coordinated for the current spawn point.
 func (l *Level) GetSpawn() (x, y, z int32) {
 	if l.levelData == nil {
