@@ -75,7 +75,7 @@ func newSection(y int32) *section {
 		sl[i] = -1
 	}
 	s.skyLight = nbt.NewByteArray(sl)
-	s.section = nbt.NewCompound([]*nbt.Tag{
+	s.section = nbt.NewCompound(nbt.Compound{
 		nbt.NewTag("Blocks", s.blocks),
 		nbt.NewTag("Add", s.add),
 		nbt.NewTag("Data", s.data),

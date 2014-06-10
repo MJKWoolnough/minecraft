@@ -12,8 +12,8 @@ import (
 )
 
 func testPathChunkSetGet(t *testing.T, path Path) {
-	toPlace := [][]*nbt.Tag{
-		[]*nbt.Tag{
+	toPlace := []nbt.Compound{
+		nbt.Compound{
 			addPos(0, 0, 3),  //0[4]
 			addPos(1, 0, 2),  //0[4],1[3]
 			addPos(2, 0, 1),  //0[4],1[3],2[2]
@@ -25,7 +25,7 @@ func testPathChunkSetGet(t *testing.T, path Path) {
 			addPos(-1, -1, 1),
 			addPos(-3, -3, 1),
 		},
-		[]*nbt.Tag{
+		nbt.Compound{
 			addPos(0, 0, 1), //0[2],[2],1[3],2[2],3[1],20[3],640[2]
 			addPos(1, 0, 2), //0[2],[2],1[3],2[2],3[1],20[3],640[2]
 			addPos(3, 0, 1), //0[2],3[2],1[3],2[2],[1],20[3],640[2]
@@ -89,8 +89,8 @@ func testPathChunkSetGet(t *testing.T, path Path) {
 }
 
 func testPathLevelSetGet(t *testing.T, path Path) {
-	levelDat := nbt.NewTag("", nbt.NewCompound([]*nbt.Tag{
-		nbt.NewTag("Beep", nbt.NewCompound([]*nbt.Tag{
+	levelDat := nbt.NewTag("", nbt.NewCompound(nbt.Compound{
+		nbt.NewTag("Beep", nbt.NewCompound(nbt.Compound{
 			nbt.NewTag("SomeInt", nbt.NewInt(45)),
 			nbt.NewTag("SomeString", nbt.NewString("hello")),
 		})),
@@ -293,7 +293,7 @@ func init() {
 					chunks[3].SetBlock(int32(i), int32(k), int32(j), &Block{
 						uint16(i+j+k) % 4096,
 						uint8(i),
-						[]*nbt.Tag{
+						nbt.Compound{
 							nbt.NewTag("testMD", nbt.NewInt(int32(i*j*k))),
 						},
 						tick,
@@ -305,7 +305,7 @@ func init() {
 					chunks[2].SetBlock(int32(i), int32(k), int32(j), &Block{
 						1,
 						0,
-						[]*nbt.Tag{
+						nbt.Compound{
 							nbt.NewTag("testMD", nbt.NewInt(int32(i*j*k))),
 						},
 						nil,
@@ -315,7 +315,7 @@ func init() {
 			chunks[1].SetBlock(int32(i), int32(j)*16, int32(j), &Block{
 				uint16(i*j + i + j),
 				uint8(i),
-				[]*nbt.Tag{
+				nbt.Compound{
 					nbt.NewTag("testMD1", nbt.NewInt(int32(i))),
 					nbt.NewTag("testMD2", nbt.NewInt(int32(i+1))),
 					nbt.NewTag("testMD3", nbt.NewInt(int32(i+2))),

@@ -755,14 +755,14 @@ func (n *List) valid(d ...Data) error {
 
 type Compound []*Tag
 
-func NewCompound(d []*Tag) *Compound {
+func NewCompound(d Compound) *Compound {
 	e := Compound(d)
 	return &e
 }
 
 func (n *Compound) ReadFrom(f io.Reader) (total int64, err error) {
 	var d int64
-	*n = Compound(make([]*Tag, 0))
+	*n = make(Compound, 0)
 	for {
 		data := new(Tag)
 		d, err = data.ReadFrom(f)
@@ -799,7 +799,7 @@ func (n Compound) WriteTo(f io.Writer) (total int64, err error) {
 }
 
 func (n Compound) Copy() Data {
-	c := Compound(make([]*Tag, len(n)))
+	c := make(Compound, len(n))
 	for i, d := range n {
 		c[i] = d.Copy()
 	}

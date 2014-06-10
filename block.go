@@ -37,7 +37,7 @@ type Tick struct {
 type Block struct {
 	BlockId  uint16
 	Data     uint8
-	metadata []*nbt.Tag
+	metadata nbt.Compound
 	ticks    []Tick
 }
 
@@ -114,19 +114,19 @@ func (b *Block) HasMetadata() bool {
 	return len(b.metadata) > 0
 }
 
-func (b *Block) GetMetadata() []*nbt.Tag {
+func (b *Block) GetMetadata() nbt.Compound {
 	if b.metadata == nil {
 		return nil
 	}
-	a := make([]*nbt.Tag, len(b.metadata))
+	a := make(nbt.Compound, len(b.metadata))
 	for i, j := range b.metadata {
 		a[i] = j.Copy()
 	}
 	return a
 }
 
-func (b *Block) SetMetadata(data []*nbt.Tag) {
-	metadata := make([]*nbt.Tag, 0)
+func (b *Block) SetMetadata(data nbt.Compound) {
+	metadata := make(nbt.Compound, 0)
 	for i := 0; i < len(data); i++ {
 		name := data[i].Name()
 		if name == "x" || name == "y" || name == "z" {
