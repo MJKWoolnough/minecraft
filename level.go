@@ -398,7 +398,7 @@ func (l *Level) Save() error {
 	}
 	toSave := make([]*nbt.Tag, 0)
 	for n, c := range l.chunks {
-		if l.changes.Get(uint64(n)) {
+		if l.changes.Get(n) {
 			toSave = append(toSave, c.GetNBT())
 		}
 	}
