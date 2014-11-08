@@ -118,11 +118,7 @@ func (b *Block) GetMetadata() nbt.Compound {
 	if b.metadata == nil {
 		return nil
 	}
-	a := make(nbt.Compound, len(b.metadata))
-	for i, j := range b.metadata {
-		a[i] = j.Copy()
-	}
-	return a
+	return *b.metadata.Copy().(*nbt.Compound)
 }
 
 func (b *Block) SetMetadata(data nbt.Compound) {
@@ -165,10 +161,7 @@ func (b *Block) SetTicks(t []Tick) {
 func (b *Block) String() string {
 	toRet := fmt.Sprintf("Block ID: %d\nData: %d\n", b.BlockId, b.Data)
 	if b.metadata != nil && len(b.metadata) != 0 {
-		toRet += "Metadata:\n"
-		for i := 0; i < len(b.metadata); i++ {
-			toRet += "	" + b.metadata[i].String() + "\n"
-		}
+		toRet += "Metadata: " + b.metadata.String()
 	}
 	for n, tick := range b.ticks {
 		toRet += fmt.Sprintf("	Tick: %d, i: %d, t: %d, p: %d\n", n+1, tick.I, tick.T, tick.P)
