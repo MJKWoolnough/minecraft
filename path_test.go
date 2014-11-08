@@ -3,12 +3,13 @@ package minecraft
 import (
 	"encoding/binary"
 	"fmt"
-	"github.com/MJKWoolnough/minecraft/nbt"
 	"io/ioutil"
 	"os"
 	"path"
 	"testing"
 	"time"
+
+	"github.com/MJKWoolnough/minecraft/nbt"
 )
 
 func testPathChunkSetGet(t *testing.T, path Path) {
@@ -38,7 +39,7 @@ func testPathChunkSetGet(t *testing.T, path Path) {
 	}
 	retest := []bool{
 		false,
-		false,
+		true,
 		true,
 		false,
 		true,
@@ -81,7 +82,11 @@ func testPathChunkSetGet(t *testing.T, path Path) {
 			} else if thatChunk == nil {
 				t.Fatalf("testPathChunkSetGet: 1-%d-%d: no chunk returned", num, i)
 			} else if thatChunk.Equal(chunk) != retest[0] {
-				t.Errorf("testPathChunkSetGet: 1-%d-%d: returned chunk not equal to set chunk, expecting: -\n%s\ngot: -\n%s", num, i, chunk.String(), thatChunk.String())
+				if retest[0] {
+					t.Errorf("testPathChunkSetGet: 1-%d-%d: returned chunk not equal to set chunk, expecting: -\n%s\ngot: -\n%s", num, i, chunk.String(), thatChunk.String())
+				} else {
+					t.Errorf("testPathChunkSetGet: 1-%d-%d: returned chunk equal to set chunk, expecting not equal", num, i)
+				}
 			}
 			retest = retest[1:]
 		}
@@ -147,10 +152,11 @@ func testPathRegionsGet(t *testing.T, path *FilePath) {
 }
 
 func addPos(x, z int32, chunkNum uint8) *nbt.Tag {
-	e := chunks[chunkNum].data
-	e.Set(nbt.NewTag("xPos", nbt.NewInt(x)))
-	e.Set(nbt.NewTag("zPos", nbt.NewInt(z)))
-	return chunks[chunkNum].GetNBT()
+	e := chunksNBT[chunkNum].Copy()
+	f := e.Data().(*nbt.Compound).Get("Level").Data().(*nbt.Compound)
+	f.Set(nbt.NewTag("xPos", nbt.NewInt(x)))
+	f.Set(nbt.NewTag("zPos", nbt.NewInt(z)))
+	return e
 }
 
 func TestMemPath(t *testing.T) {
@@ -190,18 +196,18 @@ func TestFilePath(t *testing.T) {
 		t.Error(err.Error())
 	}
 	file.Close()
-	should[0] = (2+0)<<8 | 2 //pos 0 + offset(2), size 2
+	should[0] = (2+0)<<8 | 1 //pos 0 + offset(2), size 1
 	should[1] = (2+4)<<8 | 3 //pos 4 + offset(2), size 3
-	should[2] = (2+7)<<8 | 2 //pos 7 + offset(2), size 2
-	should[3] = (2+2)<<8 | 2 //pos 2 + offset(2), size 2
-	should[4] = (2+9)<<8 | 1 //pos 9 + offset(2), size 1
+	should[2] = (2+7)<<8 | 1 //pos 7 + offset(2), size 1
+	should[3] = (2+8)<<8 | 1 //pos 8 + offset(2), size 1
+	should[4] = (2+1)<<8 | 1 //pos 1 + offset(2), size 1
 
 	for i := 0; i < 1024; i++ {
 		if should[i] != positions[i] {
 			t.Errorf("chunk position/size incorrect, expecting chunk %d at %d, got %d", i, should[i], positions[i])
-			break
 		}
 	}
+
 	regions := f.GetRegions()
 
 	for _, region := range regions {
@@ -269,14 +275,14 @@ func TestFilePathLock(t *testing.T) {
 	}
 }
 
-var chunks [4]chunk
+var chunksNBT [4]*nbt.Tag
 
 func init() {
 	a, _ := newChunk(0, 0, nil)
 	b, _ := newChunk(0, 0, nil)
 	c, _ := newChunk(0, 0, nil)
 	d, _ := newChunk(0, 0, nil)
-	chunks = [4]chunk{
+	chunks := [4]chunk{
 		*a,
 		*b,
 		*c,
@@ -326,5 +332,11 @@ func init() {
 			})
 		}
 		chunks[0].SetBlock(int32(i), int32(i), int32(i), &Block{uint16(i), uint8(i), nil, nil})
+	}
+	chunksNBT = [4]*nbt.Tag{
+		a.GetNBT(),
+		b.GetNBT(),
+		c.GetNBT(),
+		d.GetNBT(),
 	}
 }
