@@ -116,7 +116,7 @@ func (n *Tag) ReadFrom(f io.Reader) (total int64, err error) {
 	c, err = io.ReadFull(f, data[:])
 	total += int64(c)
 	if err != nil {
-		err = &ReadError{"named TagId", err}
+		err = ReadError{"named TagId", err}
 		return
 	}
 	n.tagType = TagId(data[0])
@@ -129,7 +129,7 @@ func (n *Tag) ReadFrom(f io.Reader) (total int64, err error) {
 		d, err = n.name.ReadFrom(f)
 		total += d
 		if err != nil {
-			err = &ReadError{"name", err}
+			err = ReadError{"name", err}
 			return
 		}
 		d, err = n.d.ReadFrom(f)
@@ -151,7 +151,7 @@ func (n *Tag) WriteTo(f io.Writer) (total int64, err error) {
 	c, err = f.Write([]byte{byte(n.tagType)})
 	total += int64(c)
 	if err != nil {
-		err = &WriteError{"named TagId", err}
+		err = WriteError{"named TagId", err}
 		return
 	}
 	if n.tagType == Tag_End {
@@ -216,6 +216,9 @@ func (end) Copy() Data {
 
 func (end) Equal(e equaler.Equaler) bool {
 	_, ok := e.(*end)
+	if !ok {
+		_, ok = e.(end)
+	}
 	return ok
 }
 
@@ -241,9 +244,9 @@ func (n *Byte) ReadFrom(f io.Reader) (total int64, err error) {
 	return
 }
 
-func (n *Byte) WriteTo(f io.Writer) (total int64, err error) {
+func (n Byte) WriteTo(f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write([]byte{byte(*n)})
+	c, err = f.Write([]byte{byte(n)})
 	total += int64(c)
 	return
 }
@@ -252,9 +255,9 @@ func (n Byte) Copy() Data {
 	return &n
 }
 
-func (n Byte) Equal(e equaler.Equaler) bool {
+func (n *Byte) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*Byte); ok {
-		return n == *m
+		return *n == *m
 	}
 	return false
 }
@@ -279,9 +282,9 @@ func (n *Short) ReadFrom(f io.Reader) (total int64, err error) {
 	return
 }
 
-func (n *Short) WriteTo(f io.Writer) (total int64, err error) {
+func (n Short) WriteTo(f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(bytewrite.BigEndian.PutUint16(uint16(*n)))
+	c, err = f.Write(bytewrite.BigEndian.PutUint16(uint16(n)))
 	total += int64(c)
 	return
 }
@@ -290,9 +293,9 @@ func (n Short) Copy() Data {
 	return &n
 }
 
-func (n Short) Equal(e equaler.Equaler) bool {
+func (n *Short) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*Short); ok {
-		return n == *m
+		return *n == *m
 	}
 	return false
 }
@@ -317,9 +320,9 @@ func (n *Int) ReadFrom(f io.Reader) (total int64, err error) {
 	return
 }
 
-func (n *Int) WriteTo(f io.Writer) (total int64, err error) {
+func (n Int) WriteTo(f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(*n)))
+	c, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(n)))
 	total += int64(c)
 	return
 }
@@ -328,9 +331,9 @@ func (n Int) Copy() Data {
 	return &n
 }
 
-func (n Int) Equal(e equaler.Equaler) bool {
+func (n *Int) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*Int); ok {
-		return n == *m
+		return *n == *m
 	}
 	return false
 }
@@ -355,9 +358,9 @@ func (n *Long) ReadFrom(f io.Reader) (total int64, err error) {
 	return
 }
 
-func (n *Long) WriteTo(f io.Writer) (total int64, err error) {
+func (n Long) WriteTo(f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(bytewrite.BigEndian.PutUint64(uint64(*n)))
+	c, err = f.Write(bytewrite.BigEndian.PutUint64(uint64(n)))
 	total += int64(c)
 	return
 }
@@ -366,9 +369,9 @@ func (n Long) Copy() Data {
 	return &n
 }
 
-func (n Long) Equal(e equaler.Equaler) bool {
+func (n *Long) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*Long); ok {
-		return n == *m
+		return *n == *m
 	}
 	return false
 }
@@ -393,9 +396,9 @@ func (n *Float) ReadFrom(f io.Reader) (total int64, err error) {
 	return
 }
 
-func (n *Float) WriteTo(f io.Writer) (total int64, err error) {
+func (n Float) WriteTo(f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(bytewrite.BigEndian.PutFloat32(float32(*n)))
+	c, err = f.Write(bytewrite.BigEndian.PutFloat32(float32(n)))
 	total += int64(c)
 	return
 }
@@ -404,9 +407,9 @@ func (n Float) Copy() Data {
 	return &n
 }
 
-func (n Float) Equal(e equaler.Equaler) bool {
+func (n *Float) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*Float); ok {
-		return n == *m
+		return *n == *m
 	}
 	return false
 }
@@ -431,9 +434,9 @@ func (n *Double) ReadFrom(f io.Reader) (total int64, err error) {
 	return
 }
 
-func (n *Double) WriteTo(f io.Writer) (total int64, err error) {
+func (n Double) WriteTo(f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(bytewrite.BigEndian.PutFloat64(float64(*n)))
+	c, err = f.Write(bytewrite.BigEndian.PutFloat64(float64(n)))
 	total += int64(c)
 	return
 }
@@ -442,9 +445,9 @@ func (n Double) Copy() Data {
 	return &n
 }
 
-func (n Double) Equal(e equaler.Equaler) bool {
+func (n *Double) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*Double); ok {
-		return n == *m
+		return *n == *m
 	}
 	return false
 }
@@ -466,31 +469,24 @@ func (n *ByteArray) ReadFrom(f io.Reader) (total int64, err error) {
 	c, err = io.ReadFull(f, data)
 	total += int64(c)
 	length := bytewrite.BigEndian.Uint32(data)
-	bData := make([]byte, length)
-	iData := ByteArray(make([]int8, length))
-	c, err = io.ReadFull(f, bData)
+	data = make([]byte, length)
+	*n = ByteArray(make([]int8, length))
+	c, err = io.ReadFull(f, data)
 	total += int64(c)
 	for i := uint32(0); i < length; i++ {
-		iData[i] = int8(bData[i])
+		(*n)[i] = int8(data[i])
 	}
-	*n = iData
 	return
 }
 
-func (n *ByteArray) WriteTo(f io.Writer) (total int64, err error) {
-	var c int
-	c, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(len(*n))))
-	total += int64(c)
-	if err != nil {
-		return
+func (n ByteArray) WriteTo(f io.Writer) (int64, error) {
+	data := make([]byte, len(n)+4)
+	copy(data, bytewrite.BigEndian.PutUint32(uint32(len(n))))
+	for i, b := range n {
+		data[i+4] = byte(b)
 	}
-	data := make([]byte, len(*n))
-	for i := 0; i < len(data); i++ {
-		data[i] = byte((*n)[i])
-	}
-	c, err = f.Write(data)
-	total += int64(c)
-	return
+	c, err := f.Write(data)
+	return int64(c), err
 }
 
 func (n ByteArray) Copy() Data {
@@ -499,10 +495,10 @@ func (n ByteArray) Copy() Data {
 	return &c
 }
 
-func (n ByteArray) Equal(e equaler.Equaler) bool {
+func (n *ByteArray) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*ByteArray); ok {
-		if len(n) == len(*m) {
-			for i, o := range n {
+		if len(*n) == len(*m) {
+			for i, o := range *n {
 				if o != (*m)[i] {
 					return false
 				}
@@ -529,32 +525,25 @@ func (n *String) ReadFrom(f io.Reader) (total int64, err error) {
 	data := make([]byte, 2)
 	c, err = io.ReadFull(f, data)
 	total += int64(c)
-	bData := make([]byte, bytewrite.BigEndian.Uint16(data))
-	c, err = io.ReadFull(f, bData)
+	data = make([]byte, bytewrite.BigEndian.Uint16(data))
+	c, err = io.ReadFull(f, data)
 	total += int64(c)
-	*n = String(bData)
+	*n = String(data)
 	return
 }
 
-func (n *String) WriteTo(f io.Writer) (total int64, err error) {
-	var c int
-	c, err = f.Write(bytewrite.BigEndian.PutUint16(uint16(len(*n))))
-	total += int64(c)
-	if err != nil {
-		return
-	}
-	c, err = f.Write([]byte(*n))
-	total += int64(c)
-	return
+func (n String) WriteTo(f io.Writer) (int64, error) {
+	c, err := f.Write(append(bytewrite.BigEndian.PutUint16(uint16(len(n))), n...))
+	return int64(c), err
 }
 
 func (n String) Copy() Data {
 	return &n
 }
 
-func (n String) Equal(e equaler.Equaler) bool {
+func (n *String) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*String); ok {
-		return n == *m
+		return *n == *m
 	}
 	return false
 }
@@ -806,11 +795,11 @@ func (n Compound) Copy() Data {
 	return &c
 }
 
-func (n Compound) Equal(e equaler.Equaler) bool {
+func (n *Compound) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*Compound); ok {
-		if len(n) == len(*m) {
-			for _, o := range n {
-				if n := m.Get(o.Name()); n == nil || !n.Equal(o) {
+		if len(*n) == len(*m) {
+			for _, o := range *n {
+				if p := m.Get(o.Name()); p == nil || !p.Equal(o) {
 					return false
 				}
 			}
@@ -911,10 +900,10 @@ func (n IntArray) Copy() Data {
 	return &c
 }
 
-func (n IntArray) Equal(e equaler.Equaler) bool {
+func (n *IntArray) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*IntArray); ok {
-		if len(n) == len(*m) {
-			for i, o := range n {
+		if len(*n) == len(*m) {
+			for i, o := range *n {
 				if o != (*m)[i] {
 					return false
 				}
