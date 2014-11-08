@@ -450,7 +450,7 @@ func (p *FilePath) Lock() error {
 	return nil
 }
 
-// Defrag rewrites a region file to reduce wasted space.
+// Defrag rewrites a region file to reduce wasted space. Currently unimplemented.
 func (p *FilePath) Defrag(x, z int32) error {
 	return nil
 }
