@@ -43,7 +43,6 @@ var (
 type Level struct {
 	path      Path
 	chunks    map[uint64]*chunk
-	changes   boolmap.Map
 	levelData *nbt.Compound
 	changed   bool
 }
@@ -105,7 +104,6 @@ func NewLevel(location Path) (*Level, error) {
 	return &Level{
 		location,
 		make(map[uint64]*chunk),
-		boolmap.NewMap(),
 		levelDat.Data().(*nbt.Compound).Get("Data").Data().(*nbt.Compound),
 		changed,
 	}, nil
@@ -351,6 +349,15 @@ func (l *Level) SetBiome(x, z int32, biome Biome) error {
 	return nil
 }
 
+// Returns the y coordinate for the highest non-transparent block at column x, z.
+func (l *Level) GetHeight(x, z int32) (int32, error) {
+	c, err := l.getChunk(x, z, false)
+	if err != nil || c == nil {
+		return 0, err
+	}
+	return c.GetHeight(x, z), nil
+}
+
 // Returns the name of the minecraft level.
 func (l *Level) GetName() string {
 	s := l.levelData.Get("LevelName").Data().(*nbt.String)
@@ -382,9 +389,6 @@ func (l *Level) getChunk(x, z int32, create bool) (*chunk, error) {
 			l.chunks[pos], _ = newChunk(x, z, nil)
 		}
 	}
-	if create {
-		l.changes.Set(pos, true)
-	}
 	return l.chunks[pos], nil
 }
 
@@ -397,12 +401,9 @@ func (l *Level) Save() error {
 		l.changed = false
 	}
 	toSave := make([]*nbt.Tag, 0)
-	for n, c := range l.chunks {
-		if l.changes.Get(n) {
-			toSave = append(toSave, c.GetNBT())
-		}
+	for _, c := range l.chunks {
+		toSave = append(toSave, c.GetNBT())
 	}
-	l.changes = boolmap.NewMap()
 	if len(toSave) > 0 {
 		return l.path.SetChunk(toSave...) //check multi-error
 	}
@@ -413,7 +414,6 @@ func (l *Level) Save() error {
 func (l *Level) Close() {
 	l.changed = false
 	l.chunks = make(map[uint64]*chunk)
-	l.changes = boolmap.NewMap()
 }
 
 func surroundingBlocks(x, y, z int32) [][3]int32 {
