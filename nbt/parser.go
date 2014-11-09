@@ -801,8 +801,7 @@ func (List) Type() TagId {
 type Compound []*Tag
 
 func NewCompound(d Compound) *Compound {
-	e := Compound(d)
-	return &e
+	return &d
 }
 
 func (n *Compound) ReadFrom(f io.Reader) (total int64, err error) {
