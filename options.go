@@ -253,6 +253,7 @@ func setGameRule(name string, data bool) Option {
 			d = nbt.NewString("False")
 		}
 		grc.Set(nbt.NewTag(name, d))
+		l.changed = true
 	}
 }
 
