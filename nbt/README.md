@@ -17,7 +17,7 @@ type BadRange struct{}
 #### func (BadRange) Error
 
 ```go
-func (b BadRange) Error() string
+func (BadRange) Error() string
 ```
 
 #### type Byte
@@ -33,16 +33,28 @@ type Byte int8
 func NewByte(d int8) *Byte
 ```
 
+#### func (*Byte) CReadFrom
+
+```go
+func (n *Byte) CReadFrom(c *Config, f io.Reader) (total int64, err error)
+```
+
+#### func (Byte) CWriteTo
+
+```go
+func (n Byte) CWriteTo(c *Config, f io.Writer) (total int64, err error)
+```
+
 #### func (Byte) Copy
 
 ```go
 func (n Byte) Copy() Data
 ```
 
-#### func (Byte) Equal
+#### func (*Byte) Equal
 
 ```go
-func (n Byte) Equal(e equaler.Equaler) bool
+func (n *Byte) Equal(e equaler.Equaler) bool
 ```
 
 #### func (*Byte) ReadFrom
@@ -57,10 +69,16 @@ func (n *Byte) ReadFrom(f io.Reader) (total int64, err error)
 func (n Byte) String() string
 ```
 
-#### func (*Byte) WriteTo
+#### func (Byte) Type
 
 ```go
-func (n *Byte) WriteTo(f io.Writer) (total int64, err error)
+func (Byte) Type() TagId
+```
+
+#### func (Byte) WriteTo
+
+```go
+func (n Byte) WriteTo(f io.Writer) (total int64, err error)
 ```
 
 #### type ByteArray
@@ -76,16 +94,28 @@ type ByteArray []int8
 func NewByteArray(d []int8) *ByteArray
 ```
 
+#### func (*ByteArray) CReadFrom
+
+```go
+func (n *ByteArray) CReadFrom(config *Config, f io.Reader) (total int64, err error)
+```
+
+#### func (ByteArray) CWriteTo
+
+```go
+func (n ByteArray) CWriteTo(config *Config, f io.Writer) (int64, error)
+```
+
 #### func (ByteArray) Copy
 
 ```go
 func (n ByteArray) Copy() Data
 ```
 
-#### func (ByteArray) Equal
+#### func (*ByteArray) Equal
 
 ```go
-func (n ByteArray) Equal(e equaler.Equaler) bool
+func (n *ByteArray) Equal(e equaler.Equaler) bool
 ```
 
 #### func (*ByteArray) ReadFrom
@@ -100,23 +130,41 @@ func (n *ByteArray) ReadFrom(f io.Reader) (total int64, err error)
 func (n ByteArray) String() string
 ```
 
-#### func (*ByteArray) WriteTo
+#### func (ByteArray) Type
 
 ```go
-func (n *ByteArray) WriteTo(f io.Writer) (total int64, err error)
+func (ByteArray) Type() TagId
+```
+
+#### func (ByteArray) WriteTo
+
+```go
+func (n ByteArray) WriteTo(f io.Writer) (int64, error)
 ```
 
 #### type Compound
 
 ```go
-type Compound []Tag
+type Compound []*Tag
 ```
 
 
 #### func  NewCompound
 
 ```go
-func NewCompound(d []Tag) *Compound
+func NewCompound(d Compound) *Compound
+```
+
+#### func (*Compound) CReadFrom
+
+```go
+func (n *Compound) CReadFrom(config *Config, f io.Reader) (total int64, err error)
+```
+
+#### func (Compound) CWriteTo
+
+```go
+func (n Compound) CWriteTo(config *Config, f io.Writer) (total int64, err error)
 ```
 
 #### func (Compound) Copy
@@ -125,16 +173,16 @@ func NewCompound(d []Tag) *Compound
 func (n Compound) Copy() Data
 ```
 
-#### func (Compound) Equal
+#### func (*Compound) Equal
 
 ```go
-func (n Compound) Equal(e equaler.Equaler) bool
+func (n *Compound) Equal(e equaler.Equaler) bool
 ```
 
 #### func (Compound) Get
 
 ```go
-func (n Compound) Get(name string) Tag
+func (n Compound) Get(name string) *Tag
 ```
 
 #### func (*Compound) ReadFrom
@@ -152,7 +200,7 @@ func (n *Compound) Remove(name string)
 #### func (*Compound) Set
 
 ```go
-func (n *Compound) Set(tag Tag)
+func (n *Compound) Set(tag *Tag)
 ```
 
 #### func (Compound) String
@@ -161,10 +209,31 @@ func (n *Compound) Set(tag Tag)
 func (n Compound) String() string
 ```
 
+#### func (Compound) Type
+
+```go
+func (Compound) Type() TagId
+```
+
 #### func (Compound) WriteTo
 
 ```go
 func (n Compound) WriteTo(f io.Writer) (total int64, err error)
+```
+
+#### type Config
+
+```go
+type Config struct {
+	bytewrite.Endian
+}
+```
+
+
+#### func (Config) RegisterType
+
+```go
+func (c Config) RegisterType(id TagId, nd func() Data)
 ```
 
 #### type Data
@@ -174,8 +243,11 @@ type Data interface {
 	io.ReaderFrom
 	io.WriterTo
 	equaler.Equaler
+	CReadFrom(*Config, io.Reader) (int64, error)
+	CWriteTo(*Config, io.Writer) (int64, error)
 	Copy() Data
 	String() string
+	Type() TagId
 }
 ```
 
@@ -193,16 +265,28 @@ type Double float64
 func NewDouble(d float64) *Double
 ```
 
+#### func (*Double) CReadFrom
+
+```go
+func (n *Double) CReadFrom(config *Config, f io.Reader) (total int64, err error)
+```
+
+#### func (Double) CWriteTo
+
+```go
+func (n Double) CWriteTo(config *Config, f io.Writer) (total int64, err error)
+```
+
 #### func (Double) Copy
 
 ```go
 func (n Double) Copy() Data
 ```
 
-#### func (Double) Equal
+#### func (*Double) Equal
 
 ```go
-func (n Double) Equal(e equaler.Equaler) bool
+func (n *Double) Equal(e equaler.Equaler) bool
 ```
 
 #### func (*Double) ReadFrom
@@ -217,10 +301,16 @@ func (n *Double) ReadFrom(f io.Reader) (total int64, err error)
 func (n Double) String() string
 ```
 
-#### func (*Double) WriteTo
+#### func (Double) Type
 
 ```go
-func (n *Double) WriteTo(f io.Writer) (total int64, err error)
+func (Double) Type() TagId
+```
+
+#### func (Double) WriteTo
+
+```go
+func (n Double) WriteTo(f io.Writer) (total int64, err error)
 ```
 
 #### type Float
@@ -236,16 +326,28 @@ type Float float32
 func NewFloat(d float32) *Float
 ```
 
+#### func (*Float) CReadFrom
+
+```go
+func (n *Float) CReadFrom(config *Config, f io.Reader) (total int64, err error)
+```
+
+#### func (Float) CWriteTo
+
+```go
+func (n Float) CWriteTo(config *Config, f io.Writer) (total int64, err error)
+```
+
 #### func (Float) Copy
 
 ```go
 func (n Float) Copy() Data
 ```
 
-#### func (Float) Equal
+#### func (*Float) Equal
 
 ```go
-func (n Float) Equal(e equaler.Equaler) bool
+func (n *Float) Equal(e equaler.Equaler) bool
 ```
 
 #### func (*Float) ReadFrom
@@ -260,10 +362,16 @@ func (n *Float) ReadFrom(f io.Reader) (total int64, err error)
 func (n Float) String() string
 ```
 
-#### func (*Float) WriteTo
+#### func (Float) Type
 
 ```go
-func (n *Float) WriteTo(f io.Writer) (total int64, err error)
+func (Float) Type() TagId
+```
+
+#### func (Float) WriteTo
+
+```go
+func (n Float) WriteTo(f io.Writer) (total int64, err error)
 ```
 
 #### type Int
@@ -279,16 +387,28 @@ type Int int32
 func NewInt(d int32) *Int
 ```
 
+#### func (*Int) CReadFrom
+
+```go
+func (n *Int) CReadFrom(config *Config, f io.Reader) (total int64, err error)
+```
+
+#### func (Int) CWriteTo
+
+```go
+func (n Int) CWriteTo(config *Config, f io.Writer) (total int64, err error)
+```
+
 #### func (Int) Copy
 
 ```go
 func (n Int) Copy() Data
 ```
 
-#### func (Int) Equal
+#### func (*Int) Equal
 
 ```go
-func (n Int) Equal(e equaler.Equaler) bool
+func (n *Int) Equal(e equaler.Equaler) bool
 ```
 
 #### func (*Int) ReadFrom
@@ -303,10 +423,16 @@ func (n *Int) ReadFrom(f io.Reader) (total int64, err error)
 func (n Int) String() string
 ```
 
-#### func (*Int) WriteTo
+#### func (Int) Type
 
 ```go
-func (n *Int) WriteTo(f io.Writer) (total int64, err error)
+func (Int) Type() TagId
+```
+
+#### func (Int) WriteTo
+
+```go
+func (n Int) WriteTo(f io.Writer) (total int64, err error)
 ```
 
 #### type IntArray
@@ -322,16 +448,28 @@ type IntArray []int32
 func NewIntArray(d []int32) *IntArray
 ```
 
+#### func (*IntArray) CReadFrom
+
+```go
+func (n *IntArray) CReadFrom(config *Config, f io.Reader) (total int64, err error)
+```
+
+#### func (IntArray) CWriteTo
+
+```go
+func (n IntArray) CWriteTo(config *Config, f io.Writer) (total int64, err error)
+```
+
 #### func (IntArray) Copy
 
 ```go
 func (n IntArray) Copy() Data
 ```
 
-#### func (IntArray) Equal
+#### func (*IntArray) Equal
 
 ```go
-func (n IntArray) Equal(e equaler.Equaler) bool
+func (n *IntArray) Equal(e equaler.Equaler) bool
 ```
 
 #### func (*IntArray) ReadFrom
@@ -344,6 +482,12 @@ func (n *IntArray) ReadFrom(f io.Reader) (total int64, err error)
 
 ```go
 func (n IntArray) String() string
+```
+
+#### func (IntArray) Type
+
+```go
+func (IntArray) Type() TagId
 ```
 
 #### func (IntArray) WriteTo
@@ -369,13 +513,25 @@ func NewEmptyList(tagType TagId) *List
 #### func  NewList
 
 ```go
-func NewList(d []Data) *List
+func NewList(data []Data) *List
 ```
 
 #### func (*List) Append
 
 ```go
-func (n *List) Append(d ...Data) error
+func (n *List) Append(data ...Data) error
+```
+
+#### func (*List) CReadFrom
+
+```go
+func (n *List) CReadFrom(config *Config, f io.Reader) (total int64, err error)
+```
+
+#### func (*List) CWriteTo
+
+```go
+func (n *List) CWriteTo(config *Config, f io.Writer) (total int64, err error)
 ```
 
 #### func (*List) Copy
@@ -399,7 +555,7 @@ func (n *List) Get(i int) Data
 #### func (*List) Insert
 
 ```go
-func (n *List) Insert(i int, d ...Data) error
+func (n *List) Insert(i int, data ...Data) error
 ```
 
 #### func (*List) Len
@@ -423,7 +579,7 @@ func (n *List) Remove(i int)
 #### func (*List) Set
 
 ```go
-func (n *List) Set(i int32, d Data) error
+func (n *List) Set(i int32, data Data) error
 ```
 
 #### func (*List) String
@@ -436,6 +592,12 @@ func (n *List) String() string
 
 ```go
 func (n *List) TagType() TagId
+```
+
+#### func (List) Type
+
+```go
+func (List) Type() TagId
 ```
 
 #### func (*List) WriteTo
@@ -457,16 +619,28 @@ type Long int64
 func NewLong(d int64) *Long
 ```
 
+#### func (*Long) CReadFrom
+
+```go
+func (n *Long) CReadFrom(config *Config, f io.Reader) (total int64, err error)
+```
+
+#### func (Long) CWriteTo
+
+```go
+func (n Long) CWriteTo(config *Config, f io.Writer) (total int64, err error)
+```
+
 #### func (Long) Copy
 
 ```go
 func (n Long) Copy() Data
 ```
 
-#### func (Long) Equal
+#### func (*Long) Equal
 
 ```go
-func (n Long) Equal(e equaler.Equaler) bool
+func (n *Long) Equal(e equaler.Equaler) bool
 ```
 
 #### func (*Long) ReadFrom
@@ -481,10 +655,16 @@ func (n *Long) ReadFrom(f io.Reader) (total int64, err error)
 func (n Long) String() string
 ```
 
-#### func (*Long) WriteTo
+#### func (Long) Type
 
 ```go
-func (n *Long) WriteTo(f io.Writer) (total int64, err error)
+func (Long) Type() TagId
+```
+
+#### func (Long) WriteTo
+
+```go
+func (n Long) WriteTo(f io.Writer) (total int64, err error)
 ```
 
 #### type ReadError
@@ -516,16 +696,28 @@ type Short int16
 func NewShort(d int16) *Short
 ```
 
+#### func (*Short) CReadFrom
+
+```go
+func (n *Short) CReadFrom(config *Config, f io.Reader) (total int64, err error)
+```
+
+#### func (Short) CWriteTo
+
+```go
+func (n Short) CWriteTo(config *Config, f io.Writer) (total int64, err error)
+```
+
 #### func (Short) Copy
 
 ```go
 func (n Short) Copy() Data
 ```
 
-#### func (Short) Equal
+#### func (*Short) Equal
 
 ```go
-func (n Short) Equal(e equaler.Equaler) bool
+func (n *Short) Equal(e equaler.Equaler) bool
 ```
 
 #### func (*Short) ReadFrom
@@ -540,10 +732,16 @@ func (n *Short) ReadFrom(f io.Reader) (total int64, err error)
 func (n Short) String() string
 ```
 
-#### func (*Short) WriteTo
+#### func (Short) Type
 
 ```go
-func (n *Short) WriteTo(f io.Writer) (total int64, err error)
+func (Short) Type() TagId
+```
+
+#### func (Short) WriteTo
+
+```go
+func (n Short) WriteTo(f io.Writer) (total int64, err error)
 ```
 
 #### type String
@@ -559,16 +757,28 @@ type String string
 func NewString(d string) *String
 ```
 
+#### func (*String) CReadFrom
+
+```go
+func (n *String) CReadFrom(config *Config, f io.Reader) (total int64, err error)
+```
+
+#### func (String) CWriteTo
+
+```go
+func (n String) CWriteTo(config *Config, f io.Writer) (int64, error)
+```
+
 #### func (String) Copy
 
 ```go
 func (n String) Copy() Data
 ```
 
-#### func (String) Equal
+#### func (*String) Equal
 
 ```go
-func (n String) Equal(e equaler.Equaler) bool
+func (n *String) Equal(e equaler.Equaler) bool
 ```
 
 #### func (*String) ReadFrom
@@ -583,24 +793,22 @@ func (n *String) ReadFrom(f io.Reader) (total int64, err error)
 func (n String) String() string
 ```
 
-#### func (*String) WriteTo
+#### func (String) Type
 
 ```go
-func (n *String) WriteTo(f io.Writer) (total int64, err error)
+func (String) Type() TagId
+```
+
+#### func (String) WriteTo
+
+```go
+func (n String) WriteTo(f io.Writer) (int64, error)
 ```
 
 #### type Tag
 
 ```go
-type Tag interface {
-	io.ReaderFrom
-	io.WriterTo
-	equaler.Equaler
-	Data() Data
-	Name() string
-	String() string
-	TagId() TagId
-	Copy() Tag
+type Tag struct {
 }
 ```
 
@@ -608,13 +816,73 @@ type Tag interface {
 #### func  NewTag
 
 ```go
-func NewTag(name string, d Data) (n Tag)
+func NewTag(name string, d Data) (n *Tag)
 ```
 
 #### func  ReadNBTFrom
 
 ```go
-func ReadNBTFrom(f io.Reader) (Tag, int64, error)
+func ReadNBTFrom(f io.Reader) (*Tag, int64, error)
+```
+
+#### func (*Tag) CReadFrom
+
+```go
+func (n *Tag) CReadFrom(config *Config, f io.Reader) (total int64, err error)
+```
+
+#### func (*Tag) CWriteTo
+
+```go
+func (n *Tag) CWriteTo(config *Config, f io.Writer) (total int64, err error)
+```
+
+#### func (*Tag) Copy
+
+```go
+func (n *Tag) Copy() *Tag
+```
+
+#### func (*Tag) Data
+
+```go
+func (n *Tag) Data() Data
+```
+
+#### func (*Tag) Equal
+
+```go
+func (n *Tag) Equal(e equaler.Equaler) bool
+```
+
+#### func (*Tag) Name
+
+```go
+func (n *Tag) Name() string
+```
+
+#### func (*Tag) ReadFrom
+
+```go
+func (n *Tag) ReadFrom(f io.Reader) (total int64, err error)
+```
+
+#### func (*Tag) String
+
+```go
+func (n *Tag) String() string
+```
+
+#### func (*Tag) TagId
+
+```go
+func (n *Tag) TagId() TagId
+```
+
+#### func (*Tag) WriteTo
+
+```go
+func (n *Tag) WriteTo(f io.Writer) (total int64, err error)
 ```
 
 #### type TagId
