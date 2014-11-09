@@ -6,7 +6,6 @@ func TestTagData(t *testing.T) {
 	var (
 		err error
 		d   Data
-		nId TagId
 	)
 	for id, name := range tagIdNames {
 		d, err = newFromTag(TagId(id))
@@ -16,9 +15,7 @@ func TestTagData(t *testing.T) {
 			}
 		} else if err != nil {
 			t.Errorf("failed to get new tag data for %q (%d), error %q", name, id, err)
-		} else if nId, err = idFromData(d); err != nil {
-			t.Errorf("failed to get id for %q (%d) from data, error %q", name, id, err)
-		} else if nId != TagId(id) {
+		} else if nId := d.Type(); nId != TagId(id) {
 			t.Errorf("id returned for %q (%d) is incorrect, got %d", name, id, nId)
 		}
 	}

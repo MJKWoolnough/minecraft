@@ -98,36 +98,6 @@ func newFromTag(id TagId) (d Data, err error) {
 	return
 }
 
-func idFromData(d Data) (t TagId, err error) {
-	switch d.(type) {
-	case *Byte:
-		t = Tag_Byte
-	case *Short:
-		t = Tag_Short
-	case *Int:
-		t = Tag_Int
-	case *Long:
-		t = Tag_Long
-	case *Float:
-		t = Tag_Float
-	case *Double:
-		t = Tag_Double
-	case *ByteArray:
-		t = Tag_ByteArray
-	case *String:
-		t = Tag_String
-	case *List:
-		t = Tag_List
-	case *Compound:
-		t = Tag_Compound
-	case *IntArray:
-		t = Tag_IntArray
-	default:
-		err = fmt.Errorf("couldn't determine tag type")
-	}
-	return
-}
-
 func indent(s string) (out string) {
 	last := 0
 	for i := 0; i < len(s); i++ {

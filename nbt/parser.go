@@ -28,9 +28,10 @@ package nbt
 
 import (
 	"fmt"
+	"io"
+
 	"github.com/MJKWoolnough/bytewrite"
 	"github.com/MJKWoolnough/equaler"
-	"io"
 )
 
 // Tag Types
@@ -70,6 +71,7 @@ type Data interface {
 	equaler.Equaler
 	Copy() Data
 	String() string
+	Type() TagId
 }
 
 type TagId uint8
@@ -82,9 +84,8 @@ func (t TagId) String() string {
 }
 
 type Tag struct {
-	tagType TagId
-	name    String
-	d       Data
+	name String
+	data Data
 }
 
 func ReadNBTFrom(f io.Reader) (*Tag, int64, error) {
@@ -95,14 +96,9 @@ func ReadNBTFrom(f io.Reader) (*Tag, int64, error) {
 }
 
 func NewTag(name string, d Data) (n *Tag) {
-	tagType, err := idFromData(d)
-	if err != nil {
-		return nil
-	}
 	m := Tag{
-		tagType,
-		String(name),
-		d,
+		name: String(name),
+		data: d,
 	}
 	return &m
 }
@@ -119,11 +115,11 @@ func (n *Tag) ReadFrom(f io.Reader) (total int64, err error) {
 		err = ReadError{"named TagId", err}
 		return
 	}
-	n.tagType = TagId(data[0])
-	if n.tagType == Tag_End {
-		n.d = new(end)
+	tagType := TagId(data[0])
+	if tagType == Tag_End {
+		n.data = new(end)
 	} else {
-		if n.d, err = newFromTag(n.tagType); err != nil {
+		if n.data, err = newFromTag(tagType); err != nil {
 			return
 		}
 		d, err = n.name.ReadFrom(f)
@@ -132,11 +128,11 @@ func (n *Tag) ReadFrom(f io.Reader) (total int64, err error) {
 			err = ReadError{"name", err}
 			return
 		}
-		d, err = n.d.ReadFrom(f)
+		d, err = n.data.ReadFrom(f)
 		total += d
 		if err != nil {
 			if _, ok := err.(*ReadError); !ok {
-				err = &ReadError{n.tagType.String(), err}
+				err = &ReadError{tagType.String(), err}
 			}
 		}
 	}
@@ -148,13 +144,14 @@ func (n *Tag) WriteTo(f io.Writer) (total int64, err error) {
 		c int
 		d int64
 	)
-	c, err = f.Write([]byte{byte(n.tagType)})
+	tagType := n.data.Type()
+	c, err = f.Write([]byte{byte(tagType)})
 	total += int64(c)
 	if err != nil {
 		err = WriteError{"named TagId", err}
 		return
 	}
-	if n.tagType == Tag_End {
+	if tagType == Tag_End {
 		return
 	}
 	d, err = n.name.WriteTo(f)
@@ -162,30 +159,29 @@ func (n *Tag) WriteTo(f io.Writer) (total int64, err error) {
 	if err != nil {
 		return
 	}
-	d, err = n.d.WriteTo(f)
+	d, err = n.data.WriteTo(f)
 	total += d
 	return
 }
 
 func (n *Tag) Copy() *Tag {
 	return &Tag{
-		n.tagType,
 		n.name,
-		n.d.Copy(),
+		n.data.Copy(),
 	}
 }
 
 func (n *Tag) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*Tag); ok {
-		if n.tagType == m.tagType && n.name == m.name {
-			return n.d.Equal(m.d)
+		if n.data.Type() == m.data.Type() && n.name == m.name {
+			return n.data.Equal(m.data)
 		}
 	}
 	return false
 }
 
 func (n *Tag) Data() Data {
-	return n.d
+	return n.data
 }
 
 func (n *Tag) Name() string {
@@ -193,11 +189,11 @@ func (n *Tag) Name() string {
 }
 
 func (n *Tag) TagId() TagId {
-	return n.tagType
+	return n.data.Type()
 }
 
 func (n *Tag) String() string {
-	return fmt.Sprintf("%s(%q): %s", n.tagType, n.name, n.d)
+	return fmt.Sprintf("%s(%q): %s", n.data.Type(), n.name, n.data)
 }
 
 type end struct{}
@@ -220,6 +216,10 @@ func (end) Equal(e equaler.Equaler) bool {
 		_, ok = e.(end)
 	}
 	return ok
+}
+
+func (end) Type() TagId {
+	return Tag_End
 }
 
 func (end) String() string {
@@ -266,6 +266,10 @@ func (n Byte) String() string {
 	return fmt.Sprintf("%d", n)
 }
 
+func (Byte) Type() TagId {
+	return Tag_Byte
+}
+
 type Short int16
 
 func NewShort(d int16) *Short {
@@ -302,6 +306,10 @@ func (n *Short) Equal(e equaler.Equaler) bool {
 
 func (n Short) String() string {
 	return fmt.Sprintf("%d", n)
+}
+
+func (Short) Type() TagId {
+	return Tag_Short
 }
 
 type Int int32
@@ -342,6 +350,10 @@ func (n Int) String() string {
 	return fmt.Sprintf("%d", n)
 }
 
+func (Int) Type() TagId {
+	return Tag_Int
+}
+
 type Long int64
 
 func NewLong(d int64) *Long {
@@ -378,6 +390,10 @@ func (n *Long) Equal(e equaler.Equaler) bool {
 
 func (n Long) String() string {
 	return fmt.Sprintf("%d", n)
+}
+
+func (Long) Type() TagId {
+	return Tag_Long
 }
 
 type Float float32
@@ -418,6 +434,10 @@ func (n Float) String() string {
 	return fmt.Sprintf("%f", n)
 }
 
+func (Float) Type() TagId {
+	return Tag_Float
+}
+
 type Double float64
 
 func NewDouble(d float64) *Double {
@@ -454,6 +474,10 @@ func (n *Double) Equal(e equaler.Equaler) bool {
 
 func (n Double) String() string {
 	return fmt.Sprintf("%f", n)
+}
+
+func (Double) Type() TagId {
+	return Tag_Double
 }
 
 type ByteArray []int8
@@ -513,6 +537,10 @@ func (n ByteArray) String() string {
 	return fmt.Sprintf("[%d bytes] %v", len(n), []int8(n))
 }
 
+func (ByteArray) Type() TagId {
+	return Tag_ByteArray
+}
+
 type String string
 
 func NewString(d string) *String {
@@ -552,27 +580,28 @@ func (n String) String() string {
 	return string(n)
 }
 
-type List struct {
-	tagType TagId
-	d       []Data
+func (String) Type() TagId {
+	return Tag_String
 }
 
-func NewList(d []Data) *List {
-	if len(d) == 0 {
-		return &List{Tag_Byte, d}
+type List struct {
+	tagType TagId
+	data    []Data
+}
+
+func NewList(data []Data) *List {
+	if len(data) == 0 {
+		return &List{Tag_Byte, data}
 	}
-	tagType, err := idFromData(d[0])
-	if err != nil {
-		return nil
-	}
-	for i := 1; i < len(d); i++ {
-		if id, _ := idFromData(d[i]); id != tagType {
+	tagType := data[0].Type()
+	for i := 1; i < len(data); i++ {
+		if id := data[i].Type(); id != tagType {
 			return nil
 		}
 	}
 	return &List{
 		tagType,
-		d,
+		data,
 	}
 }
 
@@ -603,12 +632,12 @@ func (n *List) ReadFrom(f io.Reader) (total int64, err error) {
 		return
 	}
 	length := bytewrite.BigEndian.Uint32(data)
-	n.d = make([]Data, length)
+	n.data = make([]Data, length)
 	for i := uint32(0); i < length; i++ {
-		if n.d[i], err = newFromTag(n.tagType); err != nil {
+		if n.data[i], err = newFromTag(n.tagType); err != nil {
 			return
 		}
-		d, err = n.d[i].ReadFrom(f)
+		d, err = n.data[i].ReadFrom(f)
 		total += d
 		if err != nil {
 			return
@@ -627,17 +656,14 @@ func (n *List) WriteTo(f io.Writer) (total int64, err error) {
 	if err != nil {
 		return
 	}
-	c, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(len(n.d))))
+	c, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(len(n.data))))
 	total += int64(c)
 	if err != nil {
 		return
 	}
-	var tagId TagId
 	if n.tagType != Tag_End {
-		for _, data := range n.d {
-			if tagId, err = idFromData(data); err != nil {
-				break
-			} else if tagId != n.tagType {
+		for _, data := range n.data {
+			if tagId := data.Type(); tagId != n.tagType {
 				err = &WrongTag{n.tagType, tagId}
 				break
 			}
@@ -658,18 +684,18 @@ func (n *List) TagType() TagId {
 func (n *List) Copy() Data {
 	c := new(List)
 	c.tagType = n.tagType
-	c.d = make([]Data, len(n.d))
-	for i, d := range n.d {
-		c.d[i] = d.Copy()
+	c.data = make([]Data, len(n.data))
+	for i, d := range n.data {
+		c.data[i] = d.Copy()
 	}
 	return c
 }
 
 func (n *List) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*List); ok {
-		if n.tagType == m.tagType && len(n.d) == len(m.d) {
-			for i, o := range n.d {
-				if !o.Equal(m.d[i]) {
+		if n.tagType == m.tagType && len(n.data) == len(m.data) {
+			for i, o := range n.data {
+				if !o.Equal(m.data[i]) {
 					return false
 				}
 			}
@@ -680,66 +706,70 @@ func (n *List) Equal(e equaler.Equaler) bool {
 }
 
 func (n *List) String() string {
-	s := fmt.Sprintf("%d entries of type %s {", len(n.d), n.tagType)
-	for _, d := range n.d {
+	s := fmt.Sprintf("%d entries of type %s {", len(n.data), n.tagType)
+	for _, d := range n.data {
 		s += fmt.Sprintf("\n	%s: %s", n.tagType, indent(d.String()))
 	}
 	return s + "\n}"
 }
 
-func (n *List) Set(i int32, d Data) error {
-	if i < 0 || i >= int32(len(n.d)) {
+func (n *List) Set(i int32, data Data) error {
+	if i < 0 || i >= int32(len(n.data)) {
 		return &BadRange{}
 	}
-	if err := n.valid(d); err != nil {
+	if err := n.valid(data); err != nil {
 		return err
 	}
-	n.d[i] = d
+	n.data[i] = data
 	return nil
 }
 
 func (n *List) Get(i int) Data {
-	if i >= 0 && i < len(n.d) {
-		return n.d[i]
+	if i >= 0 && i < len(n.data) {
+		return n.data[i]
 	}
 	return nil
 }
 
-func (n *List) Append(d ...Data) error {
-	if err := n.valid(d...); err != nil {
+func (n *List) Append(data ...Data) error {
+	if err := n.valid(data...); err != nil {
 		return err
 	}
-	n.d = append(n.d, d...)
+	n.data = append(n.data, data...)
 	return nil
 }
 
-func (n *List) Insert(i int, d ...Data) error {
-	if err := n.valid(d...); err != nil {
+func (n *List) Insert(i int, data ...Data) error {
+	if err := n.valid(data...); err != nil {
 		return err
 	}
-	n.d = append(n.d[:i], append(d, n.d[i:]...)...)
+	n.data = append(n.data[:i], append(data, n.data[i:]...)...)
 	return nil
 }
 
 func (n *List) Remove(i int) {
-	if i >= 0 && i < len(n.d) {
-		copy(n.d[i:], n.d[i+1:])
-		n.d[len(n.d)-1] = nil
-		n.d = n.d[:len(n.d)-1]
+	if i >= 0 && i < len(n.data) {
+		copy(n.data[i:], n.data[i+1:])
+		n.data[len(n.data)-1] = nil
+		n.data = n.data[:len(n.data)-1]
 	}
 }
 
 func (n *List) Len() int {
-	return len(n.d)
+	return len(n.data)
 }
 
-func (n *List) valid(d ...Data) error {
-	for _, e := range d {
-		if t, _ := idFromData(e); t != n.tagType {
+func (n *List) valid(data ...Data) error {
+	for _, d := range data {
+		if t := d.Type(); t != n.tagType {
 			return &WrongTag{n.tagType, t}
 		}
 	}
 	return nil
+}
+
+func (List) Type() TagId {
+	return Tag_List
 }
 
 type Compound []*Tag
@@ -759,7 +789,7 @@ func (n *Compound) ReadFrom(f io.Reader) (total int64, err error) {
 		if err != nil {
 			return
 		}
-		if data.tagType == Tag_End {
+		if data.TagId() == Tag_End {
 			break
 		}
 		*n = append(*n, data)
@@ -851,6 +881,10 @@ func (n *Compound) Set(tag *Tag) {
 	*n = append(*n, tag)
 }
 
+func (Compound) Type() TagId {
+	return Tag_Compound
+}
+
 type IntArray []int32
 
 func NewIntArray(d []int32) *IntArray {
@@ -916,4 +950,8 @@ func (n *IntArray) Equal(e equaler.Equaler) bool {
 
 func (n IntArray) String() string {
 	return fmt.Sprintf("[%d ints] %v", len(n), []int32(n))
+}
+
+func (IntArray) Type() TagId {
+	return Tag_IntArray
 }
