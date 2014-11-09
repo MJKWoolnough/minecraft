@@ -26,6 +26,7 @@ package minecraft
 
 import (
 	"fmt"
+
 	"github.com/MJKWoolnough/minecraft/nbt"
 )
 
@@ -148,8 +149,10 @@ func newChunk(x, z int32, data *nbt.Tag) (*chunk, error) {
 		} else if tagId == nbt.Tag_List {
 			list := tag.Data().(*nbt.List)
 			if list.TagType() != co.listType {
-				if co.emptyByte && list.TagType() == nbt.Tag_Byte && list.Len() == 0 {
-					continue
+				if co.emptyByte && list.Len() == 0 {
+					if tt := list.TagType(); tt == nbt.Tag_Byte || tt == nbt.Tag_End {
+						continue
+					}
 				}
 				return nil, &WrongTypeError{co.name, co.listType, list.TagType()}
 			}
