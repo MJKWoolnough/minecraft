@@ -27,77 +27,77 @@ package minecraft
 import "github.com/MJKWoolnough/equaler"
 
 const (
-	Biome_Ocean Biome = iota
-	Biome_Plains
-	Biome_Desert
-	Biome_ExtremeHills
-	Biome_Forest
-	Biome_Taiga
-	Biome_Swampland
-	Biome_River
-	Biome_Hell
-	Biome_Sky
-	Biome_FrozenOcean
-	Biome_FrozenRiver
-	Biome_IcePlains
-	Biome_IceMountains
-	Biome_MushroomIsland
-	Biome_MushroomIslandShore
-	Biome_Beach
-	Biome_DesertHills
-	Biome_ForestHills
-	Biome_TaigaHills
-	Biome_ExtremeHillsEdge
-	Biome_Jungle
-	Biome_JungleHills
-	Biome_JungleEdge
-	Biome_DeepOcean
-	Biome_StoneBeach
-	Biome_ColdBeach
-	Biome_BirchForest
-	Biome_BirchForestHills
-	Biome_RoofedForest
-	Biome_ColdTaiga
-	Biome_ColdTaigaHills
-	Biome_MegaTaiga
-	Biome_MegaTaigaHills
-	Biome_ExtremeHillsPlus
-	Biome_Savanna
-	Biome_SavannaPlateau
-	Biome_Mesa
-	Biome_MesaPlateauF
-	Biome_MesaPlateau
+	Ocean Biome = iota
+	Plains
+	Desert
+	ExtremeHills
+	Forest
+	Taiga
+	Swampland
+	River
+	Hell
+	Sky
+	FrozenOcean
+	FrozenRiver
+	IcePlains
+	IceMountains
+	MushroomIsland
+	MushroomIslandShore
+	Beach
+	DesertHills
+	ForestHills
+	TaigaHills
+	ExtremeHillsEdge
+	Jungle
+	JungleHills
+	JungleEdge
+	DeepOcean
+	StoneBeach
+	ColdBeach
+	BirchForest
+	BirchForestHills
+	RoofedForest
+	ColdTaiga
+	ColdTaigaHills
+	MegaTaiga
+	MegaTaigaHills
+	ExtremeHillsPlus
+	Savanna
+	SavannaPlateau
+	Mesa
+	MesaPlateauF
+	MesaPlateau
 )
 
 const (
-	Biome_SunflowerPlains Biome = iota + 129
-	Biome_DeserM
-	Biome_ExtremeHillsM
-	Biome_FlowerForest
-	Biome_TaigaM
-	Biome_SwamplandM
+	SunflowerPlains Biome = iota + 129
+	DeserM
+	ExtremeHillsM
+	FlowerForest
+	TaigaM
+	SwamplandM
 )
 const (
-	Biome_IcePlainsSpikes Biome = 140
-	Biome_JungleM         Biome = 149
-	Biome_JungleEdgeM     Biome = 151
-	Biome_Auto            Biome = 255
+	IcePlainsSpikes Biome = 140
+	JungleM         Biome = 149
+	JungleEdgeM     Biome = 151
+	AutoBiome       Biome = 255
 )
 const (
-	Biome_BirchForestM Biome = iota + 155
-	Biome_BirchForestHillsM
-	Biome_RoofedForestM
-	Biome_ColdTaigaM
+	BirchForestM Biome = iota + 155
+	BirchForestHillsM
+	RoofedForestM
+	ColdTaigaM
 )
 const (
-	Biome_MegaSpruceTaiga Biome = iota + 160
-	Biome_MegaSpruceTaigaHills
-	Biome_ExtremeHillsPlusM
-	Biome_SavannaM
-	Biome_SavannaPlateauM
-	Biome_MesaBryce
-	Biome_MesaPlateauFM
-	Biome_MesaPlateauM
+	MegaSpruceTaiga Biome = iota + 160
+	MegaSpruceTaigaHills
+	ExtremeHillsPlusM
+	SavannaM
+	SavannaPlateauM
+	MesaBryce
+	MesaPlateauFM
+	MesaPlateauM
 )
 
 type Biome uint8
@@ -113,129 +113,129 @@ func (b Biome) Equal(e equaler.Equaler) bool {
 
 func (b Biome) String() string {
 	switch b {
-	case Biome_Ocean:
+	case Ocean:
 		return "Ocean"
-	case Biome_Plains:
+	case Plains:
 		return "Plains"
-	case Biome_Desert:
+	case Desert:
 		return "Desert"
-	case Biome_ExtremeHills:
+	case ExtremeHills:
 		return "Extreme Hills"
-	case Biome_Forest:
+	case Forest:
 		return "Forest"
-	case Biome_Taiga:
+	case Taiga:
 		return "Taiga"
-	case Biome_Swampland:
+	case Swampland:
 		return "Swampland"
-	case Biome_River:
+	case River:
 		return "River"
-	case Biome_Hell:
+	case Hell:
 		return "Hell"
-	case Biome_Sky:
+	case Sky:
 		return "Sky"
-	case Biome_FrozenOcean:
+	case FrozenOcean:
 		return "Frozen Ocean"
-	case Biome_FrozenRiver:
+	case FrozenRiver:
 		return "Frozen River"
-	case Biome_IcePlains:
+	case IcePlains:
 		return "Ice Plains"
-	case Biome_IceMountains:
+	case IceMountains:
 		return "Ice Mountains"
-	case Biome_MushroomIsland:
+	case MushroomIsland:
 		return "Mushroom Island"
-	case Biome_MushroomIslandShore:
+	case MushroomIslandShore:
 		return "Mushroom Island Shore"
-	case Biome_Beach:
+	case Beach:
 		return "Beach"
-	case Biome_DesertHills:
+	case DesertHills:
 		return "Desert Hills"
-	case Biome_ForestHills:
+	case ForestHills:
 		return "Forest Hills"
-	case Biome_TaigaHills:
+	case TaigaHills:
 		return "Taiga Hills"
-	case Biome_ExtremeHillsEdge:
+	case ExtremeHillsEdge:
 		return "Extreme Hills Edge"
-	case Biome_Jungle:
+	case Jungle:
 		return "Jungle"
-	case Biome_JungleHills:
+	case JungleHills:
 		return "Jungle Hills"
-	case Biome_JungleEdge:
+	case JungleEdge:
 		return "Jungle Edge"
-	case Biome_DeepOcean:
+	case DeepOcean:
 		return "Deep Ocean"
-	case Biome_StoneBeach:
+	case StoneBeach:
 		return "Stone Beach"
-	case Biome_ColdBeach:
+	case ColdBeach:
 		return "Cold Beach"
-	case Biome_BirchForest:
+	case BirchForest:
 		return "Birch Forest"
-	case Biome_BirchForestHills:
+	case BirchForestHills:
 		return "Birch Forest Hills"
-	case Biome_RoofedForest:
+	case RoofedForest:
 		return "Roofed Forest"
-	case Biome_ColdTaiga:
+	case ColdTaiga:
 		return "Cold Taiga"
-	case Biome_ColdTaigaHills:
+	case ColdTaigaHills:
 		return "Cold Taiga Hills"
-	case Biome_MegaTaiga:
+	case MegaTaiga:
 		return "Mega Taiga"
-	case Biome_MegaTaigaHills:
+	case MegaTaigaHills:
 		return "Mega Taiga Hills"
-	case Biome_ExtremeHillsPlus:
+	case ExtremeHillsPlus:
 		return "Extreme Hills+"
-	case Biome_Savanna:
+	case Savanna:
 		return "Savanna"
-	case Biome_SavannaPlateau:
+	case SavannaPlateau:
 		return "Savanna Plateau"
-	case Biome_Mesa:
+	case Mesa:
 		return "Mesa"
-	case Biome_MesaPlateauF:
+	case MesaPlateauF:
 		return "Mesa Plateau F"
-	case Biome_MesaPlateau:
+	case MesaPlateau:
 		return "Mesa Plateau"
-	case Biome_SunflowerPlains:
+	case SunflowerPlains:
 		return "Sunflower Plains"
-	case Biome_DeserM:
+	case DeserM:
 		return "Desert M"
-	case Biome_ExtremeHillsM:
+	case ExtremeHillsM:
 		return "Extreme Hills M"
-	case Biome_FlowerForest:
+	case FlowerForest:
 		return "Flower Forest"
-	case Biome_TaigaM:
+	case TaigaM:
 		return "Taiga M"
-	case Biome_SwamplandM:
+	case SwamplandM:
 		return "Swampland M"
-	case Biome_IcePlainsSpikes:
+	case IcePlainsSpikes:
 		return "Ice Plains Spikes"
-	case Biome_JungleM:
+	case JungleM:
 		return "Jungle M"
-	case Biome_JungleEdgeM:
+	case JungleEdgeM:
 		return "Jungle Edge M"
-	case Biome_BirchForestM:
+	case BirchForestM:
 		return "BirchForestM"
-	case Biome_BirchForestHillsM:
+	case BirchForestHillsM:
 		return "BirchForestHillsM"
-	case Biome_RoofedForestM:
+	case RoofedForestM:
 		return "Roofed Forest M"
-	case Biome_ColdTaigaM:
+	case ColdTaigaM:
 		return "Cold Taiga M"
-	case Biome_MegaSpruceTaiga:
+	case MegaSpruceTaiga:
 		return "Mega Spruce Taiga"
-	case Biome_MegaSpruceTaigaHills:
+	case MegaSpruceTaigaHills:
 		return "Mega Spruce Taiga Hills"
-	case Biome_ExtremeHillsPlusM:
+	case ExtremeHillsPlusM:
 		return "Extreme Hills Plus M"
-	case Biome_SavannaM:
+	case SavannaM:
 		return "Savanna M"
-	case Biome_SavannaPlateauM:
+	case SavannaPlateauM:
 		return "Savanna Plateau M"
-	case Biome_MesaBryce:
+	case MesaBryce:
 		return "Mesa Bryce"
-	case Biome_MesaPlateauFM:
+	case MesaPlateauFM:
 		return "Mesa Plateau F M"
-	case Biome_MesaPlateauM:
+	case MesaPlateauM:
 		return "Mesa Plateau M"
-	case Biome_Auto:
+	case AutoBiome:
 		return "Auto"
 	}
 	place := 0

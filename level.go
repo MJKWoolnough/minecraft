@@ -332,9 +332,9 @@ func (l *Level) genLighting(x, y, z int32, skyLight, darker bool, source uint8) 
 func (l *Level) GetBiome(x, z int32) (Biome, error) {
 	c, err := l.getChunk(x, z, false)
 	if err != nil {
-		return Biome_Auto, err
+		return AutoBiome, err
 	} else if c == nil {
-		return Biome_Plains, nil
+		return Plains, nil
 	}
 	return c.GetBiome(x, z), nil
 }
