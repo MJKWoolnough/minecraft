@@ -27,10 +27,13 @@ type Tag struct {
 }
 
 func ReadNBTFrom(f io.Reader) (*Tag, int64, error) {
-	n := new(Tag)
-	count, err := n.ReadFrom(f)
-	return n, count, err
+	return CReadNBTFrom(defaultConfig, f)
+}
 
+func CReadNBTFrom(config *Config, f io.Reader) (*Tag, int64, error) {
+	n := new(Tag)
+	count, err := n.CReadFrom(config, f)
+	return n, count, err
 }
 
 func NewTag(name string, d Data) (n *Tag) {
