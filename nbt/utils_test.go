@@ -8,7 +8,7 @@ func TestTagData(t *testing.T) {
 		d   Data
 	)
 	for id, name := range tagIdNames {
-		d, err = newFromTag(TagId(id))
+		d, err = defaultConfig.newFromTag(TagId(id))
 		if id == 0 {
 			if err == nil {
 				t.Errorf("tag end (0) should return an error")
@@ -19,7 +19,7 @@ func TestTagData(t *testing.T) {
 			t.Errorf("id returned for %q (%d) is incorrect, got %d", name, id, nId)
 		}
 	}
-	if d, err = newFromTag(TagId(len(tagIdNames))); err == nil {
+	if d, err = defaultConfig.newFromTag(TagId(len(tagIdNames))); err == nil {
 		t.Errorf("tag id %d has no associated name", len(tagIdNames))
 	}
 }

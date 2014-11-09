@@ -10,53 +10,15 @@ import (
 	"github.com/MJKWoolnough/equaler"
 )
 
-// Tag Types
-const (
-	Tag_End TagId = iota
-	Tag_Byte
-	Tag_Short
-	Tag_Int
-	Tag_Long
-	Tag_Float
-	Tag_Double
-	Tag_ByteArray
-	Tag_String
-	Tag_List
-	Tag_Compound
-	Tag_IntArray
-)
-
-var tagIdNames = [...]string{
-	"End",
-	"Byte",
-	"Short",
-	"Int",
-	"Long",
-	"Float",
-	"Double",
-	"Byte Array",
-	"String",
-	"List",
-	"Compound",
-	"Int Array",
-}
-
 type Data interface {
 	io.ReaderFrom
 	io.WriterTo
 	equaler.Equaler
+	CReadFrom(*Config, io.Reader) (int64, error)
+	CWriteTo(*Config, io.Writer) (int64, error)
 	Copy() Data
 	String() string
 	Type() TagId
-}
-
-type TagId uint8
-
-func (t TagId) String() string {
-	if int(t) < len(tagIdNames) {
-		return tagIdNames[t]
-	}
-	return ""
 }
 
 type Tag struct {
@@ -80,6 +42,10 @@ func NewTag(name string, d Data) (n *Tag) {
 }
 
 func (n *Tag) ReadFrom(f io.Reader) (total int64, err error) {
+	return n.CReadFrom(defaultConfig, f)
+}
+
+func (n *Tag) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var (
 		c    int
 		d    int64
@@ -95,16 +61,16 @@ func (n *Tag) ReadFrom(f io.Reader) (total int64, err error) {
 	if tagType == Tag_End {
 		n.data = new(end)
 	} else {
-		if n.data, err = newFromTag(tagType); err != nil {
+		if n.data, err = config.newFromTag(tagType); err != nil {
 			return
 		}
-		d, err = n.name.ReadFrom(f)
+		d, err = n.name.CReadFrom(config, f)
 		total += d
 		if err != nil {
 			err = ReadError{"name", err}
 			return
 		}
-		d, err = n.data.ReadFrom(f)
+		d, err = n.data.CReadFrom(config, f)
 		total += d
 		if err != nil {
 			if _, ok := err.(*ReadError); !ok {
@@ -116,6 +82,10 @@ func (n *Tag) ReadFrom(f io.Reader) (total int64, err error) {
 }
 
 func (n *Tag) WriteTo(f io.Writer) (total int64, err error) {
+	return n.CWriteTo(defaultConfig, f)
+}
+
+func (n *Tag) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	var (
 		c int
 		d int64
@@ -130,12 +100,12 @@ func (n *Tag) WriteTo(f io.Writer) (total int64, err error) {
 	if tagType == Tag_End {
 		return
 	}
-	d, err = n.name.WriteTo(f)
+	d, err = n.name.CWriteTo(config, f)
 	total += d
 	if err != nil {
 		return
 	}
-	d, err = n.data.WriteTo(f)
+	d, err = n.data.CWriteTo(config, f)
 	total += d
 	return
 }
@@ -174,11 +144,19 @@ func (n *Tag) String() string {
 
 type end struct{}
 
-func (end) ReadFrom(f io.Reader) (total int64, err error) {
+func (end) CReadFrom(*Config, io.Reader) (total int64, err error) {
 	return
 }
 
-func (end) WriteTo(f io.Writer) (total int64, err error) {
+func (end) ReadFrom(io.Reader) (total int64, err error) {
+	return
+}
+
+func (end) CWriteTo(*Config, io.Writer) (total int64, err error) {
+	return
+}
+
+func (end) WriteTo(io.Writer) (total int64, err error) {
 	return
 }
 
@@ -220,11 +198,19 @@ func (n *Byte) ReadFrom(f io.Reader) (total int64, err error) {
 	return
 }
 
+func (n *Byte) CReadFrom(c *Config, f io.Reader) (total int64, err error) {
+	return n.ReadFrom(f)
+}
+
 func (n Byte) WriteTo(f io.Writer) (total int64, err error) {
 	var c int
 	c, err = f.Write([]byte{byte(n)})
 	total += int64(c)
 	return
+}
+
+func (n Byte) CWriteTo(c *Config, f io.Writer) (total int64, err error) {
+	return n.WriteTo(f)
 }
 
 func (n Byte) Copy() Data {
@@ -254,17 +240,25 @@ func NewShort(d int16) *Short {
 }
 
 func (n *Short) ReadFrom(f io.Reader) (total int64, err error) {
+	return n.CReadFrom(defaultConfig, f)
+}
+
+func (n *Short) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var c int
 	data := make([]byte, 2)
 	c, err = io.ReadFull(f, data)
 	total += int64(c)
-	*n = Short(bytewrite.BigEndian.Uint16(data))
+	*n = Short(config.endian.Uint16(data))
 	return
 }
 
 func (n Short) WriteTo(f io.Writer) (total int64, err error) {
+	return n.CWriteTo(defaultConfig, f)
+}
+
+func (n Short) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(bytewrite.BigEndian.PutUint16(uint16(n)))
+	c, err = f.Write(config.endian.PutUint16(uint16(n)))
 	total += int64(c)
 	return
 }
@@ -296,17 +290,25 @@ func NewInt(d int32) *Int {
 }
 
 func (n *Int) ReadFrom(f io.Reader) (total int64, err error) {
+	return n.CReadFrom(defaultConfig, f)
+}
+
+func (n *Int) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var c int
 	data := make([]byte, 4)
 	c, err = io.ReadFull(f, data[:])
 	total += int64(c)
-	*n = Int(bytewrite.BigEndian.Uint32(data))
+	*n = Int(config.endian.Uint32(data))
 	return
 }
 
 func (n Int) WriteTo(f io.Writer) (total int64, err error) {
+	return n.CWriteTo(defaultConfig, f)
+}
+
+func (n Int) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(n)))
+	c, err = f.Write(config.endian.PutUint32(uint32(n)))
 	total += int64(c)
 	return
 }
@@ -338,17 +340,25 @@ func NewLong(d int64) *Long {
 }
 
 func (n *Long) ReadFrom(f io.Reader) (total int64, err error) {
+	return n.CReadFrom(defaultConfig, f)
+}
+
+func (n *Long) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var c int
 	data := make([]byte, 8)
 	c, err = io.ReadFull(f, data)
 	total += int64(c)
-	*n = Long(bytewrite.BigEndian.Uint64(data))
+	*n = Long(config.endian.Uint64(data))
 	return
 }
 
 func (n Long) WriteTo(f io.Writer) (total int64, err error) {
+	return n.CWriteTo(defaultConfig, f)
+}
+
+func (n Long) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(bytewrite.BigEndian.PutUint64(uint64(n)))
+	c, err = f.Write(config.endian.PutUint64(uint64(n)))
 	total += int64(c)
 	return
 }
@@ -380,17 +390,25 @@ func NewFloat(d float32) *Float {
 }
 
 func (n *Float) ReadFrom(f io.Reader) (total int64, err error) {
+	return n.CReadFrom(defaultConfig, f)
+}
+
+func (n *Float) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var c int
 	data := make([]byte, 4)
 	c, err = io.ReadFull(f, data)
 	total += int64(c)
-	*n = Float(bytewrite.BigEndian.Float32(data))
+	*n = Float(config.endian.Float32(data))
 	return
 }
 
 func (n Float) WriteTo(f io.Writer) (total int64, err error) {
+	return n.CWriteTo(defaultConfig, f)
+}
+
+func (n Float) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(bytewrite.BigEndian.PutFloat32(float32(n)))
+	c, err = f.Write(config.endian.PutFloat32(float32(n)))
 	total += int64(c)
 	return
 }
@@ -422,17 +440,25 @@ func NewDouble(d float64) *Double {
 }
 
 func (n *Double) ReadFrom(f io.Reader) (total int64, err error) {
+	return n.CReadFrom(defaultConfig, f)
+}
+
+func (n *Double) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var c int
 	data := make([]byte, 8)
 	c, err = io.ReadFull(f, data)
 	total += int64(c)
-	*n = Double(bytewrite.BigEndian.Float64(data))
+	*n = Double(config.endian.Float64(data))
 	return
 }
 
 func (n Double) WriteTo(f io.Writer) (total int64, err error) {
+	return n.CWriteTo(defaultConfig, f)
+}
+
+func (n Double) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	var c int
-	c, err = f.Write(bytewrite.BigEndian.PutFloat64(float64(n)))
+	c, err = f.Write(config.endian.PutFloat64(float64(n)))
 	total += int64(c)
 	return
 }
@@ -464,11 +490,15 @@ func NewByteArray(d []int8) *ByteArray {
 }
 
 func (n *ByteArray) ReadFrom(f io.Reader) (total int64, err error) {
+	return n.CReadFrom(defaultConfig, f)
+}
+
+func (n *ByteArray) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var c int
 	data := make([]byte, 4)
 	c, err = io.ReadFull(f, data)
 	total += int64(c)
-	length := bytewrite.BigEndian.Uint32(data)
+	length := config.endian.Uint32(data)
 	data = make([]byte, length)
 	*n = ByteArray(make([]int8, length))
 	c, err = io.ReadFull(f, data)
@@ -480,8 +510,12 @@ func (n *ByteArray) ReadFrom(f io.Reader) (total int64, err error) {
 }
 
 func (n ByteArray) WriteTo(f io.Writer) (int64, error) {
+	return n.CWriteTo(defaultConfig, f)
+}
+
+func (n ByteArray) CWriteTo(config *Config, f io.Writer) (int64, error) {
 	data := make([]byte, len(n)+4)
-	copy(data, bytewrite.BigEndian.PutUint32(uint32(len(n))))
+	copy(data, config.endian.PutUint32(uint32(len(n))))
 	for i, b := range n {
 		data[i+4] = byte(b)
 	}
@@ -525,11 +559,15 @@ func NewString(d string) *String {
 }
 
 func (n *String) ReadFrom(f io.Reader) (total int64, err error) {
+	return n.CReadFrom(defaultConfig, f)
+}
+
+func (n *String) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var c int
 	data := make([]byte, 2)
 	c, err = io.ReadFull(f, data)
 	total += int64(c)
-	data = make([]byte, bytewrite.BigEndian.Uint16(data))
+	data = make([]byte, config.endian.Uint16(data))
 	c, err = io.ReadFull(f, data)
 	total += int64(c)
 	*n = String(data)
@@ -537,7 +575,11 @@ func (n *String) ReadFrom(f io.Reader) (total int64, err error) {
 }
 
 func (n String) WriteTo(f io.Writer) (int64, error) {
-	c, err := f.Write(append(bytewrite.BigEndian.PutUint16(uint16(len(n))), n...))
+	return n.CWriteTo(defaultConfig, f)
+}
+
+func (n String) CWriteTo(config *Config, f io.Writer) (int64, error) {
+	c, err := f.Write(append(config.endian.PutUint16(uint16(len(n))), n...))
 	return int64(c), err
 }
 
@@ -589,6 +631,10 @@ func NewEmptyList(tagType TagId) *List {
 }
 
 func (n *List) ReadFrom(f io.Reader) (total int64, err error) {
+	return n.CReadFrom(defaultConfig, f)
+}
+
+func (n *List) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var (
 		c int
 		d int64
@@ -607,13 +653,13 @@ func (n *List) ReadFrom(f io.Reader) (total int64, err error) {
 		err = &ReadError{"list length", err}
 		return
 	}
-	length := bytewrite.BigEndian.Uint32(data)
+	length := config.endian.Uint32(data)
 	n.data = make([]Data, length)
 	for i := uint32(0); i < length; i++ {
-		if n.data[i], err = newFromTag(n.tagType); err != nil {
+		if n.data[i], err = config.newFromTag(n.tagType); err != nil {
 			return
 		}
-		d, err = n.data[i].ReadFrom(f)
+		d, err = n.data[i].CReadFrom(config, f)
 		total += d
 		if err != nil {
 			return
@@ -623,6 +669,10 @@ func (n *List) ReadFrom(f io.Reader) (total int64, err error) {
 }
 
 func (n *List) WriteTo(f io.Writer) (total int64, err error) {
+	return n.CWriteTo(defaultConfig, f)
+}
+
+func (n *List) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	var (
 		c int
 		d int64
@@ -632,7 +682,7 @@ func (n *List) WriteTo(f io.Writer) (total int64, err error) {
 	if err != nil {
 		return
 	}
-	c, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(len(n.data))))
+	c, err = f.Write(config.endian.PutUint32(uint32(len(n.data))))
 	total += int64(c)
 	if err != nil {
 		return
@@ -643,7 +693,7 @@ func (n *List) WriteTo(f io.Writer) (total int64, err error) {
 				err = &WrongTag{n.tagType, tagId}
 				break
 			}
-			d, err = data.WriteTo(f)
+			d, err = data.CWriteTo(config, f)
 			total += d
 			if err != nil {
 				break
@@ -756,11 +806,15 @@ func NewCompound(d Compound) *Compound {
 }
 
 func (n *Compound) ReadFrom(f io.Reader) (total int64, err error) {
+	return n.CReadFrom(defaultConfig, f)
+}
+
+func (n *Compound) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var d int64
 	*n = make(Compound, 0)
 	for {
 		data := new(Tag)
-		d, err = data.ReadFrom(f)
+		d, err = data.CReadFrom(config, f)
 		total += d
 		if err != nil {
 			return
@@ -774,12 +828,16 @@ func (n *Compound) ReadFrom(f io.Reader) (total int64, err error) {
 }
 
 func (n Compound) WriteTo(f io.Writer) (total int64, err error) {
+	return n.CWriteTo(defaultConfig, f)
+}
+
+func (n Compound) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	var (
 		c int
 		d int64
 	)
 	for _, data := range n {
-		d, err = data.WriteTo(f)
+		d, err = data.CWriteTo(config, f)
 		total += d
 		if err != nil {
 			return
@@ -869,6 +927,10 @@ func NewIntArray(d []int32) *IntArray {
 }
 
 func (n *IntArray) ReadFrom(f io.Reader) (total int64, err error) {
+	return n.CReadFrom(defaultConfig, f)
+}
+
+func (n *IntArray) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var c int
 	data := make([]byte, 4)
 	c, err = io.ReadFull(f, data)
@@ -876,32 +938,30 @@ func (n *IntArray) ReadFrom(f io.Reader) (total int64, err error) {
 	if err != nil {
 		return
 	}
-	length := bytewrite.BigEndian.Uint32(data)
+	length := config.endian.Uint32(data)
 	*n = make([]int32, length)
 	ints := make([]byte, 4*length)
 	c, err = io.ReadFull(f, ints)
 	total += int64(c)
 	for i := uint32(0); i < length; i++ {
-		(*n)[i] = int32(bytewrite.BigEndian.Uint32(ints))
+		(*n)[i] = int32(config.endian.Uint32(ints))
 		ints = ints[4:]
 	}
 	return
 }
 
 func (n IntArray) WriteTo(f io.Writer) (total int64, err error) {
-	var c int
-	c, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(len(n))))
-	total += int64(c)
-	if err != nil {
-		return
-	}
-	ints := make([]byte, 0, 4*len(n))
+	return n.CWriteTo(defaultConfig, f)
+}
+
+func (n IntArray) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
+	ints := make([]byte, 4, 4*len(n)+4)
+	copy(ints, config.endian.PutUint32(uint32(len(n))))
 	for i := 0; i < len(n); i++ {
 		ints = append(ints, bytewrite.BigEndian.PutUint32(uint32(n[i]))...)
 	}
-	c, err = f.Write(ints)
-	total += int64(c)
-	return
+	c, err := f.Write(ints)
+	return int64(c), err
 }
 
 func (n IntArray) Copy() Data {

@@ -9,7 +9,7 @@ import (
 func TestSize(t *testing.T) {
 	for i := TagId(1); i < 12; i++ {
 		o := new(bytes.Buffer)
-		tag, _ := newFromTag(i)
+		tag, _ := defaultConfig.newFromTag(i)
 		d := NewTag("test", tag)
 		n, _ := d.WriteTo(o)
 		_, m, _ := ReadNBTFrom(o)
