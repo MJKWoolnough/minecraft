@@ -25,10 +25,11 @@
 package minecraft
 
 import (
-	"github.com/MJKWoolnough/boolmap"
-	"github.com/MJKWoolnough/minecraft/nbt"
 	"math/rand"
 	"time"
+
+	"github.com/MJKWoolnough/boolmap"
+	"github.com/MJKWoolnough/minecraft/nbt"
 )
 
 var (
@@ -60,25 +61,52 @@ func NewLevel(location Path) (*Level, error) {
 	} else if levelDat == nil {
 		levelDat = nbt.NewTag("", nbt.NewCompound([]*nbt.Tag{
 			nbt.NewTag("Data", nbt.NewCompound([]*nbt.Tag{
-				nbt.NewTag("GameType", nbt.NewInt(1)),
-				nbt.NewTag("generatorName", nbt.NewString("flat")),
+				nbt.NewTag("version", nbt.NewInt(19133)),
+				nbt.NewTag("initialized", nbt.NewByte(0)),
+				nbt.NewTag("LevelName", nbt.NewString("")),
+				nbt.NewTag("generatorName", nbt.NewString(DefaultGenerator)),
 				nbt.NewTag("generatorVersion", nbt.NewInt(0)),
 				nbt.NewTag("generatorOptions", nbt.NewString("0")),
-				nbt.NewTag("hardcore", nbt.NewByte(0)),
-				nbt.NewTag("LastPlayed", nbt.NewLong(time.Now().Unix()*1000)),
-				nbt.NewTag("LevelName", nbt.NewString("")),
-				nbt.NewTag("MapFeatures", nbt.NewByte(0)),
 				nbt.NewTag("RandomSeed", nbt.NewLong(rand.New(rand.NewSource(time.Now().Unix())).Int63())),
-				nbt.NewTag("raining", nbt.NewByte(0)),
-				nbt.NewTag("rainTime", nbt.NewInt(0)),
+				nbt.NewTag("MapFeatures", nbt.NewByte(1)),
+				nbt.NewTag("LastPlayed", nbt.NewLong(time.Now().Unix()*1000)),
 				nbt.NewTag("SizeOnDisk", nbt.NewLong(0)),
+				nbt.NewTag("allowCommands", nbt.NewByte(0)),
+				nbt.NewTag("hardcore", nbt.NewByte(0)),
+				nbt.NewTag("GameType", nbt.NewInt(Survival)),
+				nbt.NewTag("Time", nbt.NewLong(0)),
+				nbt.NewTag("DayTime", nbt.NewLong(0)),
 				nbt.NewTag("SpawnX", nbt.NewInt(0)),
 				nbt.NewTag("SpawnY", nbt.NewInt(0)),
 				nbt.NewTag("SpawnZ", nbt.NewInt(0)),
-				nbt.NewTag("Time", nbt.NewLong(0)),
+				nbt.NewTag("BorderCenterX", nbt.NewDouble(0)),
+				nbt.NewTag("BorderCenterZ", nbt.NewDouble(0)),
+				nbt.NewTag("BorderSize", nbt.NewDouble(60000000)),
+				nbt.NewTag("BorderSafeZone", nbt.NewDouble(5)),
+				nbt.NewTag("BorderWarningTime", nbt.NewDouble(15)),
+				nbt.NewTag("BorderSizeLerpTarget", nbt.NewDouble(60000000)),
+				nbt.NewTag("BorderSizeLerpTime", nbt.NewLong(0)),
+				nbt.NewTag("BorderDamagePerBlock", nbt.NewDouble(0.2)),
+				nbt.NewTag("raining", nbt.NewByte(0)),
+				nbt.NewTag("rainTime", nbt.NewInt(0)),
 				nbt.NewTag("thundering", nbt.NewByte(0)),
 				nbt.NewTag("thunderTime", nbt.NewInt(0)),
-				nbt.NewTag("version", nbt.NewInt(19133)),
+				nbt.NewTag("clearWeatherTime", nbt.NewInt(0)),
+				nbt.NewTag("GameRules", nbt.NewCompound([]*nbt.Tag{
+					nbt.NewTag("commandBlockOutput", nbt.NewString("True")),
+					nbt.NewTag("doDaylightCycle", nbt.NewString("True")),
+					nbt.NewTag("doFireTick", nbt.NewString("True")),
+					nbt.NewTag("doMobLoot", nbt.NewString("True")),
+					nbt.NewTag("doMobSpawning", nbt.NewString("True")),
+					nbt.NewTag("doTileDrops", nbt.NewString("True")),
+					nbt.NewTag("keepInventory", nbt.NewString("False")),
+					nbt.NewTag("logAdminCommands", nbt.NewString("True")),
+					nbt.NewTag("mobGriefing", nbt.NewString("True")),
+					nbt.NewTag("naturalRegeneration", nbt.NewString("True")),
+					nbt.NewTag("randomTickSpeed", nbt.NewString("3")),
+					nbt.NewTag("sendCommandFeedback", nbt.NewString("True")),
+					nbt.NewTag("showDeathMessages", nbt.NewString("True")),
+				})),
 			})),
 		}))
 		changed = true
@@ -107,41 +135,6 @@ func NewLevel(location Path) (*Level, error) {
 		levelDat.Data().(*nbt.Compound).Get("Data").Data().(*nbt.Compound),
 		changed,
 	}, nil
-}
-
-func (l *Level) LevelData() *nbt.Compound {
-	l.changed = true
-	return l.levelData
-}
-
-// Returns the x, y, z coordinated for the current spawn point.
-func (l *Level) GetSpawn() (x, y, z int32) {
-	if l.levelData == nil {
-		return
-	}
-	xTag, yTag, zTag := l.levelData.Get("SpawnX"), l.levelData.Get("SpawnY"), l.levelData.Get("SpawnZ")
-	if xd, ok := xTag.Data().(*nbt.Int); !ok {
-		return
-	} else {
-		x = int32(*xd)
-	}
-	if yd, ok := yTag.Data().(*nbt.Int); !ok {
-		return
-	} else {
-		y = int32(*yd)
-	}
-	if zd, ok := zTag.Data().(*nbt.Int); ok {
-		z = int32(*zd)
-	}
-	return
-}
-
-// Sets the spawn point.
-func (l *Level) SetSpawn(x, y, z int32) {
-	l.levelData.Set(nbt.NewTag("SpawnX", nbt.NewInt(x)))
-	l.levelData.Set(nbt.NewTag("SpawnY", nbt.NewInt(y)))
-	l.levelData.Set(nbt.NewTag("SpawnZ", nbt.NewInt(z)))
-	l.changed = true
 }
 
 // Get the block at coordinates x, y, z.
@@ -356,18 +349,6 @@ func (l *Level) GetHeight(x, z int32) (int32, error) {
 		return 0, err
 	}
 	return c.GetHeight(x, z), nil
-}
-
-// Returns the name of the minecraft level.
-func (l *Level) GetName() string {
-	s := l.levelData.Get("LevelName").Data().(*nbt.String)
-	return string(*s)
-}
-
-// Sets the name of the minecraft level.
-func (l *Level) SetName(name string) {
-	l.levelData.Set(nbt.NewTag("LevelName", nbt.NewString(name)))
-	l.changed = true
 }
 
 func (l *Level) getChunk(x, z int32, create bool) (*chunk, error) {
