@@ -33,11 +33,11 @@ import (
 )
 
 var (
-	levelRequired = map[string]nbt.TagId{
-		"LevelName": nbt.Tag_String,
-		"SpawnX":    nbt.Tag_Int,
-		"SpawnY":    nbt.Tag_Int,
-		"SpawnZ":    nbt.Tag_Int,
+	levelRequired = map[string]nbt.TagID{
+		"LevelName": nbt.TagString,
+		"SpawnX":    nbt.TagInt,
+		"SpawnY":    nbt.TagInt,
+		"SpawnZ":    nbt.TagInt,
 	}
 )
 
@@ -48,7 +48,7 @@ type Level struct {
 	changed   bool
 }
 
-// Create/Load a minecraft level from the given path.
+// NewLevel creates/Loads a minecraft level from the given path.
 func NewLevel(location Path) (*Level, error) {
 	var (
 		levelDat *nbt.Tag
@@ -111,13 +111,13 @@ func NewLevel(location Path) (*Level, error) {
 		}))
 		changed = true
 	}
-	if levelDat.TagId() != nbt.Tag_Compound {
-		return nil, &WrongTypeError{"[BASE]", nbt.Tag_Compound, levelDat.TagId()}
+	if levelDat.TagID() != nbt.TagCompound {
+		return nil, &WrongTypeError{"[BASE]", nbt.TagCompound, levelDat.TagID()}
 	} else if d := levelDat.Data().(*nbt.Compound).Get("Data"); d != nil {
-		if d.TagId() == nbt.Tag_Compound {
+		if d.TagID() == nbt.TagCompound {
 			data = d.Data().(*nbt.Compound)
 		} else {
-			return nil, &WrongTypeError{"Data", nbt.Tag_Compound, d.TagId()}
+			return nil, &WrongTypeError{"Data", nbt.TagCompound, d.TagID()}
 		}
 	} else {
 		return nil, &MissingTagError{"Data"}
@@ -125,8 +125,8 @@ func NewLevel(location Path) (*Level, error) {
 	for name, tagType := range levelRequired {
 		if x := data.Get(name); x == nil {
 			return nil, &MissingTagError{name}
-		} else if x.TagId() != tagType {
-			return nil, &WrongTypeError{name, tagType, x.TagId()}
+		} else if x.TagID() != tagType {
+			return nil, &WrongTypeError{name, tagType, x.TagID()}
 		}
 	}
 	return &Level{
@@ -137,7 +137,7 @@ func NewLevel(location Path) (*Level, error) {
 	}, nil
 }
 
-// Get the block at coordinates x, y, z.
+// GetBlock gets the block at coordinates x, y, z.
 func (l *Level) GetBlock(x, y, z int32) (*Block, error) {
 	c, err := l.getChunk(x, z, false)
 	if err != nil {
@@ -148,7 +148,7 @@ func (l *Level) GetBlock(x, y, z int32) (*Block, error) {
 	return c.GetBlock(x, y, z), nil
 }
 
-// Sets the block at coordinates x, y, z. Also processes any lighting updates if applicable.
+// SetBlock sets the block at coordinates x, y, z. Also processes any lighting updates if applicable.
 func (l *Level) SetBlock(x, y, z int32, block *Block) error {
 	var (
 		c   *chunk
@@ -321,7 +321,7 @@ func (l *Level) genLighting(x, y, z int32, skyLight, darker bool, source uint8) 
 	return nil
 }
 
-// Returns the biome for the column x, z.
+// GetBiome returns the biome for the column x, z.
 func (l *Level) GetBiome(x, z int32) (Biome, error) {
 	c, err := l.getChunk(x, z, false)
 	if err != nil {
@@ -332,7 +332,7 @@ func (l *Level) GetBiome(x, z int32) (Biome, error) {
 	return c.GetBiome(x, z), nil
 }
 
-// Sets the biome for the column x, z.
+// SetBiome sets the biome for the column x, z.
 func (l *Level) SetBiome(x, z int32, biome Biome) error {
 	c, err := l.getChunk(x, z, true)
 	if err != nil {
@@ -342,7 +342,7 @@ func (l *Level) SetBiome(x, z int32, biome Biome) error {
 	return nil
 }
 
-// Returns the y coordinate for the highest non-transparent block at column x, z.
+// GetHeight returns the y coordinate for the highest non-transparent block at column x, z.
 func (l *Level) GetHeight(x, z int32) (int32, error) {
 	c, err := l.getChunk(x, z, false)
 	if err != nil || c == nil {
@@ -373,7 +373,7 @@ func (l *Level) getChunk(x, z int32, create bool) (*chunk, error) {
 	return l.chunks[pos], nil
 }
 
-// Saves all open chunks, but does not close them.
+// Save saves all open chunks, but does not close them.
 func (l *Level) Save() error {
 	if l.changed {
 		if err := l.path.WriteLevelDat(nbt.NewTag("", nbt.NewCompound([]*nbt.Tag{nbt.NewTag("Data", l.levelData)}))); err != nil {
@@ -391,7 +391,7 @@ func (l *Level) Save() error {
 	return nil
 }
 
-// Closes all open chunks, but does not save them.
+// Close closes all open chunks, but does not save them.
 func (l *Level) Close() {
 	l.changed = false
 	l.chunks = make(map[uint64]*chunk)

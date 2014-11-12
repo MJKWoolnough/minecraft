@@ -15,7 +15,7 @@ func (m *MissingTagError) Error() string {
 
 type WrongTypeError struct {
 	TagName        string
-	Expecting, Got nbt.TagId
+	Expecting, Got nbt.TagID
 }
 
 func (w *WrongTypeError) Error() string {

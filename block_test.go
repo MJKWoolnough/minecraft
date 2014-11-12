@@ -6,9 +6,9 @@ import (
 
 func TestEquality(t *testing.T) {
 	testData := []Block{
-		Block{BlockId: 14},
-		Block{BlockId: 214},
-		Block{BlockId: 792},
+		Block{BlockID: 14},
+		Block{BlockID: 214},
+		Block{BlockID: 792},
 	}
 	for i, aBlock := range testData {
 		for j, bBlock := range testData {

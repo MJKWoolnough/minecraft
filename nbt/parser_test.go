@@ -7,7 +7,7 @@ import (
 )
 
 func TestSize(t *testing.T) {
-	for i := TagId(1); i < 12; i++ {
+	for i := TagID(1); i < 12; i++ {
 		o := new(bytes.Buffer)
 		tag, _ := defaultConfig.newFromTag(i)
 		d := NewTag("test", tag)

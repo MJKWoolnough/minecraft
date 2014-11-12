@@ -92,8 +92,8 @@ func loadSection(c *nbt.Compound) (*section, error) {
 	blocks := c.Get("Blocks")
 	if blocks == nil {
 		return nil, &MissingTagError{"[SECTION]->Blocks"}
-	} else if blocks.TagId() != nbt.Tag_ByteArray {
-		return nil, &WrongTypeError{"Blocks", nbt.Tag_ByteArray, blocks.TagId()}
+	} else if blocks.TagID() != nbt.TagByteArray {
+		return nil, &WrongTypeError{"Blocks", nbt.TagByteArray, blocks.TagID()}
 	}
 	s.blocks = blocks.Data().(*nbt.ByteArray)
 	if len(*s.blocks) != 4096 {
@@ -101,8 +101,8 @@ func loadSection(c *nbt.Compound) (*section, error) {
 	}
 	add := c.Get("Add")
 	if add != nil {
-		if add.TagId() != nbt.Tag_ByteArray {
-			return nil, &WrongTypeError{"Add", nbt.Tag_ByteArray, add.TagId()}
+		if add.TagID() != nbt.TagByteArray {
+			return nil, &WrongTypeError{"Add", nbt.TagByteArray, add.TagID()}
 		}
 		s.add = add.Data().(*nbt.ByteArray)
 	} else {
@@ -115,8 +115,8 @@ func loadSection(c *nbt.Compound) (*section, error) {
 	data := c.Get("Data")
 	if data == nil {
 		return nil, &MissingTagError{"[SECTION]->Data"}
-	} else if data.TagId() != nbt.Tag_ByteArray {
-		return nil, &WrongTypeError{"Data", nbt.Tag_ByteArray, data.TagId()}
+	} else if data.TagID() != nbt.TagByteArray {
+		return nil, &WrongTypeError{"Data", nbt.TagByteArray, data.TagID()}
 	}
 	s.data = data.Data().(*nbt.ByteArray)
 	if len(*s.data) != 2048 {
@@ -125,8 +125,8 @@ func loadSection(c *nbt.Compound) (*section, error) {
 	blockLight := c.Get("BlockLight")
 	if blockLight == nil {
 		return nil, &MissingTagError{"[SECTION]->BlockLight"}
-	} else if blockLight.TagId() != nbt.Tag_ByteArray {
-		return nil, &WrongTypeError{"BlockLight", nbt.Tag_ByteArray, blockLight.TagId()}
+	} else if blockLight.TagID() != nbt.TagByteArray {
+		return nil, &WrongTypeError{"BlockLight", nbt.TagByteArray, blockLight.TagID()}
 	}
 	s.blockLight = blockLight.Data().(*nbt.ByteArray)
 	if len(*s.blockLight) != 2048 {
@@ -135,8 +135,8 @@ func loadSection(c *nbt.Compound) (*section, error) {
 	skyLight := c.Get("SkyLight")
 	if skyLight == nil {
 		return nil, &MissingTagError{"[SECTION]->SkyLight"}
-	} else if skyLight.TagId() != nbt.Tag_ByteArray {
-		return nil, &WrongTypeError{"SkyLight", nbt.Tag_ByteArray, skyLight.TagId()}
+	} else if skyLight.TagID() != nbt.TagByteArray {
+		return nil, &WrongTypeError{"SkyLight", nbt.TagByteArray, skyLight.TagID()}
 	}
 	s.skyLight = skyLight.Data().(*nbt.ByteArray)
 	if len(*s.skyLight) != 2048 {
@@ -145,22 +145,22 @@ func loadSection(c *nbt.Compound) (*section, error) {
 	y := c.Get("Y")
 	if blockLight == nil {
 		return nil, &MissingTagError{"[SECTION]->Y"}
-	} else if y.TagId() != nbt.Tag_Byte {
-		return nil, &WrongTypeError{"Y", nbt.Tag_Byte, y.TagId()}
+	} else if y.TagID() != nbt.TagByte {
+		return nil, &WrongTypeError{"Y", nbt.TagByte, y.TagID()}
 	}
 	return s, nil
 }
 
 func (s *section) GetBlock(x, y, z int32) *Block {
 	return &Block{
-		BlockId: uint16(getNibble(*s.add, x, y, z))<<8 | uint16(byte((*s.blocks)[yzx(x, y, z)])),
+		BlockID: uint16(getNibble(*s.add, x, y, z))<<8 | uint16(byte((*s.blocks)[yzx(x, y, z)])),
 		Data:    getNibble(*s.data, x, y, z),
 	}
 }
 
 func (s *section) SetBlock(x, y, z int32, b *Block) {
-	(*s.blocks)[yzx(x, y, z)] = int8(b.BlockId & 255)
-	setNibble(*s.add, x, y, z, byte(b.BlockId>>8))
+	(*s.blocks)[yzx(x, y, z)] = int8(b.BlockID & 255)
+	setNibble(*s.add, x, y, z, byte(b.BlockID>>8))
 	setNibble(*s.data, x, y, z, byte(b.Data))
 }
 

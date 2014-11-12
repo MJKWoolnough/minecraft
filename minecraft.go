@@ -1,21 +1,21 @@
-// Package Minecraft will be a full featured minecraft level editor/viewer.
+// Package minecraft will be a full featured minecraft level editor/viewer.
 package minecraft
 
 type TransparentBlockList []uint16
 
-func (t *TransparentBlockList) Add(blockId uint16) bool {
+func (t *TransparentBlockList) Add(blockID uint16) bool {
 	for _, b := range *t {
-		if b == blockId {
+		if b == blockID {
 			return false
 		}
 	}
-	*t = append(*t, blockId)
+	*t = append(*t, blockID)
 	return true
 }
 
-func (t *TransparentBlockList) Remove(blockId uint16) bool {
+func (t *TransparentBlockList) Remove(blockID uint16) bool {
 	for n, b := range *t {
-		if b == blockId {
+		if b == blockID {
 			lt := len(*t) - 1
 			(*t)[n], (*t) = (*t)[lt], (*t)[:lt]
 			return true
@@ -26,18 +26,18 @@ func (t *TransparentBlockList) Remove(blockId uint16) bool {
 
 type LightBlockList map[uint16]uint8
 
-func (l LightBlockList) Add(blockId uint16, light uint8) bool {
+func (l LightBlockList) Add(blockID uint16, light uint8) bool {
 	toRet := true
-	if _, ok := l[blockId]; ok {
+	if _, ok := l[blockID]; ok {
 		toRet = false
 	}
-	l[blockId] = light
+	l[blockID] = light
 	return toRet
 }
 
-func (l LightBlockList) Remove(blockId uint16) bool {
-	if _, ok := l[blockId]; ok {
-		delete(l, blockId)
+func (l LightBlockList) Remove(blockID uint16) bool {
+	if _, ok := l[blockID]; ok {
+		delete(l, blockID)
 		return true
 	}
 	return false

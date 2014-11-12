@@ -182,7 +182,7 @@ func TestBlock(t *testing.T) {
 		//Test simple set
 		{
 			Block{
-				BlockId: 12,
+				BlockID: 12,
 			},
 			0, 0, 0,
 			true,
@@ -190,21 +190,21 @@ func TestBlock(t *testing.T) {
 		//Test higher ids
 		{
 			Block{
-				BlockId: 853,
+				BlockID: 853,
 			},
 			1, 0, 0,
 			true,
 		},
 		{
 			Block{
-				BlockId: 463,
+				BlockID: 463,
 			},
 			2, 0, 0,
 			true,
 		},
 		{
 			Block{
-				BlockId: 1001,
+				BlockID: 1001,
 			},
 			3, 0, 0,
 			true,
@@ -212,7 +212,7 @@ func TestBlock(t *testing.T) {
 		//Test data set
 		{
 			Block{
-				BlockId: 143,
+				BlockID: 143,
 				Data:    12,
 			},
 			0, 1, 0,
@@ -220,7 +220,7 @@ func TestBlock(t *testing.T) {
 		},
 		{
 			Block{
-				BlockId: 153,
+				BlockID: 153,
 				Data:    4,
 			},
 			1, 1, 0,
@@ -228,7 +228,7 @@ func TestBlock(t *testing.T) {
 		},
 		{
 			Block{
-				BlockId: 163,
+				BlockID: 163,
 				Data:    5,
 			},
 			2, 1, 0,
@@ -303,24 +303,24 @@ func TestHeightMap(t *testing.T) {
 		height int32
 	}{
 		{0, 0, 0, &Block{}, 0},
-		{1, 0, 0, &Block{BlockId: 1}, 1},
-		{1, 1, 0, &Block{BlockId: 1}, 2},
+		{1, 0, 0, &Block{BlockID: 1}, 1},
+		{1, 1, 0, &Block{BlockID: 1}, 2},
 		{1, 0, 0, &Block{}, 2},
 		{1, 1, 0, &Block{}, 0},
-		{2, 10, 0, &Block{BlockId: 1}, 11},
-		{2, 12, 0, &Block{BlockId: 1}, 13},
+		{2, 10, 0, &Block{BlockID: 1}, 11},
+		{2, 12, 0, &Block{BlockID: 1}, 13},
 		{2, 12, 0, &Block{}, 11},
 		{2, 10, 0, &Block{}, 0},
-		{3, 15, 0, &Block{BlockId: 1}, 16},
-		{3, 16, 0, &Block{BlockId: 1}, 17},
+		{3, 15, 0, &Block{BlockID: 1}, 16},
+		{3, 16, 0, &Block{BlockID: 1}, 17},
 		{3, 16, 0, &Block{}, 16},
 		{3, 15, 0, &Block{}, 0},
-		{4, 31, 0, &Block{BlockId: 1}, 32},
-		{4, 32, 0, &Block{BlockId: 1}, 33},
+		{4, 31, 0, &Block{BlockID: 1}, 32},
+		{4, 32, 0, &Block{BlockID: 1}, 33},
 		{4, 32, 0, &Block{}, 32},
 		{4, 31, 0, &Block{}, 0},
-		{5, 16, 0, &Block{BlockId: 1}, 17},
-		{5, 32, 0, &Block{BlockId: 1}, 33},
+		{5, 16, 0, &Block{BlockID: 1}, 17},
+		{5, 32, 0, &Block{BlockID: 1}, 33},
 		{5, 32, 0, &Block{}, 17},
 		{5, 16, 0, &Block{}, 0},
 	}

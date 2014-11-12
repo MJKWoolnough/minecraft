@@ -2,6 +2,7 @@ package minecraft
 
 import "github.com/MJKWoolnough/minecraft/nbt"
 
+// Option is a function used to set an option for a minecraft level struct
 type Option func(*Level)
 
 // GetLevelName sets the given string to the name of the minecraft level.
@@ -46,7 +47,7 @@ func MapFeatures(mf bool) Option {
 	return setOption("MapFeatures", boolToByte(mf))
 }
 
-// AllowsCommands enables/disables the cheat commands
+// AllowCommands enables/disables the cheat commands
 func AllowCommands(a bool) Option {
 	return setOption("allowCommands", boolToByte(a))
 }
@@ -260,7 +261,6 @@ func setGameRule(name string, data bool) Option {
 func boolToByte(b bool) *nbt.Byte {
 	if b {
 		return nbt.NewByte(1)
-	} else {
-		return nbt.NewByte(0)
 	}
+	return nbt.NewByte(0)
 }

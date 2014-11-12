@@ -4,18 +4,18 @@ import "github.com/MJKWoolnough/bytewrite"
 
 // Tag Types
 const (
-	Tag_End TagId = iota
-	Tag_Byte
-	Tag_Short
-	Tag_Int
-	Tag_Long
-	Tag_Float
-	Tag_Double
-	Tag_ByteArray
-	Tag_String
-	Tag_List
-	Tag_Compound
-	Tag_IntArray
+	TagEnd TagID = iota
+	TagByte
+	TagShort
+	TagInt
+	TagLong
+	TagFloat
+	TagDouble
+	TagByteArray
+	TagString
+	TagList
+	TagCompound
+	TagIntArray
 )
 
 var tagIdNames = [...]string{
@@ -33,54 +33,58 @@ var tagIdNames = [...]string{
 	"Int Array",
 }
 
-type TagId uint8
+// TagId represents the type of nbt tag
+type TagID uint8
 
-func (t TagId) String() string {
+func (t TagID) String() string {
 	if int(t) < len(tagIdNames) {
 		return tagIdNames[t]
 	}
 	return ""
 }
 
+// Config allows for specific configuration of endianness and types for the NBT
+// parser
 type Config struct {
 	endian bytewrite.Endian
-	types  map[TagId]func() Data
+	types  map[TagID]func() Data
 }
 
+// NewConfig returns a new Config struct with the endianness set accordingly.
 func NewConfig(endian bytewrite.Endian) *Config {
 	return &Config{
 		endian: endian,
-		types:  make(map[TagId]func() Data),
+		types:  make(map[TagID]func() Data),
 	}
 }
 
-func (c Config) newFromTag(id TagId) (Data, error) {
+func (c Config) newFromTag(id TagID) (Data, error) {
 	if nd, ok := c.types[id]; ok {
 		return nd(), nil
 	}
 	var d Data
 	switch id {
-	case Tag_Byte:
+	case TagByte:
 		d = new(Byte)
-	case Tag_Short:
+	case TagShort:
 		d = new(Short)
-	case Tag_Int:
+	case TagInt:
 		d = new(Int)
-	case Tag_Long:
+	case TagLong:
 		d = new(Long)
-	case Tag_Float:
+	case TagFloat:
 		d = new(Float)
-	case Tag_Double:
+	case TagDouble:
 		d = new(Double)
-	case Tag_ByteArray:
+	case TagByteArray:
 		d = new(ByteArray)
-	case Tag_String:
+	case TagString:
 		d = new(String)
-	case Tag_List:
+	case TagList:
 		d = new(List)
-	case Tag_Compound:
+	case TagCompound:
 		d = new(Compound)
-	case Tag_IntArray:
+	case TagIntArray:
 		d = new(IntArray)
 	default:
 		return nil, &UnknownTag{id}
@@ -88,7 +92,12 @@ func (c Config) newFromTag(id TagId) (Data, error) {
 	return d, nil
 }
 
-func (c Config) RegisterType(id TagId, nd func() Data) {
+// RegisterType allows the creating of new NBT tags or the overriding of
+// existing ones.
+//
+// TagId is the new or existing id and the func() Data is a small function
+// which creates a newly initialised data tag.
+func (c Config) RegisterType(id TagID, nd func() Data) {
 	c.types[id] = nd
 }
 

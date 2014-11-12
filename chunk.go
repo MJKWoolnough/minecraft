@@ -33,26 +33,26 @@ import (
 var (
 	chunkRequired = []struct {
 		name string
-		nbt.TagId
+		nbt.TagID
 	}{
-		{"HeightMap", nbt.Tag_IntArray},
-		{"InhabitedTime", nbt.Tag_Long},
-		{"LastUpdate", nbt.Tag_Long},
-		{"Sections", nbt.Tag_List},
-		{"TerrainPopulated", nbt.Tag_Byte},
-		{"xPos", nbt.Tag_Int},
-		{"zPos", nbt.Tag_Int},
+		{"HeightMap", nbt.TagIntArray},
+		{"InhabitedTime", nbt.TagLong},
+		{"LastUpdate", nbt.TagLong},
+		{"Sections", nbt.TagList},
+		{"TerrainPopulated", nbt.TagByte},
+		{"xPos", nbt.TagInt},
+		{"zPos", nbt.TagInt},
 	}
 	chunkOther = []struct {
 		name      string
-		tagType   nbt.TagId
-		listType  nbt.TagId
+		tagType   nbt.TagID
+		listType  nbt.TagID
 		emptyByte bool
 	}{
-		{"Biomes", nbt.Tag_ByteArray, nbt.Tag_Byte, false},
-		{"Entities", nbt.Tag_List, nbt.Tag_Compound, true},
-		{"TileEntities", nbt.Tag_List, nbt.Tag_Compound, true},
-		{"TileTicks", nbt.Tag_List, nbt.Tag_Compound, false},
+		{"Biomes", nbt.TagByteArray, nbt.TagByte, false},
+		{"Entities", nbt.TagList, nbt.TagCompound, true},
+		{"TileEntities", nbt.TagList, nbt.TagCompound, true},
+		{"TileTicks", nbt.TagList, nbt.TagCompound, false},
 	}
 )
 
@@ -73,7 +73,7 @@ func (c *chunk) GetNBT() *nbt.Tag {
 			sections = append(sections, c.sections[i].section)
 		}
 	}
-	sectionList := nbt.NewEmptyList(nbt.Tag_Compound)
+	sectionList := nbt.NewEmptyList(nbt.TagCompound)
 	sectionList.Append(sections...)
 	data.Set(nbt.NewTag("Sections", sectionList))
 	tileEntities := make([]nbt.Data, 0)
@@ -111,26 +111,26 @@ func newChunk(x, z int32, data *nbt.Tag) (*chunk, error) {
 				nbt.NewTag("HeightMap", nbt.NewIntArray(make([]int32, 256))),
 				nbt.NewTag("InhabitedTime", nbt.NewLong(0)),
 				nbt.NewTag("LastUpdate", nbt.NewLong(0)),
-				nbt.NewTag("Sections", nbt.NewEmptyList(nbt.Tag_Compound)),
+				nbt.NewTag("Sections", nbt.NewEmptyList(nbt.TagCompound)),
 				nbt.NewTag("TerrainPopulated", nbt.NewByte(1)),
 			})),
 		}))
 	}
 	c := new(chunk)
-	if data.TagId() != nbt.Tag_Compound {
-		return nil, &WrongTypeError{"[Chunk Base]", nbt.Tag_Compound, data.TagId()}
+	if data.TagID() != nbt.TagCompound {
+		return nil, &WrongTypeError{"[Chunk Base]", nbt.TagCompound, data.TagID()}
 	} else if tag := data.Data().(*nbt.Compound).Get("Level"); tag == nil {
 		return nil, &MissingTagError{"[Chunk Base]->Level"}
-	} else if tag.TagId() != nbt.Tag_Compound {
-		return nil, &WrongTypeError{"[Chunk Base]->Level", nbt.Tag_Compound, tag.TagId()}
+	} else if tag.TagID() != nbt.TagCompound {
+		return nil, &WrongTypeError{"[Chunk Base]->Level", nbt.TagCompound, tag.TagID()}
 	} else {
 		c.data = tag.Data().(*nbt.Compound)
 	}
 	for _, req := range chunkRequired {
 		if tag := c.data.Get(req.name); tag == nil {
 			return nil, &MissingTagError{req.name}
-		} else if tagId := tag.TagId(); tagId != req.TagId {
-			return nil, &WrongTypeError{req.name, req.TagId, tagId}
+		} else if tagID := tag.TagID(); tagID != req.TagID {
+			return nil, &WrongTypeError{req.name, req.TagID, tagID}
 		}
 	}
 
@@ -144,13 +144,13 @@ func newChunk(x, z int32, data *nbt.Tag) (*chunk, error) {
 	for _, co := range chunkOther {
 		if tag := c.data.Get(co.name); tag == nil {
 			continue
-		} else if tagId := tag.TagId(); tagId != co.tagType {
-			return nil, &WrongTypeError{co.name, co.tagType, tagId}
-		} else if tagId == nbt.Tag_List {
+		} else if tagID := tag.TagID(); tagID != co.tagType {
+			return nil, &WrongTypeError{co.name, co.tagType, tagID}
+		} else if tagID == nbt.TagList {
 			list := tag.Data().(*nbt.List)
 			if list.TagType() != co.listType {
 				if co.emptyByte && list.Len() == 0 {
-					if tt := list.TagType(); tt == nbt.Tag_Byte || tt == nbt.Tag_End {
+					if tt := list.TagType(); tt == nbt.TagByte || tt == nbt.TagEnd {
 						continue
 					}
 				}
@@ -201,18 +201,18 @@ func newChunk(x, z int32, data *nbt.Tag) (*chunk, error) {
 				}
 				if id := tag.Get("i"); id == nil {
 					return nil, &MissingTagError{"TileTicks->Child->i"}
-				} else if j := id.TagId(); j != nbt.Tag_Int {
-					return nil, &WrongTypeError{"TileTicks->Child->i", nbt.Tag_Int, j}
+				} else if j := id.TagID(); j != nbt.TagInt {
+					return nil, &WrongTypeError{"TileTicks->Child->i", nbt.TagInt, j}
 				}
 				if t := tag.Get("t"); t == nil {
 					return nil, &MissingTagError{"TileTicks->Child->t"}
-				} else if j := t.TagId(); j != nbt.Tag_Int {
-					return nil, &WrongTypeError{"TileTicks->Child->t", nbt.Tag_Int, j}
+				} else if j := t.TagID(); j != nbt.TagInt {
+					return nil, &WrongTypeError{"TileTicks->Child->t", nbt.TagInt, j}
 				}
 				if p := tag.Get("p"); p == nil {
 					return nil, &MissingTagError{"TileTicks->Child->p"}
-				} else if j := p.TagId(); j != nbt.Tag_Int {
-					return nil, &WrongTypeError{"TileTicks->Child->p", nbt.Tag_Int, j}
+				} else if j := p.TagID(); j != nbt.TagInt {
+					return nil, &WrongTypeError{"TileTicks->Child->p", nbt.TagInt, j}
 				}
 				pos := xyz(x, y, z)
 				c.tileTicks[pos] = append(c.tileTicks[pos], tag)
@@ -225,8 +225,8 @@ func newChunk(x, z int32, data *nbt.Tag) (*chunk, error) {
 		section := sections.Get(i).(*nbt.Compound)
 		if yc := section.Get("Y"); yc == nil {
 			return nil, &MissingTagError{"Sections->Child->Y"}
-		} else if yc.TagId() != nbt.Tag_Byte {
-			return nil, &WrongTypeError{"Sections->Child->Y", nbt.Tag_Byte, yc.TagId()}
+		} else if yc.TagID() != nbt.TagByte {
+			return nil, &WrongTypeError{"Sections->Child->Y", nbt.TagByte, yc.TagID()}
 		} else {
 			y := int32(*yc.Data().(*nbt.Byte))
 			var err error
@@ -398,8 +398,8 @@ func getCoord(name string, data *nbt.Compound) (int32, error) {
 	tag := data.Get(name)
 	if tag == nil {
 		return 0, &MissingTagError{name}
-	} else if tag.TagId() != nbt.Tag_Int {
-		return 0, &WrongTypeError{name, nbt.Tag_Int, tag.TagId()}
+	} else if tag.TagID() != nbt.TagInt {
+		return 0, &WrongTypeError{name, nbt.TagInt, tag.TagID()}
 	}
 	return int32(*tag.Data().(*nbt.Int)), nil
 }

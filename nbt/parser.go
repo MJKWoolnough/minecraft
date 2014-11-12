@@ -18,7 +18,7 @@ type Data interface {
 	CWriteTo(*Config, io.Writer) (int64, error)
 	Copy() Data
 	String() string
-	Type() TagId
+	Type() TagID
 }
 
 type Tag struct {
@@ -26,16 +26,21 @@ type Tag struct {
 	data Data
 }
 
+// ReadNBTFrom will read an entire NBT tree from the given readed and return
+// the base tag, the number of bytes read and an error if any occurred
 func ReadNBTFrom(f io.Reader) (*Tag, int64, error) {
 	return CReadNBTFrom(defaultConfig, f)
 }
 
+// CReadNBTFrom acts much like ReadNBTFrom except that is allows a custom
+// confguration to be used.
 func CReadNBTFrom(config *Config, f io.Reader) (*Tag, int64, error) {
 	n := new(Tag)
 	count, err := n.CReadFrom(config, f)
 	return n, count, err
 }
 
+// NewTag constructs a new tag with the given name and data.
 func NewTag(name string, d Data) (n *Tag) {
 	m := Tag{
 		name: String(name),
@@ -44,10 +49,12 @@ func NewTag(name string, d Data) (n *Tag) {
 	return &m
 }
 
+// ReadFrom will
 func (n *Tag) ReadFrom(f io.Reader) (total int64, err error) {
 	return n.CReadFrom(defaultConfig, f)
 }
 
+// CReadFrom act
 func (n *Tag) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var (
 		c    int
@@ -60,8 +67,8 @@ func (n *Tag) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 		err = ReadError{"named TagId", err}
 		return
 	}
-	tagType := TagId(data[0])
-	if tagType == Tag_End {
+	tagType := TagID(data[0])
+	if tagType == TagEnd {
 		n.data = new(end)
 	} else {
 		if n.data, err = config.newFromTag(tagType); err != nil {
@@ -100,7 +107,7 @@ func (n *Tag) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 		err = WriteError{"named TagId", err}
 		return
 	}
-	if tagType == Tag_End {
+	if tagType == TagEnd {
 		return
 	}
 	d, err = n.name.CWriteTo(config, f)
@@ -137,7 +144,7 @@ func (n *Tag) Name() string {
 	return string(n.name)
 }
 
-func (n *Tag) TagId() TagId {
+func (n *Tag) TagID() TagID {
 	return n.data.Type()
 }
 
@@ -175,8 +182,8 @@ func (end) Equal(e equaler.Equaler) bool {
 	return ok
 }
 
-func (end) Type() TagId {
-	return Tag_End
+func (end) Type() TagID {
+	return TagEnd
 }
 
 func (end) String() string {
@@ -231,8 +238,8 @@ func (n Byte) String() string {
 	return fmt.Sprintf("%d", n)
 }
 
-func (Byte) Type() TagId {
-	return Tag_Byte
+func (Byte) Type() TagID {
+	return TagByte
 }
 
 type Short int16
@@ -281,8 +288,8 @@ func (n Short) String() string {
 	return fmt.Sprintf("%d", n)
 }
 
-func (Short) Type() TagId {
-	return Tag_Short
+func (Short) Type() TagID {
+	return TagShort
 }
 
 type Int int32
@@ -331,8 +338,8 @@ func (n Int) String() string {
 	return fmt.Sprintf("%d", n)
 }
 
-func (Int) Type() TagId {
-	return Tag_Int
+func (Int) Type() TagID {
+	return TagInt
 }
 
 type Long int64
@@ -381,8 +388,8 @@ func (n Long) String() string {
 	return fmt.Sprintf("%d", n)
 }
 
-func (Long) Type() TagId {
-	return Tag_Long
+func (Long) Type() TagID {
+	return TagLong
 }
 
 type Float float32
@@ -431,8 +438,8 @@ func (n Float) String() string {
 	return fmt.Sprintf("%f", n)
 }
 
-func (Float) Type() TagId {
-	return Tag_Float
+func (Float) Type() TagID {
+	return TagFloat
 }
 
 type Double float64
@@ -481,8 +488,8 @@ func (n Double) String() string {
 	return fmt.Sprintf("%f", n)
 }
 
-func (Double) Type() TagId {
-	return Tag_Double
+func (Double) Type() TagID {
+	return TagDouble
 }
 
 type ByteArray []int8
@@ -550,8 +557,8 @@ func (n ByteArray) String() string {
 	return fmt.Sprintf("[%d bytes] %v", len(n), []int8(n))
 }
 
-func (ByteArray) Type() TagId {
-	return Tag_ByteArray
+func (ByteArray) Type() TagID {
+	return TagByteArray
 }
 
 type String string
@@ -601,18 +608,18 @@ func (n String) String() string {
 	return string(n)
 }
 
-func (String) Type() TagId {
-	return Tag_String
+func (String) Type() TagID {
+	return TagString
 }
 
 type List struct {
-	tagType TagId
+	tagType TagID
 	data    []Data
 }
 
 func NewList(data []Data) *List {
 	if len(data) == 0 {
-		return &List{Tag_Byte, data}
+		return &List{TagByte, data}
 	}
 	tagType := data[0].Type()
 	for i := 1; i < len(data); i++ {
@@ -626,7 +633,7 @@ func NewList(data []Data) *List {
 	}
 }
 
-func NewEmptyList(tagType TagId) *List {
+func NewEmptyList(tagType TagID) *List {
 	return &List{
 		tagType,
 		make([]Data, 0),
@@ -649,7 +656,7 @@ func (n *List) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 		err = &ReadError{"list TagId", err}
 		return
 	}
-	n.tagType = TagId(data[0])
+	n.tagType = TagID(data[0])
 	c, err = io.ReadFull(f, data)
 	total += int64(c)
 	if err != nil {
@@ -690,10 +697,10 @@ func (n *List) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	if err != nil {
 		return
 	}
-	if n.tagType != Tag_End {
+	if n.tagType != TagEnd {
 		for _, data := range n.data {
-			if tagId := data.Type(); tagId != n.tagType {
-				err = &WrongTag{n.tagType, tagId}
+			if tagID := data.Type(); tagID != n.tagType {
+				err = &WrongTag{n.tagType, tagID}
 				break
 			}
 			d, err = data.CWriteTo(config, f)
@@ -706,7 +713,7 @@ func (n *List) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	return
 }
 
-func (n *List) TagType() TagId {
+func (n *List) TagType() TagID {
 	return n.tagType
 }
 
@@ -797,8 +804,8 @@ func (n *List) valid(data ...Data) error {
 	return nil
 }
 
-func (List) Type() TagId {
-	return Tag_List
+func (List) Type() TagID {
+	return TagList
 }
 
 type Compound []*Tag
@@ -821,7 +828,7 @@ func (n *Compound) CReadFrom(config *Config, f io.Reader) (total int64, err erro
 		if err != nil {
 			return
 		}
-		if data.TagId() == Tag_End {
+		if data.TagID() == TagEnd {
 			break
 		}
 		*n = append(*n, data)
@@ -844,11 +851,11 @@ func (n Compound) CWriteTo(config *Config, f io.Writer) (total int64, err error)
 		if err != nil {
 			return
 		}
-		if data.TagId() == Tag_End {
+		if data.TagID() == TagEnd {
 			return
 		}
 	}
-	c, err = f.Write([]byte{byte(Tag_End)})
+	c, err = f.Write([]byte{byte(TagEnd)})
 	total += int64(c)
 	return
 }
@@ -904,7 +911,7 @@ func (n *Compound) Remove(name string) {
 }
 
 func (n *Compound) Set(tag *Tag) {
-	if tag.TagId() == Tag_End {
+	if tag.TagID() == TagEnd {
 		return
 	}
 	name := tag.Name()
@@ -917,8 +924,8 @@ func (n *Compound) Set(tag *Tag) {
 	*n = append(*n, tag)
 }
 
-func (Compound) Type() TagId {
-	return Tag_Compound
+func (Compound) Type() TagID {
+	return TagCompound
 }
 
 type IntArray []int32
@@ -990,6 +997,6 @@ func (n IntArray) String() string {
 	return fmt.Sprintf("[%d ints] %v", len(n), []int32(n))
 }
 
-func (IntArray) Type() TagId {
-	return Tag_IntArray
+func (IntArray) Type() TagID {
+	return TagIntArray
 }

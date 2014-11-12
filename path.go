@@ -178,8 +178,8 @@ func (p *FilePath) SetChunk(data ...*nbt.Tag) error {
 			regions[r] = append(regions[r], reg)
 		}
 	}
-	for rId, chunks := range regions {
-		x, z := int32(rId&0xffffffff), int32(rId>>32)
+	for rID, chunks := range regions {
+		x, z := int32(rID&0xffffffff), int32(rID>>32)
 		if err := p.setChunks(x, z, chunks); err != nil {
 			errors = append(errors, &FilePathSetError{x, z, err})
 		}
@@ -438,14 +438,14 @@ func (p *FilePath) Lock() error {
 	}
 	p.lock = time.Now().UnixNano() / 1000000 // ms
 	session := path.Join(p.dirname, "session.lock")
-	if f, err := os.Create(session); err != nil {
+	f, err := os.Create(session)
+	if err != nil {
 		return err
-	} else {
-		_, err = f.Write(bytewrite.BigEndian.PutUint64(uint64(p.lock)))
-		f.Close()
-		if err != nil {
-			return err
-		}
+	}
+	_, err = f.Write(bytewrite.BigEndian.PutUint64(uint64(p.lock)))
+	f.Close()
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -529,36 +529,39 @@ func (m *MemPath) write(data *nbt.Tag, buf *[]byte) error {
 }
 
 func chunkCoords(data *nbt.Tag) (x int32, z int32, err error) {
-	if data.TagId() != nbt.Tag_Compound {
-		err = &WrongTypeError{"[Chunk Base]", nbt.Tag_Compound, data.TagId()}
+	if data.TagID() != nbt.TagCompound {
+		err = &WrongTypeError{"[Chunk Base]", nbt.TagCompound, data.TagID()}
 		return
 	} else if lTag := data.Data().(*nbt.Compound).Get("Level"); lTag == nil {
 		err = &MissingTagError{"[Chunk Base]->Level"}
 		return
-	} else if lTag.TagId() != nbt.Tag_Compound {
-		err = &WrongTypeError{"[Chunk Base]->Level", nbt.Tag_Compound, lTag.TagId()}
+	} else if lTag.TagID() != nbt.TagCompound {
+		err = &WrongTypeError{"[Chunk Base]->Level", nbt.TagCompound, lTag.TagID()}
 		return
-	} else {
-		lCmp := lTag.Data().(*nbt.Compound)
-		if xPos := lCmp.Get("xPos"); xPos == nil {
-			err = &MissingTagError{"[Chunk Base]->Level->xPos"}
-			return
-		} else if xPos.TagId() != nbt.Tag_Int {
-			err = &WrongTypeError{"[Chunk Base]->Level->xPos", nbt.Tag_Int, xPos.TagId()}
-			return
-		} else {
-			x = int32(*xPos.Data().(*nbt.Int))
-		}
-		if zPos := lCmp.Get("zPos"); zPos == nil {
-			err = &MissingTagError{"[Chunk Base]->Level->zPos"}
-			return
-		} else if zPos.TagId() != nbt.Tag_Int {
-			err = &WrongTypeError{"[Chunk Base]->Level->zPos", nbt.Tag_Int, zPos.TagId()}
-			return
-		} else {
-			z = int32(*zPos.Data().(*nbt.Int))
-		}
 	}
+
+	lCmp := lTag.Data().(*nbt.Compound)
+
+	if xPos := lCmp.Get("xPos"); xPos == nil {
+		err = &MissingTagError{"[Chunk Base]->Level->xPos"}
+		return
+	} else if xPos.TagID() != nbt.TagInt {
+		err = &WrongTypeError{"[Chunk Base]->Level->xPos", nbt.TagInt, xPos.TagID()}
+		return
+	}
+
+	x = int32(*xPos.Data().(*nbt.Int))
+
+	if zPos := lCmp.Get("zPos"); zPos == nil {
+		err = &MissingTagError{"[Chunk Base]->Level->zPos"}
+		return
+	} else if zPos.TagID() != nbt.TagInt {
+		err = &WrongTypeError{"[Chunk Base]->Level->zPos", nbt.TagInt, zPos.TagID()}
+		return
+	}
+
+	z = int32(*zPos.Data().(*nbt.Int))
+
 	return
 }
 
