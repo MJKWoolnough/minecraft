@@ -10,17 +10,21 @@ import (
 	"github.com/MJKWoolnough/equaler"
 )
 
+// Data is an interface representing the many different types that a tag can be
 type Data interface {
 	io.ReaderFrom
 	io.WriterTo
 	equaler.Equaler
+	// CReadFrom acts like the ReadFrom method, but with custom configutation
 	CReadFrom(*Config, io.Reader) (int64, error)
+	// CWriteTo acts like the WriteTo method, but with custom configutation
 	CWriteTo(*Config, io.Writer) (int64, error)
 	Copy() Data
 	String() string
 	Type() TagID
 }
 
+// Tag is the main NBT type, a combination of a name and a Data type
 type Tag struct {
 	name String
 	data Data
@@ -49,12 +53,12 @@ func NewTag(name string, d Data) (n *Tag) {
 	return &m
 }
 
-// ReadFrom will
+// ReadFrom will read a tag, and all nested tags, from the reader
 func (n *Tag) ReadFrom(f io.Reader) (total int64, err error) {
 	return n.CReadFrom(defaultConfig, f)
 }
 
-// CReadFrom act
+// CReadFrom acts similarly to ReadFrom, but allows for custom configutation
 func (n *Tag) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var (
 		c    int
@@ -91,10 +95,12 @@ func (n *Tag) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	return
 }
 
+// WriteTo will export the tag to the given Writer
 func (n *Tag) WriteTo(f io.Writer) (total int64, err error) {
 	return n.CWriteTo(defaultConfig, f)
 }
 
+// CWriteTo acts similarly to WriteTo, but allows for custom configutation
 func (n *Tag) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	var (
 		c int
@@ -120,6 +126,7 @@ func (n *Tag) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	return
 }
 
+// Copy simply returns a deep-copy the the tag
 func (n *Tag) Copy() *Tag {
 	return &Tag{
 		n.name,
@@ -127,6 +134,8 @@ func (n *Tag) Copy() *Tag {
 	}
 }
 
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
 func (n *Tag) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*Tag); ok {
 		if n.data.Type() == m.data.Type() && n.name == m.name {
@@ -136,18 +145,22 @@ func (n *Tag) Equal(e equaler.Equaler) bool {
 	return false
 }
 
+// Data returns the tags data type
 func (n *Tag) Data() Data {
 	return n.data
 }
 
+// Name returns the tags' name
 func (n *Tag) Name() string {
 	return string(n.name)
 }
 
+// TagID returns the type of the data
 func (n *Tag) TagID() TagID {
 	return n.data.Type()
 }
 
+// String returns a textual representation of the tag
 func (n *Tag) String() string {
 	return fmt.Sprintf("%s(%q): %s", n.data.Type(), n.name, n.data)
 }
@@ -749,6 +762,7 @@ func (n *List) String() string {
 	return s + "\n}"
 }
 
+// Set sets the data at the given position. It does not append
 func (n *List) Set(i int32, data Data) error {
 	if i < 0 || i >= int32(len(n.data)) {
 		return &BadRange{}
@@ -760,6 +774,7 @@ func (n *List) Set(i int32, data Data) error {
 	return nil
 }
 
+// Get returns the data at the given positon
 func (n *List) Get(i int) Data {
 	if i >= 0 && i < len(n.data) {
 		return n.data[i]
@@ -767,6 +782,7 @@ func (n *List) Get(i int) Data {
 	return nil
 }
 
+// Append adds data to the list
 func (n *List) Append(data ...Data) error {
 	if err := n.valid(data...); err != nil {
 		return err
@@ -775,6 +791,8 @@ func (n *List) Append(data ...Data) error {
 	return nil
 }
 
+// Insert will add the given data at the specified position, moving other
+// elements up.
 func (n *List) Insert(i int, data ...Data) error {
 	if err := n.valid(data...); err != nil {
 		return err
@@ -783,6 +801,7 @@ func (n *List) Insert(i int, data ...Data) error {
 	return nil
 }
 
+// Remove deletes the specified position and shifts remaing data down
 func (n *List) Remove(i int) {
 	if i >= 0 && i < len(n.data) {
 		copy(n.data[i:], n.data[i+1:])
@@ -791,6 +810,7 @@ func (n *List) Remove(i int) {
 	}
 }
 
+// Len returns the length of the list
 func (n *List) Len() int {
 	return len(n.data)
 }
