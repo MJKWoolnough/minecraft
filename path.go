@@ -75,7 +75,7 @@ func NewFilePath(dirname string) (*FilePath, error) {
 	return p, p.Lock()
 }
 
-// Returns the chunk at chunk coords x, z.
+// GetChunk returns the chunk at chunk coords x, z.
 func (p *FilePath) GetChunk(x, z int32) (*nbt.Tag, error) {
 	if !p.HasLock() {
 		return nil, &NoLock{}

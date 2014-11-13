@@ -119,13 +119,18 @@ func newChunk(x, z int32, data *nbt.Tag) (*chunk, error) {
 	c := new(chunk)
 	if data.TagID() != nbt.TagCompound {
 		return nil, &WrongTypeError{"[Chunk Base]", nbt.TagCompound, data.TagID()}
-	} else if tag := data.Data().(*nbt.Compound).Get("Level"); tag == nil {
+	}
+
+	tag := data.Data().(*nbt.Compound).Get("Level")
+
+	if tag == nil {
 		return nil, &MissingTagError{"[Chunk Base]->Level"}
 	} else if tag.TagID() != nbt.TagCompound {
 		return nil, &WrongTypeError{"[Chunk Base]->Level", nbt.TagCompound, tag.TagID()}
-	} else {
-		c.data = tag.Data().(*nbt.Compound)
 	}
+
+	c.data = tag.Data().(*nbt.Compound)
+
 	for _, req := range chunkRequired {
 		if tag := c.data.Get(req.name); tag == nil {
 			return nil, &MissingTagError{req.name}

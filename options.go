@@ -200,7 +200,7 @@ func LogAdminCommands(d bool) Option {
 	return setGameRule("logAdminCommands", d)
 }
 
-// ModGriefing enables/disables the abilty of mobs to destroy blocks
+// MobGriefing enables/disables the abilty of mobs to destroy blocks
 func MobGriefing(d bool) Option {
 	return setGameRule("mobGriefing", d)
 }

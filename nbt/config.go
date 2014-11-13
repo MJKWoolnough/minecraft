@@ -18,7 +18,7 @@ const (
 	TagIntArray
 )
 
-var tagIdNames = [...]string{
+var tagIDNames = [...]string{
 	"End",
 	"Byte",
 	"Short",
@@ -33,12 +33,12 @@ var tagIdNames = [...]string{
 	"Int Array",
 }
 
-// TagId represents the type of nbt tag
+// TagID represents the type of nbt tag
 type TagID uint8
 
 func (t TagID) String() string {
-	if int(t) < len(tagIdNames) {
-		return tagIdNames[t]
+	if int(t) < len(tagIDNames) {
+		return tagIDNames[t]
 	}
 	return ""
 }
