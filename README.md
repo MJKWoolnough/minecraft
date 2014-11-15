@@ -2,7 +2,7 @@
 --
     import "github.com/MJKWoolnough/minecraft"
 
-Package Minecraft will be a full featured minecraft level editor/viewer.
+Package minecraft will be a full featured minecraft level editor/viewer.
 
 ## Usage
 
@@ -192,7 +192,7 @@ func (b Biome) String() string
 
 ```go
 type Block struct {
-	BlockId uint16
+	BlockID uint16
 	Data    uint8
 }
 ```
@@ -239,7 +239,7 @@ func (b *Block) HasTicks() bool
 ```go
 func (b *Block) IsLiquid() bool
 ```
-Returns true if the block id matches a liquid
+IsLiquid returns true if the block id matches a liquid
 
 #### func (*Block) Light
 
@@ -323,14 +323,14 @@ NewFilePath constructs a new directory based path to read from.
 ```go
 func (p *FilePath) Defrag(x, z int32) error
 ```
-Defrag rewrites a region file to reduce wasted space. Currently unimplemented.
+Defrag rewrites a region file to reduce wasted space.
 
 #### func (*FilePath) GetChunk
 
 ```go
 func (p *FilePath) GetChunk(x, z int32) (*nbt.Tag, error)
 ```
-Returns the chunk at chunk coords x, z.
+GetChunk returns the chunk at chunk coords x, z.
 
 #### func (*FilePath) GetChunks
 
@@ -418,35 +418,36 @@ type Level struct {
 ```go
 func NewLevel(location Path) (*Level, error)
 ```
-Create/Load a minecraft level from the given path.
+NewLevel creates/Loads a minecraft level from the given path.
 
 #### func (*Level) Close
 
 ```go
 func (l *Level) Close()
 ```
-Closes all open chunks, but does not save them.
+Close closes all open chunks, but does not save them.
 
 #### func (*Level) GetBiome
 
 ```go
 func (l *Level) GetBiome(x, z int32) (Biome, error)
 ```
-Returns the biome for the column x, z.
+GetBiome returns the biome for the column x, z.
 
 #### func (*Level) GetBlock
 
 ```go
 func (l *Level) GetBlock(x, y, z int32) (*Block, error)
 ```
-Get the block at coordinates x, y, z.
+GetBlock gets the block at coordinates x, y, z.
 
 #### func (*Level) GetHeight
 
 ```go
 func (l *Level) GetHeight(x, z int32) (int32, error)
 ```
-Returns the y coordinate for the highest non-transparent block at column x, z.
+GetHeight returns the y coordinate for the highest non-transparent block at
+column x, z.
 
 #### func (*Level) Options
 
@@ -461,22 +462,22 @@ minecraft level
 ```go
 func (l *Level) Save() error
 ```
-Saves all open chunks, but does not close them.
+Save saves all open chunks, but does not close them.
 
 #### func (*Level) SetBiome
 
 ```go
 func (l *Level) SetBiome(x, z int32, biome Biome) error
 ```
-Sets the biome for the column x, z.
+SetBiome sets the biome for the column x, z.
 
 #### func (*Level) SetBlock
 
 ```go
 func (l *Level) SetBlock(x, y, z int32, block *Block) error
 ```
-Sets the block at coordinates x, y, z. Also processes any lighting updates if
-applicable.
+SetBlock sets the block at coordinates x, y, z. Also processes any lighting
+updates if applicable.
 
 #### type LightBlockList
 
@@ -488,13 +489,13 @@ type LightBlockList map[uint16]uint8
 #### func (LightBlockList) Add
 
 ```go
-func (l LightBlockList) Add(blockId uint16, light uint8) bool
+func (l LightBlockList) Add(blockID uint16, light uint8) bool
 ```
 
 #### func (LightBlockList) Remove
 
 ```go
-func (l LightBlockList) Remove(blockId uint16) bool
+func (l LightBlockList) Remove(blockID uint16) bool
 ```
 
 #### type MemPath
@@ -610,13 +611,14 @@ func (OOB) Error() string
 type Option func(*Level)
 ```
 
+Option is a function used to set an option for a minecraft level struct
 
 #### func  AllowCommands
 
 ```go
 func AllowCommands(a bool) Option
 ```
-AllowsCommands enables/disables the cheat commands
+AllowCommands enables/disables the cheat commands
 
 #### func  BorderCenter
 
@@ -766,7 +768,7 @@ mineshafts, etc.)
 ```go
 func MobGriefing(d bool) Option
 ```
-ModGriefing enables/disables the abilty of mobs to destroy blocks
+MobGriefing enables/disables the abilty of mobs to destroy blocks
 
 #### func  MobLoot
 
@@ -880,13 +882,13 @@ type TransparentBlockList []uint16
 #### func (*TransparentBlockList) Add
 
 ```go
-func (t *TransparentBlockList) Add(blockId uint16) bool
+func (t *TransparentBlockList) Add(blockID uint16) bool
 ```
 
 #### func (*TransparentBlockList) Remove
 
 ```go
-func (t *TransparentBlockList) Remove(blockId uint16) bool
+func (t *TransparentBlockList) Remove(blockID uint16) bool
 ```
 
 #### type UnexpectedValue
@@ -924,7 +926,7 @@ func (u UnknownCompression) Error() string
 ```go
 type WrongTypeError struct {
 	TagName        string
-	Expecting, Got nbt.TagId
+	Expecting, Got nbt.TagID
 }
 ```
 
