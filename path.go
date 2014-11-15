@@ -28,9 +28,6 @@ import (
 	"compress/gzip"
 	"compress/zlib"
 	"fmt"
-	"github.com/MJKWoolnough/bytewrite"
-	"github.com/MJKWoolnough/memio"
-	"github.com/MJKWoolnough/minecraft/nbt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -38,6 +35,10 @@ import (
 	"regexp"
 	"sort"
 	"time"
+
+	"github.com/MJKWoolnough/bytewrite"
+	"github.com/MJKWoolnough/memio"
+	"github.com/MJKWoolnough/minecraft/nbt"
 )
 
 var filename *regexp.Regexp
@@ -78,7 +79,7 @@ func NewFilePath(dirname string) (*FilePath, error) {
 // GetChunk returns the chunk at chunk coords x, z.
 func (p *FilePath) GetChunk(x, z int32) (*nbt.Tag, error) {
 	if !p.HasLock() {
-		return nil, &NoLock{}
+		return nil, NoLock{}
 	}
 	f, err := os.Open(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x>>5, z>>5)))
 	if err != nil {
@@ -92,11 +93,11 @@ func (p *FilePath) GetChunk(x, z int32) (*nbt.Tag, error) {
 	if _, err = f.Seek(4*pos, os.SEEK_SET); err != nil {
 		return nil, err
 	}
-	var bytes [4]byte
-	if _, err = io.ReadFull(f, bytes[:]); err != nil {
+	bytes := make([]byte, 4)
+	if _, err = io.ReadFull(f, bytes); err != nil {
 		return nil, err
 	}
-	locationSize := bytewrite.BigEndian.Uint32(bytes[:])
+	locationSize := bytewrite.BigEndian.Uint32(bytes)
 	if locationSize>>8 == 0 {
 		return nil, nil
 	} else if _, err = f.Seek(int64(locationSize>>8<<12), os.SEEK_SET); err != nil {
@@ -108,10 +109,10 @@ func (p *FilePath) GetChunk(x, z int32) (*nbt.Tag, error) {
 		compression [1]byte
 	)
 
-	if _, err = io.ReadFull(f, bytes[:]); err != nil {
+	if _, err = io.ReadFull(f, bytes); err != nil {
 		return nil, err
 	}
-	length = bytewrite.BigEndian.Uint32(bytes[:])
+	length = bytewrite.BigEndian.Uint32(bytes)
 	reader = io.LimitReader(reader, int64(length))
 	if _, err = io.ReadFull(f, compression[:]); err != nil {
 		return nil, err
@@ -144,7 +145,7 @@ type rc struct {
 // multiple errors were encountered.
 func (p *FilePath) SetChunk(data ...*nbt.Tag) error {
 	if !p.HasLock() {
-		return &NoLock{}
+		return NoLock{}
 	}
 	regions := make(map[uint64][]rc)
 	poses := make([]uint64, 0)
@@ -312,7 +313,7 @@ func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
 // Deletes the chunk at chunk coords x, z.
 func (p *FilePath) RemoveChunk(x, z int32) error {
 	if !p.HasLock() {
-		return &NoLock{}
+		return NoLock{}
 	}
 	chunkX := x & 31
 	regionX := x >> 5
@@ -335,7 +336,7 @@ func (p *FilePath) RemoveChunk(x, z int32) error {
 // Returns the level data.
 func (p *FilePath) ReadLevelDat() (*nbt.Tag, error) {
 	if !p.HasLock() {
-		return nil, &NoLock{}
+		return nil, NoLock{}
 	}
 	f, err := os.Open(path.Join(p.dirname, "level.dat"))
 	if os.IsNotExist(err) {
@@ -355,7 +356,7 @@ func (p *FilePath) ReadLevelDat() (*nbt.Tag, error) {
 // Writes the level data.
 func (p *FilePath) WriteLevelDat(data *nbt.Tag) error {
 	if !p.HasLock() {
-		return &NoLock{}
+		return NoLock{}
 	}
 	f, err := os.OpenFile(path.Join(p.dirname, "level.dat"), os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
@@ -388,7 +389,7 @@ func (p *FilePath) GetRegions() [][2]int32 {
 // GetChunks returns a list of all chunks within a region with coords x,z
 func (p *FilePath) GetChunks(x, z int32) ([][2]int32, error) {
 	if !p.HasLock() {
-		return nil, &NoLock{}
+		return nil, NoLock{}
 	}
 	f, err := os.Open(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x, z)))
 	if err != nil {
@@ -396,9 +397,7 @@ func (p *FilePath) GetChunks(x, z int32) ([][2]int32, error) {
 	}
 	defer f.Close()
 
-	var bytes [4096]byte
-
-	pBytes := bytes[:]
+	pBytes := make([]byte, 4096)
 	if _, err = io.ReadFull(f, pBytes); err != nil {
 		return nil, err
 	}
@@ -450,8 +449,71 @@ func (p *FilePath) Lock() error {
 	return nil
 }
 
-// Defrag rewrites a region file to reduce wasted space. Currently unimplemented.
+// Defrag rewrites a region file to reduce wasted space.
 func (p *FilePath) Defrag(x, z int32) error {
+	if !p.HasLock() {
+		return NoLock{}
+	}
+	f, err := os.Open(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x, z)))
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	locationSizes := make([]byte, 4096)
+	if _, err = io.ReadFull(f, locationSizes); err != nil {
+		return err
+	}
+
+	var (
+		data       [1024][]byte
+		locations  [4096]byte
+		currSector uint32 = 2
+	)
+
+	for i := 0; i < 1024; i++ {
+		locationSize := bytewrite.BigEndian.Uint32(locationSizes[:4])
+		locationSizes = locationSizes[4:]
+		if locationSize>>8 == 0 {
+			continue
+		} else if _, err = f.Seek(int64(locationSize>>8<<12), os.SEEK_SET); err != nil {
+			return err
+		}
+
+		data[i] = make([]byte, locationSize&256<<12)
+
+		if _, err := io.ReadFull(f, data[i]); err != nil {
+			return err
+		}
+
+		copy(locations[i<<2:i<<2+4], bytewrite.BigEndian.PutUint32(currSector<<8|locationSize&256))
+
+		currSector += locationSize & 255
+	}
+
+	_, err = f.Seek(0, os.SEEK_SET)
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Write(locations[:])
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Seek(8192, os.SEEK_SET)
+	if err != nil {
+		return err // Try and recover first?
+	}
+
+	for _, d := range data {
+		if len(d) > 0 {
+			_, err = f.Write(d)
+			if err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 
@@ -532,7 +594,9 @@ func chunkCoords(data *nbt.Tag) (x int32, z int32, err error) {
 	if data.TagID() != nbt.TagCompound {
 		err = &WrongTypeError{"[Chunk Base]", nbt.TagCompound, data.TagID()}
 		return
-	} else if lTag := data.Data().(*nbt.Compound).Get("Level"); lTag == nil {
+	}
+	lTag := data.Data().(*nbt.Compound).Get("Level")
+	if lTag == nil {
 		err = &MissingTagError{"[Chunk Base]->Level"}
 		return
 	} else if lTag.TagID() != nbt.TagCompound {
@@ -542,7 +606,8 @@ func chunkCoords(data *nbt.Tag) (x int32, z int32, err error) {
 
 	lCmp := lTag.Data().(*nbt.Compound)
 
-	if xPos := lCmp.Get("xPos"); xPos == nil {
+	xPos := lCmp.Get("xPos")
+	if xPos == nil {
 		err = &MissingTagError{"[Chunk Base]->Level->xPos"}
 		return
 	} else if xPos.TagID() != nbt.TagInt {
@@ -552,7 +617,8 @@ func chunkCoords(data *nbt.Tag) (x int32, z int32, err error) {
 
 	x = int32(*xPos.Data().(*nbt.Int))
 
-	if zPos := lCmp.Get("zPos"); zPos == nil {
+	zPos := lCmp.Get("zPos")
+	if zPos == nil {
 		err = &MissingTagError{"[Chunk Base]->Level->zPos"}
 		return
 	} else if zPos.TagID() != nbt.TagInt {
