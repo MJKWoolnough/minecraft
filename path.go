@@ -454,7 +454,7 @@ func (p *FilePath) Defrag(x, z int32) error {
 	if !p.HasLock() {
 		return NoLock{}
 	}
-	f, err := os.Open(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x, z)))
+	f, err := os.OpenFile(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x, z)), os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		return err
 	}
@@ -480,13 +480,13 @@ func (p *FilePath) Defrag(x, z int32) error {
 			return err
 		}
 
-		data[i] = make([]byte, locationSize&256<<12)
+		data[i] = make([]byte, locationSize&255<<12)
 
 		if _, err := io.ReadFull(f, data[i]); err != nil {
 			return err
 		}
 
-		copy(locations[i<<2:i<<2+4], bytewrite.BigEndian.PutUint32(currSector<<8|locationSize&256))
+		copy(locations[i<<2:i<<2+4], bytewrite.BigEndian.PutUint32(currSector<<8|locationSize&255))
 
 		currSector += locationSize & 255
 	}

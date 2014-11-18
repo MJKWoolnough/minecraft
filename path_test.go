@@ -167,14 +167,13 @@ func TestMemPath(t *testing.T) {
 }
 
 func TestFilePath(t *testing.T) {
-	var (
-		tempDir string
-		err     error
-		f       *FilePath
-	)
-	if tempDir, err = ioutil.TempDir("", "minecraft-path-test"); err != nil {
+	tempDir, err := ioutil.TempDir("", "minecraft-path-test")
+	if err != nil {
 		t.Error(err.Error())
-	} else if f, err = NewFilePath(tempDir); err != nil {
+		return
+	}
+	f, err := NewFilePath(tempDir)
+	if err != nil {
 		t.Error(err.Error())
 	}
 	if a := len(f.GetRegions()); a != 0 {
@@ -201,6 +200,35 @@ func TestFilePath(t *testing.T) {
 	should[2] = (2+7)<<8 | 1 //pos 7 + offset(2), size 1
 	should[3] = (2+8)<<8 | 1 //pos 8 + offset(2), size 1
 	should[4] = (2+1)<<8 | 1 //pos 1 + offset(2), size 1
+
+	for i := 0; i < 1024; i++ {
+		if should[i] != positions[i] {
+			t.Errorf("chunk position/size incorrect, expecting chunk %d at %d, got %d", i, should[i], positions[i])
+		}
+	}
+
+	//Check Defrag
+
+	err = f.Defrag(0, 0)
+	if err != nil {
+		t.Error(err.Error())
+		return
+	}
+
+	file, err = os.Open(path.Join(tempDir, "region", "r.0.0.mca"))
+	if err != nil {
+		t.Error(err.Error())
+	}
+	if err = binary.Read(file, binary.BigEndian, positions[:]); err != nil {
+		t.Error(err.Error())
+	}
+	file.Close()
+
+	should[0] = (2+0)<<8 | 1 //pos 0 + offset(2), size 1
+	should[1] = (2+1)<<8 | 3 //pos 1 + offset(2), size 3
+	should[2] = (2+4)<<8 | 1 //pos 4 + offset(2), size 1
+	should[3] = (2+5)<<8 | 1 //pos 5 + offset(2), size 1
+	should[4] = (2+6)<<8 | 1 //pos 6 + offset(2), size 1
 
 	for i := 0; i < 1024; i++ {
 		if should[i] != positions[i] {
