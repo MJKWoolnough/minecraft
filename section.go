@@ -36,11 +36,9 @@ func getNibble(arr nbt.ByteArray, x, y, z int32) byte {
 	coord := yzx(x, y, z)
 	data := byte(arr[coord>>1])
 	if coord&1 == 0 {
-		data &= 15
-	} else {
-		data >>= 4
+		return data & 15
 	}
-	return data
+	return data >> 4
 }
 
 func setNibble(arr nbt.ByteArray, x, y, z int32, data byte) {
@@ -52,7 +50,6 @@ func setNibble(arr nbt.ByteArray, x, y, z int32, data byte) {
 		oldData = oldData&15 | data<<4
 	}
 	arr[coord>>1] = int8(oldData)
-	return
 }
 
 type section struct {
