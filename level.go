@@ -208,14 +208,14 @@ func (l *Level) genLighting(x, y, z int32, skyLight, darker bool, source uint8) 
 	list := make([]*lightCoords, 1)
 	list[0] = &lightCoords{x, y, z, getLight(c, x, y, z)}
 	changed := boolmap.NewMap()
-	changed.Set((uint64(y)<<10)|(uint64(z&31)<<5)|uint64(x&31), true)
+	changed.SetBool((uint64(y)<<10)|(uint64(z&31)<<5)|uint64(x&31), true)
 	if darker { // reset lighting on all blocks affected by the changed one (only applies if darker)
 		setLight(c, x, y, z, 0)
 		for i := 0; i < len(list); i++ {
 			for _, s := range surroundingBlocks(list[i].x, list[i].y, list[i].z) {
 				mx, my, mz := s[0], s[1], s[2]
 				pos := (uint64(my) << 10) | (uint64(mz&31) << 5) | uint64(mx&31)
-				if changed.Get(pos) {
+				if changed.GetBool(pos) {
 					continue
 				}
 				if c, err = l.getChunk(mx, mz, false); err != nil {
@@ -223,7 +223,7 @@ func (l *Level) genLighting(x, y, z int32, skyLight, darker bool, source uint8) 
 				} else if c == nil {
 					continue
 				} else if ys := my >> 4; my < 16 && c.sections[ys] == nil {
-					changed.Set(pos, true)
+					changed.SetBool(pos, true)
 					continue
 				}
 				shouldBe := list[i].lightLevel
@@ -235,7 +235,7 @@ func (l *Level) genLighting(x, y, z int32, skyLight, darker bool, source uint8) 
 				}
 				if thisLight := getLight(c, mx, my, mz); thisLight == shouldBe && shouldBe != 0 || (skyLight && thisLight == 15 && my < c.GetHeight(mx, mz)) {
 					list = append(list, &lightCoords{mx, my, mz, thisLight})
-					changed.Set(pos, true)
+					changed.SetBool(pos, true)
 					if thisLight > 0 {
 						setLight(c, mx, my, mz, 0)
 					}
@@ -250,7 +250,7 @@ func (l *Level) genLighting(x, y, z int32, skyLight, darker bool, source uint8) 
 		for _, s := range surroundingBlocks(x, y, z) {
 			mx, my, mz := s[0], s[1], s[2]
 			pos := (uint64(my) << 10) | (uint64(mz&31) << 5) | uint64(mx&31)
-			if changed.Get(pos) {
+			if changed.GetBool(pos) {
 				continue
 			}
 			if c, err = l.getChunk(mx, mz, false); err != nil {
@@ -258,18 +258,18 @@ func (l *Level) genLighting(x, y, z int32, skyLight, darker bool, source uint8) 
 			} else if c == nil {
 				continue
 			} else if ys := my >> 4; my < 16 && c.sections[ys] == nil {
-				changed.Set(pos, true)
+				changed.SetBool(pos, true)
 				continue
 			}
 			if thisLight := getLight(c, mx, my, mz); thisLight < source {
 				list = append(list, &lightCoords{mx, my, mz, thisLight})
-				changed.Set(pos, true)
+				changed.SetBool(pos, true)
 			}
 		}
 	}
 	for ; len(list) > 0; list = list[1:] {
 		mx, my, mz := list[0].x, list[0].y, list[0].z
-		changed.Set((uint64(my)<<10)|(uint64(mz&31)<<5)|uint64(mx&31), false)
+		changed.SetBool((uint64(my)<<10)|(uint64(mz&31)<<5)|uint64(mx&31), false)
 		newLight := uint8(0)
 		c, _ = l.getChunk(mx, mz, false)
 		if skyLight && my >= c.GetHeight(mx, mz) { //Determine correct light level...
@@ -300,7 +300,7 @@ func (l *Level) genLighting(x, y, z int32, skyLight, darker bool, source uint8) 
 			for _, s := range surroundingBlocks(mx, my, mz) {
 				mx, my, mz = s[0], s[1], s[2]
 				pos := (uint64(my) << 10) | (uint64(mz&31) << 5) | uint64(mx&31)
-				if changed.Get(pos) {
+				if changed.GetBool(pos) {
 					continue
 				}
 				if c, err = l.getChunk(mx, mz, false); err != nil {
@@ -308,12 +308,12 @@ func (l *Level) genLighting(x, y, z int32, skyLight, darker bool, source uint8) 
 				} else if c == nil {
 					continue
 				} else if ys := my >> 4; ys < 16 && c.sections[ys] == nil {
-					changed.Set(pos, true)
+					changed.SetBool(pos, true)
 					continue
 				}
 				if thisLight := getLight(c, mx, my, mz); thisLight < newLight {
 					list = append(list, &lightCoords{mx, my, mz, thisLight})
-					changed.Set(pos, true)
+					changed.SetBool(pos, true)
 				}
 			}
 		}
