@@ -10,8 +10,8 @@ func TestNewLevel(t *testing.T) {
 		return
 	}
 	x, y, z := int32(1534545), int32(23), int32(-56456)
-	l.Options(Spawn(x, y, z))
-	l.Options(GetSpawn(&x, &y, &z))
+	l.Spawn(x, y, z)
+	x, y, z = l.GetSpawn()
 	if x != 1534545 || y != 23 || z != -56456 {
 		t.Errorf("[SG]etSpawn test failed, expecting 1534545, 23, -56456, got %d, %d, %d", x, y, z)
 	}
@@ -71,7 +71,8 @@ func TestNewLevel(t *testing.T) {
 		t.Error(err.Error())
 		return
 	}
-	l.Options(GetSpawn(&x, &y, &z))
+	x, y, z = l.GetSpawn()
+	l.Spawn(x, y, z)
 	if x != 1534545 || y != 23 || z != -56456 {
 		t.Errorf("[SG]etSpawn test failed, expecting 1534545, 23, -56456, got %d, %d, %d", x, y, z)
 	}
