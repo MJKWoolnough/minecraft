@@ -91,6 +91,7 @@ func (l *Level) TicksExisted(t int64) {
 	l.setOption("Time", nbt.NewLong(t))
 }
 
+// Time-of-day convenience constants
 const (
 	SunRise  = 0
 	Noon     = 6000

@@ -54,6 +54,7 @@ type Path interface {
 	WriteLevelDat(*nbt.Tag) error
 }
 
+// Compression convenience constants
 const (
 	GZip byte = 1
 	Zlib byte = 2
@@ -141,15 +142,17 @@ type rc struct {
 	buf []byte
 }
 
-// Saves multiple chunks at once, possibly returning a MultiError if
+// SetChunk saves multiple chunks at once, possibly returning a MultiError if
 // multiple errors were encountered.
 func (p *FilePath) SetChunk(data ...*nbt.Tag) error {
 	if !p.HasLock() {
 		return NoLock{}
 	}
 	regions := make(map[uint64][]rc)
-	poses := make([]uint64, 0)
-	errors := make([]error, 0)
+	var (
+		poses  []uint64
+		errors []error
+	)
 	for _, d := range data {
 		x, z, err := chunkCoords(d)
 		if err != nil {
@@ -310,7 +313,7 @@ func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
 	return nil
 }
 
-// Deletes the chunk at chunk coords x, z.
+// RemoveChunk deletes the chunk at chunk coords x, z.
 func (p *FilePath) RemoveChunk(x, z int32) error {
 	if !p.HasLock() {
 		return NoLock{}
@@ -333,7 +336,7 @@ func (p *FilePath) RemoveChunk(x, z int32) error {
 	return err
 }
 
-// Returns the level data.
+// ReadLevelDat returns the level data.
 func (p *FilePath) ReadLevelDat() (*nbt.Tag, error) {
 	if !p.HasLock() {
 		return nil, NoLock{}
@@ -353,7 +356,7 @@ func (p *FilePath) ReadLevelDat() (*nbt.Tag, error) {
 	return data, err
 }
 
-// Writes the level data.
+// WriteLevelDat Writes the level data.
 func (p *FilePath) WriteLevelDat(data *nbt.Tag) error {
 	if !p.HasLock() {
 		return NoLock{}
@@ -372,7 +375,7 @@ func (p *FilePath) WriteLevelDat(data *nbt.Tag) error {
 // GetRegions returns a list of region x,z coords of all generated regions.
 func (p *FilePath) GetRegions() [][2]int32 {
 	files, _ := ioutil.ReadDir(path.Join(p.dirname, "region"))
-	toRet := make([][2]int32, 0)
+	var toRet [][2]int32
 	var x, z int32
 	for _, file := range files {
 		if !file.IsDir() {
@@ -415,7 +418,7 @@ func (p *FilePath) GetChunks(x, z int32) ([][2]int32, error) {
 	return toRet, nil
 }
 
-// Returns whether or not another program has taken the lock.
+// HasLock returns whether or not another program has taken the lock.
 func (p *FilePath) HasLock() bool {
 	r, err := os.Open(path.Join(p.dirname, "session.lock"))
 	if err != nil {
@@ -517,18 +520,18 @@ func (p *FilePath) Defrag(x, z int32) error {
 	return nil
 }
 
-// An in memory minecraft level format that implements the Path interface.
+// MemPath is an in memory minecraft level format that implements the Path interface.
 type MemPath struct {
 	level  []byte
 	chunks map[uint64][]byte
 }
 
-// Creates a new MemPath implementation.
+// NewMemPath creates a new MemPath implementation.
 func NewMemPath() *MemPath {
 	return &MemPath{chunks: make(map[uint64][]byte)}
 }
 
-// Returns the chunk at chunk coords x, z.
+// GetChunk returns the chunk at chunk coords x, z.
 func (m *MemPath) GetChunk(x, z int32) (*nbt.Tag, error) {
 	pos := uint64(z)<<32 | uint64(uint32(x))
 	if m.chunks[pos] == nil {
@@ -537,7 +540,7 @@ func (m *MemPath) GetChunk(x, z int32) (*nbt.Tag, error) {
 	return m.read(m.chunks[pos])
 }
 
-// Saves multiple chunks at once.
+// SetChunk saves multiple chunks at once.
 func (m *MemPath) SetChunk(data ...*nbt.Tag) error {
 	for _, d := range data {
 		x, z, err := chunkCoords(d)
@@ -554,14 +557,14 @@ func (m *MemPath) SetChunk(data ...*nbt.Tag) error {
 	return nil
 }
 
-// Deletes the chunk at chunk coords x, z.
+// RemoveChunk deletes the chunk at chunk coords x, z.
 func (m *MemPath) RemoveChunk(x, z int32) error {
 	pos := uint64(z)<<32 | uint64(uint32(x))
 	delete(m.chunks, pos)
 	return nil
 }
 
-// Returns the level data.
+// ReadLevelDat Returns the level data.
 func (m *MemPath) ReadLevelDat() (*nbt.Tag, error) {
 	if len(m.level) == 0 {
 		return nil, nil
@@ -569,7 +572,7 @@ func (m *MemPath) ReadLevelDat() (*nbt.Tag, error) {
 	return m.read(m.level)
 }
 
-// Writes the level data.
+// WriteLevelDat Writes the level data.
 func (m *MemPath) WriteLevelDat(data *nbt.Tag) error {
 	return m.write(data, &m.level)
 }

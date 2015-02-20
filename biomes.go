@@ -26,6 +26,7 @@ package minecraft
 
 import "github.com/MJKWoolnough/equaler"
 
+// Biome constants
 const (
 	Ocean Biome = iota
 	Plains
@@ -69,6 +70,7 @@ const (
 	MesaPlateau
 )
 
+// Biome constants
 const (
 	SunflowerPlains Biome = iota + 129
 	DeserM
@@ -77,18 +79,24 @@ const (
 	TaigaM
 	SwamplandM
 )
+
+// Biome constants
 const (
 	IcePlainsSpikes Biome = 140
 	JungleM         Biome = 149
 	JungleEdgeM     Biome = 151
 	AutoBiome       Biome = 255
 )
+
+// Biome constants
 const (
 	BirchForestM Biome = iota + 155
 	BirchForestHillsM
 	RoofedForestM
 	ColdTaigaM
 )
+
+// Biome constants
 const (
 	MegaSpruceTaiga Biome = iota + 160
 	MegaSpruceTaigaHills
@@ -100,8 +108,10 @@ const (
 	MesaPlateauM
 )
 
+// Biome is a convenience type for biomes
 type Biome uint8
 
+// Equal is an implementation of the equaler.Equaler interface
 func (b Biome) Equal(e equaler.Equaler) bool {
 	if c, ok := e.(*Biome); ok {
 		return b == *c

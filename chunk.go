@@ -76,14 +76,13 @@ func (c *chunk) GetNBT() *nbt.Tag {
 	sectionList := nbt.NewEmptyList(nbt.TagCompound)
 	sectionList.Append(sections...)
 	data.Set(nbt.NewTag("Sections", sectionList))
-	tileEntities := make([]nbt.Data, 0)
+	var tileEntities, tileTicks []nbt.Data
 	for _, cmp := range c.tileEntities {
 		if cmp != nil {
 			tileEntities = append(tileEntities, cmp)
 		}
 	}
 	data.Set(nbt.NewTag("TileEntities", nbt.NewList(tileEntities)))
-	tileTicks := make([]nbt.Data, 0)
 	for _, cmpa := range c.tileTicks {
 		for _, cmp := range cmpa {
 			tileTicks = append(tileTicks, cmp)

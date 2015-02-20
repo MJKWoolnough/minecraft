@@ -26,14 +26,18 @@ package minecraft
 
 import (
 	"fmt"
+
 	"github.com/MJKWoolnough/equaler"
 	"github.com/MJKWoolnough/minecraft/nbt"
 )
 
+// Tick is a type that represents a scheduled tick
 type Tick struct {
 	I, T, P int32
 }
 
+// Block is a type that represents the full information for a block, id, data,
+// metadata and scheduled tick data
 type Block struct {
 	BlockID  uint16
 	Data     uint8
@@ -41,6 +45,7 @@ type Block struct {
 	ticks    []Tick
 }
 
+// Equal is an implementation of the equaler.Equaler interface
 func (b Block) Equal(e equaler.Equaler) bool {
 	c, ok := e.(*Block)
 	if !ok {
@@ -110,10 +115,13 @@ func (b *Block) IsLiquid() bool {
 	return b.BlockID == 8 || b.BlockID == 9 || b.BlockID == 10 || b.BlockID == 11
 }
 
+// HasMetadata returns true the the block contains extended metadata
 func (b *Block) HasMetadata() bool {
 	return len(b.metadata) > 0
 }
 
+// GetMetadata returns a copy of the metadata for this block, or nil is it has
+// none
 func (b *Block) GetMetadata() nbt.Compound {
 	if b.metadata == nil {
 		return nil
@@ -121,6 +129,7 @@ func (b *Block) GetMetadata() nbt.Compound {
 	return *b.metadata.Copy().(*nbt.Compound)
 }
 
+// SetMetadata sets the blocks metadata to a copy of the given metadata
 func (b *Block) SetMetadata(data nbt.Compound) {
 	metadata := make(nbt.Compound, 0)
 	for i := 0; i < len(data); i++ {
@@ -139,20 +148,24 @@ func (b *Block) SetMetadata(data nbt.Compound) {
 	}
 }
 
+// HasTicks returns true if the block has any scheduled ticks
 func (b *Block) HasTicks() bool {
 	return len(b.ticks) > 0
 }
 
+// GetTicks returns all of the scheduled ticks for a block
 func (b *Block) GetTicks() []Tick {
 	t := make([]Tick, len(b.ticks))
 	copy(t, b.ticks)
 	return t
 }
 
+// AddTicks adds one or more scheduled ticks to the block
 func (b *Block) AddTicks(t ...Tick) {
 	b.ticks = append(b.ticks, t...)
 }
 
+// SetTicks sets the scheduled ticks for the block, replacing any existing ones
 func (b *Block) SetTicks(t []Tick) {
 	b.ticks = make([]Tick, len(t))
 	copy(b.ticks, t)

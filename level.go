@@ -41,6 +41,8 @@ var (
 	}
 )
 
+// Level is the base type for minecraft data, all data for a minecraft level is
+// either store in, or accessed from, this type
 type Level struct {
 	path      Path
 	chunks    map[uint64]*chunk
@@ -381,7 +383,7 @@ func (l *Level) Save() error {
 		}
 		l.changed = false
 	}
-	toSave := make([]*nbt.Tag, 0)
+	var toSave []*nbt.Tag
 	for _, c := range l.chunks {
 		toSave = append(toSave, c.GetNBT())
 	}
