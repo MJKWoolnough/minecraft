@@ -1,9 +1,18 @@
 package minecraft
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/MJKWoolnough/minecraft/nbt"
+)
+
+var (
+	// OOB is an error returned when sanity checking section data
+	OOB = errors.New("Received Out-of-bounds error")
+	// NoLock is an error returns by path types to indicate that the lock on the
+	// minecraft level has been locked and needs reinstating to continue
+	NoLock = errors.New("lost lock on files")
 )
 
 // MissingTagError is an error type returned when an expected tag is not found
@@ -25,13 +34,6 @@ func (w *WrongTypeError) Error() string {
 	return fmt.Sprintf("minecraft: tag %q is of incorrect type, expecting %q, got %q", w.TagName, w.Expecting, w.Got)
 }
 
-// OOB is an error returned when sanity checking section data
-type OOB struct{}
-
-func (OOB) Error() string {
-	return "Received Out-of-bounds error"
-}
-
 // UnexpectedValue is an error returned from chunk loading during sanity
 // checking
 type UnexpectedValue struct {
@@ -51,14 +53,6 @@ type UnknownCompression struct {
 
 func (u UnknownCompression) Error() string {
 	return fmt.Sprintf("unknown compression code: %d", u.Code)
-}
-
-// NoLock is an error returns by path types to indicate that the lock on the
-// minecraft level has been locked and needs reinstating to continue
-type NoLock struct{}
-
-func (NoLock) Error() string {
-	return "lost lock on files"
 }
 
 // ConflictError is an error return by SetChunk when trying to save a single

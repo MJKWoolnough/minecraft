@@ -274,7 +274,7 @@ func TestFilePathLock(t *testing.T) {
 	_, err = f.GetChunks(0, 0)
 	if err == nil {
 		t.Errorf("expecting error, got nil")
-	} else if _, ok := err.(NoLock); !ok {
+	} else if err != NoLock {
 		t.Errorf("expecting NoLock error, got %q", err)
 	}
 	f.Lock()
@@ -284,7 +284,7 @@ func TestFilePathLock(t *testing.T) {
 	_, err = g.GetChunks(0, 0)
 	if err == nil {
 		t.Errorf("expecting error, got nil")
-	} else if _, ok := err.(NoLock); !ok {
+	} else if err != NoLock {
 		t.Errorf("expecting NoLock error, got %q", err)
 	}
 	g.Lock()
@@ -294,7 +294,7 @@ func TestFilePathLock(t *testing.T) {
 	_, err = f.GetChunks(0, 0)
 	if err == nil {
 		t.Errorf("expecting error, got nil")
-	} else if _, ok := err.(NoLock); !ok {
+	} else if err != NoLock {
 		t.Errorf("expecting NoLock error, got %q", err)
 	}
 
