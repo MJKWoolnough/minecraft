@@ -203,13 +203,16 @@ func (end) String() string {
 	return ""
 }
 
+// Byte is an implementation of the Data interface
 type Byte int8
 
+// NewByte returns the given data as a pointer to a Byte
 func NewByte(d int8) *Byte {
 	e := Byte(d)
 	return &e
 }
 
+// ReadFrom is an implementation of io.ReaderFrom
 func (n *Byte) ReadFrom(f io.Reader) (total int64, err error) {
 	var (
 		c    int
@@ -221,10 +224,12 @@ func (n *Byte) ReadFrom(f io.Reader) (total int64, err error) {
 	return
 }
 
+// CReadFrom acts similarly to ReadFrom, but allows for custom configutation
 func (n *Byte) CReadFrom(c *Config, f io.Reader) (total int64, err error) {
 	return n.ReadFrom(f)
 }
 
+// WriteTo is an implementation of io.WriterTo
 func (n Byte) WriteTo(f io.Writer) (total int64, err error) {
 	var c int
 	c, err = f.Write([]byte{byte(n)})
@@ -232,14 +237,18 @@ func (n Byte) WriteTo(f io.Writer) (total int64, err error) {
 	return
 }
 
+// CWriteTo acts similarly to WriteTo, but allows for custom configutation
 func (n Byte) CWriteTo(c *Config, f io.Writer) (total int64, err error) {
 	return n.WriteTo(f)
 }
 
+// Copy simply returns a copy the the data
 func (n Byte) Copy() Data {
 	return &n
 }
 
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
 func (n *Byte) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*Byte); ok {
 		return *n == *m
@@ -251,21 +260,26 @@ func (n Byte) String() string {
 	return fmt.Sprintf("%d", n)
 }
 
+// Type returns the TagID of the data
 func (Byte) Type() TagID {
 	return TagByte
 }
 
+// Short is an implementation of the Data interface
 type Short int16
 
+// NewShort returns a new Short Data type
 func NewShort(d int16) *Short {
 	e := Short(d)
 	return &e
 }
 
+// ReadFrom is an implementation of io.ReaderFrom
 func (n *Short) ReadFrom(f io.Reader) (total int64, err error) {
 	return n.CReadFrom(defaultConfig, f)
 }
 
+// CReadFrom acts similarly to ReadFrom, but allows for custom configutation
 func (n *Short) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var c int
 	data := make([]byte, 2)
@@ -275,10 +289,12 @@ func (n *Short) CReadFrom(config *Config, f io.Reader) (total int64, err error) 
 	return
 }
 
+// WriteTo is an implementation of io.WriterTo
 func (n Short) WriteTo(f io.Writer) (total int64, err error) {
 	return n.CWriteTo(defaultConfig, f)
 }
 
+// CWriteTo acts similarly to WriteTo, but allows for custom configutation
 func (n Short) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	var c int
 	c, err = f.Write(config.endian.PutUint16(uint16(n)))
@@ -286,10 +302,13 @@ func (n Short) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	return
 }
 
+// Copy simply returns a copy the the data
 func (n Short) Copy() Data {
 	return &n
 }
 
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
 func (n *Short) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*Short); ok {
 		return *n == *m
@@ -301,21 +320,26 @@ func (n Short) String() string {
 	return fmt.Sprintf("%d", n)
 }
 
+// Type returns the TagID of the data
 func (Short) Type() TagID {
 	return TagShort
 }
 
+// Int is an implementation of the Data interface
 type Int int32
 
+// NewInt returns a new Int Data type
 func NewInt(d int32) *Int {
 	e := Int(d)
 	return &e
 }
 
+// ReadFrom is an implementation of io.ReaderFrom
 func (n *Int) ReadFrom(f io.Reader) (total int64, err error) {
 	return n.CReadFrom(defaultConfig, f)
 }
 
+// CReadFrom acts similarly to ReadFrom, but allows for custom configutation
 func (n *Int) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var c int
 	data := make([]byte, 4)
@@ -325,10 +349,12 @@ func (n *Int) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	return
 }
 
+// WriteTo is an implementation of io.WriterTo
 func (n Int) WriteTo(f io.Writer) (total int64, err error) {
 	return n.CWriteTo(defaultConfig, f)
 }
 
+// CWriteTo acts similarly to WriteTo, but allows for custom configutation
 func (n Int) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	var c int
 	c, err = f.Write(config.endian.PutUint32(uint32(n)))
@@ -336,10 +362,13 @@ func (n Int) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	return
 }
 
+// Copy simply returns a copy the the data
 func (n Int) Copy() Data {
 	return &n
 }
 
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
 func (n *Int) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*Int); ok {
 		return *n == *m
@@ -351,21 +380,26 @@ func (n Int) String() string {
 	return fmt.Sprintf("%d", n)
 }
 
+// Type returns the TagID of the data
 func (Int) Type() TagID {
 	return TagInt
 }
 
+// Long is an implementation of the Data interface
 type Long int64
 
+// NewLong returns a new Long Data type
 func NewLong(d int64) *Long {
 	e := Long(d)
 	return &e
 }
 
+// ReadFrom is an implementation of io.ReaderFrom
 func (n *Long) ReadFrom(f io.Reader) (total int64, err error) {
 	return n.CReadFrom(defaultConfig, f)
 }
 
+// CReadFrom acts similarly to ReadFrom, but allows for custom configutation
 func (n *Long) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var c int
 	data := make([]byte, 8)
@@ -375,10 +409,12 @@ func (n *Long) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	return
 }
 
+// WriteTo is an implementation of io.WriterTo
 func (n Long) WriteTo(f io.Writer) (total int64, err error) {
 	return n.CWriteTo(defaultConfig, f)
 }
 
+// CWriteTo acts similarly to WriteTo, but allows for custom configutation
 func (n Long) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	var c int
 	c, err = f.Write(config.endian.PutUint64(uint64(n)))
@@ -386,10 +422,13 @@ func (n Long) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	return
 }
 
+// Copy simply returns a copy the the data
 func (n Long) Copy() Data {
 	return &n
 }
 
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
 func (n *Long) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*Long); ok {
 		return *n == *m
@@ -401,21 +440,26 @@ func (n Long) String() string {
 	return fmt.Sprintf("%d", n)
 }
 
+// Type returns the TagID of the data
 func (Long) Type() TagID {
 	return TagLong
 }
 
+// Float is an implementation of the Data interface
 type Float float32
 
+// NewFloat returns a new Long Data type
 func NewFloat(d float32) *Float {
 	e := Float(d)
 	return &e
 }
 
+// ReadFrom is an implementation of io.ReaderFrom
 func (n *Float) ReadFrom(f io.Reader) (total int64, err error) {
 	return n.CReadFrom(defaultConfig, f)
 }
 
+// CReadFrom acts similarly to ReadFrom, but allows for custom configutation
 func (n *Float) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var c int
 	data := make([]byte, 4)
@@ -425,10 +469,12 @@ func (n *Float) CReadFrom(config *Config, f io.Reader) (total int64, err error) 
 	return
 }
 
+// WriteTo is an implementation of io.WriterTo
 func (n Float) WriteTo(f io.Writer) (total int64, err error) {
 	return n.CWriteTo(defaultConfig, f)
 }
 
+// CWriteTo acts similarly to WriteTo, but allows for custom configutation
 func (n Float) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	var c int
 	c, err = f.Write(config.endian.PutFloat32(float32(n)))
@@ -436,10 +482,13 @@ func (n Float) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	return
 }
 
+// Copy simply returns a copy the the data
 func (n Float) Copy() Data {
 	return &n
 }
 
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
 func (n *Float) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*Float); ok {
 		return *n == *m
@@ -451,21 +500,26 @@ func (n Float) String() string {
 	return fmt.Sprintf("%f", n)
 }
 
+// Type returns the TagID of the data
 func (Float) Type() TagID {
 	return TagFloat
 }
 
+// Double is an implementation of the Data interface
 type Double float64
 
+// NewDouble returns a new Double Data type
 func NewDouble(d float64) *Double {
 	e := Double(d)
 	return &e
 }
 
+// ReadFrom is an implementation of io.ReaderFrom
 func (n *Double) ReadFrom(f io.Reader) (total int64, err error) {
 	return n.CReadFrom(defaultConfig, f)
 }
 
+// CReadFrom acts similarly to ReadFrom, but allows for custom configutation
 func (n *Double) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var c int
 	data := make([]byte, 8)
@@ -475,10 +529,12 @@ func (n *Double) CReadFrom(config *Config, f io.Reader) (total int64, err error)
 	return
 }
 
+// WriteTo is an implementation of io.WriterTo
 func (n Double) WriteTo(f io.Writer) (total int64, err error) {
 	return n.CWriteTo(defaultConfig, f)
 }
 
+// CWriteTo acts similarly to WriteTo, but allows for custom configutation
 func (n Double) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	var c int
 	c, err = f.Write(config.endian.PutFloat64(float64(n)))
@@ -486,10 +542,13 @@ func (n Double) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	return
 }
 
+// Copy simply returns a copy the the data
 func (n Double) Copy() Data {
 	return &n
 }
 
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
 func (n *Double) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*Double); ok {
 		return *n == *m
@@ -501,21 +560,26 @@ func (n Double) String() string {
 	return fmt.Sprintf("%f", n)
 }
 
+// Type returns the TagID of the data
 func (Double) Type() TagID {
 	return TagDouble
 }
 
+// ByteArray is an implementation of the Data interface
 type ByteArray []int8
 
+// NewByteArray returns a new Double Data type
 func NewByteArray(d []int8) *ByteArray {
 	e := ByteArray(d)
 	return &e
 }
 
+// ReadFrom is an implementation of io.ReaderFrom
 func (n *ByteArray) ReadFrom(f io.Reader) (total int64, err error) {
 	return n.CReadFrom(defaultConfig, f)
 }
 
+// CReadFrom acts similarly to ReadFrom, but allows for custom configutation
 func (n *ByteArray) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var c int
 	data := make([]byte, 4)
@@ -532,10 +596,12 @@ func (n *ByteArray) CReadFrom(config *Config, f io.Reader) (total int64, err err
 	return
 }
 
+// WriteTo is an implementation of io.WriterTo
 func (n ByteArray) WriteTo(f io.Writer) (int64, error) {
 	return n.CWriteTo(defaultConfig, f)
 }
 
+// CWriteTo acts similarly to WriteTo, but allows for custom configutation
 func (n ByteArray) CWriteTo(config *Config, f io.Writer) (int64, error) {
 	data := make([]byte, len(n)+4)
 	copy(data, config.endian.PutUint32(uint32(len(n))))
@@ -546,12 +612,15 @@ func (n ByteArray) CWriteTo(config *Config, f io.Writer) (int64, error) {
 	return int64(c), err
 }
 
+// Copy simply returns a copy the the data
 func (n ByteArray) Copy() Data {
 	c := ByteArray(make([]int8, len(n)))
 	copy(c, n)
 	return &c
 }
 
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
 func (n *ByteArray) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*ByteArray); ok {
 		if len(*n) == len(*m) {
@@ -570,21 +639,26 @@ func (n ByteArray) String() string {
 	return fmt.Sprintf("[%d bytes] %v", len(n), []int8(n))
 }
 
+// Type returns the TagID of the data
 func (ByteArray) Type() TagID {
 	return TagByteArray
 }
 
+// String is an implementation of the Data interface
 type String string
 
+// NewString returns a new String Data type
 func NewString(d string) *String {
 	e := String(d)
 	return &e
 }
 
+// ReadFrom is an implementation of io.ReaderFrom
 func (n *String) ReadFrom(f io.Reader) (total int64, err error) {
 	return n.CReadFrom(defaultConfig, f)
 }
 
+// CReadFrom acts similarly to ReadFrom, but allows for custom configutation
 func (n *String) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var c int
 	data := make([]byte, 2)
@@ -597,19 +671,24 @@ func (n *String) CReadFrom(config *Config, f io.Reader) (total int64, err error)
 	return
 }
 
+// WriteTo is an implementation of io.WriterTo
 func (n String) WriteTo(f io.Writer) (int64, error) {
 	return n.CWriteTo(defaultConfig, f)
 }
 
+// CWriteTo acts similarly to WriteTo, but allows for custom configutation
 func (n String) CWriteTo(config *Config, f io.Writer) (int64, error) {
 	c, err := f.Write(append(config.endian.PutUint16(uint16(len(n))), n...))
 	return int64(c), err
 }
 
+// Copy simply returns a copy the the data
 func (n String) Copy() Data {
 	return &n
 }
 
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
 func (n *String) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*String); ok {
 		return *n == *m
@@ -621,15 +700,19 @@ func (n String) String() string {
 	return string(n)
 }
 
+// Type returns the TagID of the data
 func (String) Type() TagID {
 	return TagString
 }
 
+// List is an implementation of the Data interface
 type List struct {
 	tagType TagID
 	data    []Data
 }
 
+// NewList returns a new List Data type, or nil if the given data is not of all
+// the same Data type
 func NewList(data []Data) *List {
 	if len(data) == 0 {
 		return &List{TagByte, data}
@@ -646,6 +729,7 @@ func NewList(data []Data) *List {
 	}
 }
 
+// NewEmptyList returns a new empty List Data type, set to the type given
 func NewEmptyList(tagType TagID) *List {
 	return &List{
 		tagType,
@@ -653,10 +737,12 @@ func NewEmptyList(tagType TagID) *List {
 	}
 }
 
+// ReadFrom is an implementation of io.ReaderFrom
 func (n *List) ReadFrom(f io.Reader) (total int64, err error) {
 	return n.CReadFrom(defaultConfig, f)
 }
 
+// CReadFrom acts similarly to ReadFrom, but allows for custom configutation
 func (n *List) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var (
 		c int
@@ -691,10 +777,12 @@ func (n *List) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	return
 }
 
+// WriteTo is an implementation of io.WriterTo
 func (n *List) WriteTo(f io.Writer) (total int64, err error) {
 	return n.CWriteTo(defaultConfig, f)
 }
 
+// CWriteTo acts similarly to WriteTo, but allows for custom configutation
 func (n *List) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	var (
 		c int
@@ -726,10 +814,12 @@ func (n *List) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	return
 }
 
+// TagType returns the TagID of the type of tag this list contains
 func (n *List) TagType() TagID {
 	return n.tagType
 }
 
+// Copy simply returns a deep-copy the the data
 func (n *List) Copy() Data {
 	c := new(List)
 	c.tagType = n.tagType
@@ -740,6 +830,8 @@ func (n *List) Copy() Data {
 	return c
 }
 
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
 func (n *List) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*List); ok {
 		if n.tagType == m.tagType && len(n.data) == len(m.data) {
@@ -824,20 +916,25 @@ func (n *List) valid(data ...Data) error {
 	return nil
 }
 
+// Type returns the TagID of the data
 func (List) Type() TagID {
 	return TagList
 }
 
+// Compound is an implementation of the Data interface
 type Compound []*Tag
 
+// NewCompound returns a new Compound Data type
 func NewCompound(d Compound) *Compound {
 	return &d
 }
 
+// ReadFrom is an implementation of io.ReaderFrom
 func (n *Compound) ReadFrom(f io.Reader) (total int64, err error) {
 	return n.CReadFrom(defaultConfig, f)
 }
 
+// CReadFrom acts similarly to ReadFrom, but allows for custom configutation
 func (n *Compound) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var d int64
 	*n = make(Compound, 0)
@@ -856,10 +953,12 @@ func (n *Compound) CReadFrom(config *Config, f io.Reader) (total int64, err erro
 	return
 }
 
+// WriteTo is an implementation of io.WriterTo
 func (n Compound) WriteTo(f io.Writer) (total int64, err error) {
 	return n.CWriteTo(defaultConfig, f)
 }
 
+// CWriteTo acts similarly to WriteTo, but allows for custom configutation
 func (n Compound) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	var (
 		c int
@@ -880,6 +979,7 @@ func (n Compound) CWriteTo(config *Config, f io.Writer) (total int64, err error)
 	return
 }
 
+// Copy simply returns a deep-copy the the data
 func (n Compound) Copy() Data {
 	c := make(Compound, len(n))
 	for i, d := range n {
@@ -888,6 +988,8 @@ func (n Compound) Copy() Data {
 	return &c
 }
 
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
 func (n *Compound) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*Compound); ok {
 		if len(*n) == len(*m) {
@@ -910,6 +1012,7 @@ func (n Compound) String() string {
 	return s + "\n}"
 }
 
+// Get returns the tag for the given name
 func (n Compound) Get(name string) *Tag {
 	for _, t := range n {
 		if t.Name() == name {
@@ -919,6 +1022,7 @@ func (n Compound) Get(name string) *Tag {
 	return nil
 }
 
+// Remove removes the tag corresponding to the given name
 func (n *Compound) Remove(name string) {
 	for i, t := range *n {
 		if t.Name() == name {
@@ -930,6 +1034,8 @@ func (n *Compound) Remove(name string) {
 	}
 }
 
+// Set adds the given tag to the compound, or, if the tags name is already
+// present, overrides the old data
 func (n *Compound) Set(tag *Tag) {
 	if tag.TagID() == TagEnd {
 		return
@@ -944,21 +1050,26 @@ func (n *Compound) Set(tag *Tag) {
 	*n = append(*n, tag)
 }
 
+// Type returns the TagID of the data
 func (Compound) Type() TagID {
 	return TagCompound
 }
 
+// IntArray is an implementation of the Data interface
 type IntArray []int32
 
+// NewIntArray returns a new IntArray Data type
 func NewIntArray(d []int32) *IntArray {
 	e := IntArray(d)
 	return &e
 }
 
+// ReadFrom is an implementation of io.ReaderFrom
 func (n *IntArray) ReadFrom(f io.Reader) (total int64, err error) {
 	return n.CReadFrom(defaultConfig, f)
 }
 
+// CReadFrom acts similarly to ReadFrom, but allows for custom configutation
 func (n *IntArray) CReadFrom(config *Config, f io.Reader) (total int64, err error) {
 	var c int
 	data := make([]byte, 4)
@@ -979,10 +1090,12 @@ func (n *IntArray) CReadFrom(config *Config, f io.Reader) (total int64, err erro
 	return
 }
 
+// WriteTo is an implementation of io.WriterTo
 func (n IntArray) WriteTo(f io.Writer) (total int64, err error) {
 	return n.CWriteTo(defaultConfig, f)
 }
 
+// CWriteTo acts similarly to WriteTo, but allows for custom configutation
 func (n IntArray) CWriteTo(config *Config, f io.Writer) (total int64, err error) {
 	ints := make([]byte, 4, 4*len(n)+4)
 	copy(ints, config.endian.PutUint32(uint32(len(n))))
@@ -993,12 +1106,15 @@ func (n IntArray) CWriteTo(config *Config, f io.Writer) (total int64, err error)
 	return int64(c), err
 }
 
+// Copy simply returns a copy the the data
 func (n IntArray) Copy() Data {
 	c := IntArray(make([]int32, len(n)))
 	copy(c, n)
 	return &c
 }
 
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
 func (n *IntArray) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(*IntArray); ok {
 		if len(*n) == len(*m) {
@@ -1017,6 +1133,7 @@ func (n IntArray) String() string {
 	return fmt.Sprintf("[%d ints] %v", len(n), []int32(n))
 }
 
+// Type returns the TagID of the data
 func (IntArray) Type() TagID {
 	return TagIntArray
 }
