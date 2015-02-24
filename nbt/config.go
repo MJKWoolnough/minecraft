@@ -54,7 +54,7 @@ type Config struct {
 func NewConfig(endian bytewrite.Endian) *Config {
 	return &Config{
 		endian: endian,
-		types:  make(map[TagID]func() Data),
+		types:  make(map[TagID]func() Data, 11),
 	}
 }
 
