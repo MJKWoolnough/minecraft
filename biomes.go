@@ -28,84 +28,68 @@ import "github.com/MJKWoolnough/equaler"
 
 // Biome constants
 const (
-	Ocean Biome = iota
-	Plains
-	Desert
-	ExtremeHills
-	Forest
-	Taiga
-	Swampland
-	River
-	Hell
-	Sky
-	FrozenOcean
-	FrozenRiver
-	IcePlains
-	IceMountains
-	MushroomIsland
-	MushroomIslandShore
-	Beach
-	DesertHills
-	ForestHills
-	TaigaHills
-	ExtremeHillsEdge
-	Jungle
-	JungleHills
-	JungleEdge
-	DeepOcean
-	StoneBeach
-	ColdBeach
-	BirchForest
-	BirchForestHills
-	RoofedForest
-	ColdTaiga
-	ColdTaigaHills
-	MegaTaiga
-	MegaTaigaHills
-	ExtremeHillsPlus
-	Savanna
-	SavannaPlateau
-	Mesa
-	MesaPlateauF
-	MesaPlateau
-)
-
-// Biome constants
-const (
-	SunflowerPlains Biome = iota + 129
-	DeserM
-	ExtremeHillsM
-	FlowerForest
-	TaigaM
-	SwamplandM
-)
-
-// Biome constants
-const (
-	IcePlainsSpikes Biome = 140
-	JungleM         Biome = 149
-	JungleEdgeM     Biome = 151
-	AutoBiome       Biome = 255
-)
-
-// Biome constants
-const (
-	BirchForestM Biome = iota + 155
-	BirchForestHillsM
-	RoofedForestM
-	ColdTaigaM
-)
-
-// Biome constants
-const (
-	MegaSpruceTaiga Biome = iota + 160
-	MegaSpruceTaigaHills
-	ExtremeHillsPlusM
-	SavannaM
-	SavannaPlateauM
-	MesaBryce
-	MesaPlateauFM
-	MesaPlateauM
+	Ocean                Biome = 0
+	Plains               Biome = 1
+	Desert               Biome = 2
+	ExtremeHills         Biome = 3
+	Forest               Biome = 4
+	Taiga                Biome = 5
+	Swampland            Biome = 6
+	River                Biome = 7
+	Hell                 Biome = 8
+	Sky                  Biome = 9
+	FrozenOcean          Biome = 10
+	FrozenRiver          Biome = 11
+	IcePlains            Biome = 12
+	IceMountains         Biome = 13
+	MushroomIsland       Biome = 14
+	MushroomIslandShore  Biome = 15
+	Beach                Biome = 16
+	DesertHills          Biome = 17
+	ForestHills          Biome = 18
+	TaigaHills           Biome = 19
+	ExtremeHillsEdge     Biome = 20
+	Jungle               Biome = 21
+	JungleHills          Biome = 22
+	JungleEdge           Biome = 23
+	DeepOcean            Biome = 23
+	StoneBeach           Biome = 24
+	ColdBeach            Biome = 25
+	BirchForest          Biome = 26
+	BirchForestHills     Biome = 27
+	RoofedForest         Biome = 28
+	ColdTaiga            Biome = 29
+	ColdTaigaHills       Biome = 30
+	MegaTaiga            Biome = 31
+	MegaTaigaHills       Biome = 32
+	ExtremeHillsPlus     Biome = 33
+	Savanna              Biome = 34
+	SavannaPlateau       Biome = 35
+	Mesa                 Biome = 36
+	MesaPlateauF         Biome = 37
+	MesaPlateau          Biome = 38
+	SunflowerPlains      Biome = 129
+	DeserM               Biome = 130
+	ExtremeHillsM        Biome = 131
+	FlowerForest         Biome = 132
+	TaigaM               Biome = 133
+	SwamplandM           Biome = 134
+	IcePlainsSpikes      Biome = 140
+	JungleM              Biome = 149
+	JungleEdgeM          Biome = 151
+	BirchForestM         Biome = 155
+	BirchForestHillsM    Biome = 156
+	RoofedForestM        Biome = 157
+	ColdTaigaM           Biome = 158
+	MegaSpruceTaiga      Biome = 160
+	MegaSpruceTaigaHills Biome = 161
+	ExtremeHillsPlusM    Biome = 162
+	SavannaM             Biome = 163
+	SavannaPlateauM      Biome = 164
+	MesaBryce            Biome = 165
+	MesaPlateauFM        Biome = 166
+	MesaPlateauM         Biome = 167
+	AutoBiome            Biome = 255
 )
 
 // Biome is a convenience type for biomes
