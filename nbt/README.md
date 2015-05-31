@@ -13,6 +13,8 @@ http://web.archive.org/web/20110723210920/http://www.minecraft.net/docs/NBT.txt
 type BadRange struct{}
 ```
 
+BadRange is an error that occurs when trying to set an item on a list which is
+outside of the current limits of the list.
 
 #### func (BadRange) Error
 
@@ -26,60 +28,35 @@ func (BadRange) Error() string
 type Byte int8
 ```
 
-
-#### func  NewByte
-
-```go
-func NewByte(d int8) *Byte
-```
-
-#### func (*Byte) CReadFrom
-
-```go
-func (n *Byte) CReadFrom(c *Config, f io.Reader) (total int64, err error)
-```
-
-#### func (Byte) CWriteTo
-
-```go
-func (n Byte) CWriteTo(c *Config, f io.Writer) (total int64, err error)
-```
+Byte is an implementation of the Data interface
 
 #### func (Byte) Copy
 
 ```go
-func (n Byte) Copy() Data
+func (b Byte) Copy() Data
 ```
+Copy simply returns a copy the the data
 
-#### func (*Byte) Equal
+#### func (Byte) Equal
 
 ```go
-func (n *Byte) Equal(e equaler.Equaler) bool
+func (b Byte) Equal(e equaler.Equaler) bool
 ```
-
-#### func (*Byte) ReadFrom
-
-```go
-func (n *Byte) ReadFrom(f io.Reader) (total int64, err error)
-```
+Equal satisfies the equaler.Equaler interface, allowing for types to be checked
+for equality
 
 #### func (Byte) String
 
 ```go
-func (n Byte) String() string
+func (b Byte) String() string
 ```
 
 #### func (Byte) Type
 
 ```go
-func (Byte) Type() TagId
+func (Byte) Type() TagID
 ```
-
-#### func (Byte) WriteTo
-
-```go
-func (n Byte) WriteTo(f io.Writer) (total int64, err error)
-```
+Type returns the TagID of the data
 
 #### type ByteArray
 
@@ -87,170 +64,213 @@ func (n Byte) WriteTo(f io.Writer) (total int64, err error)
 type ByteArray []int8
 ```
 
-
-#### func  NewByteArray
-
-```go
-func NewByteArray(d []int8) *ByteArray
-```
-
-#### func (*ByteArray) CReadFrom
-
-```go
-func (n *ByteArray) CReadFrom(config *Config, f io.Reader) (total int64, err error)
-```
-
-#### func (ByteArray) CWriteTo
-
-```go
-func (n ByteArray) CWriteTo(config *Config, f io.Writer) (int64, error)
-```
+ByteArray is an implementation of the Data interface
 
 #### func (ByteArray) Copy
 
 ```go
-func (n ByteArray) Copy() Data
+func (b ByteArray) Copy() Data
 ```
+Copy simply returns a copy the the data
 
-#### func (*ByteArray) Equal
+#### func (ByteArray) Equal
 
 ```go
-func (n *ByteArray) Equal(e equaler.Equaler) bool
+func (b ByteArray) Equal(e equaler.Equaler) bool
 ```
-
-#### func (*ByteArray) ReadFrom
-
-```go
-func (n *ByteArray) ReadFrom(f io.Reader) (total int64, err error)
-```
+Equal satisfies the equaler.Equaler interface, allowing for types to be checked
+for equality
 
 #### func (ByteArray) String
 
 ```go
-func (n ByteArray) String() string
+func (b ByteArray) String() string
 ```
 
 #### func (ByteArray) Type
 
 ```go
-func (ByteArray) Type() TagId
+func (ByteArray) Type() TagID
 ```
-
-#### func (ByteArray) WriteTo
-
-```go
-func (n ByteArray) WriteTo(f io.Writer) (int64, error)
-```
+Type returns the TagID of the data
 
 #### type Compound
 
 ```go
-type Compound []*Tag
+type Compound []Tag
 ```
 
-
-#### func  NewCompound
-
-```go
-func NewCompound(d Compound) *Compound
-```
-
-#### func (*Compound) CReadFrom
-
-```go
-func (n *Compound) CReadFrom(config *Config, f io.Reader) (total int64, err error)
-```
-
-#### func (Compound) CWriteTo
-
-```go
-func (n Compound) CWriteTo(config *Config, f io.Writer) (total int64, err error)
-```
+Compound is an implementation of the Data interface
 
 #### func (Compound) Copy
 
 ```go
-func (n Compound) Copy() Data
+func (c Compound) Copy() Data
 ```
+Copy simply returns a deep-copy the the data
 
-#### func (*Compound) Equal
+#### func (Compound) Equal
 
 ```go
-func (n *Compound) Equal(e equaler.Equaler) bool
+func (c Compound) Equal(e equaler.Equaler) bool
 ```
+Equal satisfies the equaler.Equaler interface, allowing for types to be checked
+for equality
 
 #### func (Compound) Get
 
 ```go
-func (n Compound) Get(name string) *Tag
+func (c Compound) Get(name string) Tag
 ```
-
-#### func (*Compound) ReadFrom
-
-```go
-func (n *Compound) ReadFrom(f io.Reader) (total int64, err error)
-```
+Get returns the tag for the given name
 
 #### func (*Compound) Remove
 
 ```go
-func (n *Compound) Remove(name string)
+func (c *Compound) Remove(name string)
 ```
+Remove removes the tag corresponding to the given name
 
 #### func (*Compound) Set
 
 ```go
-func (n *Compound) Set(tag *Tag)
+func (c *Compound) Set(tag Tag)
 ```
+Set adds the given tag to the compound, or, if the tags name is already present,
+overrides the old data
 
 #### func (Compound) String
 
 ```go
-func (n Compound) String() string
+func (c Compound) String() string
 ```
 
 #### func (Compound) Type
 
 ```go
-func (Compound) Type() TagId
+func (Compound) Type() TagID
 ```
-
-#### func (Compound) WriteTo
-
-```go
-func (n Compound) WriteTo(f io.Writer) (total int64, err error)
-```
-
-#### type Config
-
-```go
-type Config struct {
-	bytewrite.Endian
-}
-```
-
-
-#### func (Config) RegisterType
-
-```go
-func (c Config) RegisterType(id TagId, nd func() Data)
-```
+Type returns the TagID of the data
 
 #### type Data
 
 ```go
 type Data interface {
-	io.ReaderFrom
-	io.WriterTo
 	equaler.Equaler
-	CReadFrom(*Config, io.Reader) (int64, error)
-	CWriteTo(*Config, io.Writer) (int64, error)
 	Copy() Data
 	String() string
-	Type() TagId
+	Type() TagID
 }
 ```
 
+Data is an interface representing the many different types that a tag can be
+
+#### type Decoder
+
+```go
+type Decoder struct {
+}
+```
+
+Decoder is a type used to decode NBT streams
+
+#### func  NewDecoder
+
+```go
+func NewDecoder(r io.Reader) Decoder
+```
+NewDecoder returns a Decoder using Big Endian
+
+#### func  NewDecoderEndian
+
+```go
+func NewDecoderEndian(e byteio.EndianReader) Decoder
+```
+NewDecoderEndian allows you to specify your own Endian Reader
+
+#### func (Decoder) DecodeByte
+
+```go
+func (d Decoder) DecodeByte() (Byte, error)
+```
+DecodeByte will read a single Byte Data
+
+#### func (Decoder) DecodeByteArray
+
+```go
+func (d Decoder) DecodeByteArray() (ByteArray, error)
+```
+DecodeByteArray will read a ByteArray Data
+
+#### func (Decoder) DecodeCompound
+
+```go
+func (d Decoder) DecodeCompound() (Compound, error)
+```
+DecodeCompound will read a Compound Data
+
+#### func (Decoder) DecodeDouble
+
+```go
+func (d Decoder) DecodeDouble() (Double, error)
+```
+DecodeDouble will read a single Double Data
+
+#### func (Decoder) DecodeFloat
+
+```go
+func (d Decoder) DecodeFloat() (Float, error)
+```
+DecodeFloat will read a single Float Data
+
+#### func (Decoder) DecodeInt
+
+```go
+func (d Decoder) DecodeInt() (Int, error)
+```
+DecodeInt will read a single Int Data
+
+#### func (Decoder) DecodeIntArray
+
+```go
+func (d Decoder) DecodeIntArray() (IntArray, error)
+```
+DecodeIntArray will read an IntArray Data
+
+#### func (Decoder) DecodeList
+
+```go
+func (d Decoder) DecodeList() (*List, error)
+```
+DecodeList will read a List Data
+
+#### func (Decoder) DecodeLong
+
+```go
+func (d Decoder) DecodeLong() (Long, error)
+```
+DecodeLong will read a single Long Data
+
+#### func (Decoder) DecodeShort
+
+```go
+func (d Decoder) DecodeShort() (Short, error)
+```
+DecodeShort will read a single Short Data
+
+#### func (Decoder) DecodeString
+
+```go
+func (d Decoder) DecodeString() (String, error)
+```
+DecodeString will read a String Data
+
+#### func (Decoder) DecodeTag
+
+```go
+func (d Decoder) DecodeTag() (Tag, error)
+```
+DecodeTag will read a whole tag out of the decoding stream
 
 #### type Double
 
@@ -258,60 +278,142 @@ type Data interface {
 type Double float64
 ```
 
-
-#### func  NewDouble
-
-```go
-func NewDouble(d float64) *Double
-```
-
-#### func (*Double) CReadFrom
-
-```go
-func (n *Double) CReadFrom(config *Config, f io.Reader) (total int64, err error)
-```
-
-#### func (Double) CWriteTo
-
-```go
-func (n Double) CWriteTo(config *Config, f io.Writer) (total int64, err error)
-```
+Double is an implementation of the Data interface
 
 #### func (Double) Copy
 
 ```go
-func (n Double) Copy() Data
+func (d Double) Copy() Data
 ```
+Copy simply returns a copy the the data
 
-#### func (*Double) Equal
+#### func (Double) Equal
 
 ```go
-func (n *Double) Equal(e equaler.Equaler) bool
+func (d Double) Equal(e equaler.Equaler) bool
 ```
-
-#### func (*Double) ReadFrom
-
-```go
-func (n *Double) ReadFrom(f io.Reader) (total int64, err error)
-```
+Equal satisfies the equaler.Equaler interface, allowing for types to be checked
+for equality
 
 #### func (Double) String
 
 ```go
-func (n Double) String() string
+func (d Double) String() string
 ```
 
 #### func (Double) Type
 
 ```go
-func (Double) Type() TagId
+func (Double) Type() TagID
 ```
+Type returns the TagID of the data
 
-#### func (Double) WriteTo
+#### type Encoder
 
 ```go
-func (n Double) WriteTo(f io.Writer) (total int64, err error)
+type Encoder struct {
+}
 ```
+
+Encoder is a type used to encode NBT streams
+
+#### func  NewEncoder
+
+```go
+func NewEncoder(w io.Writer) Encoder
+```
+NewEncoder returns an Encoder using Big Endian
+
+#### func  NewEncoderEndian
+
+```go
+func NewEncoderEndian(e byteio.EndianWriter) Encoder
+```
+NewEncoderEndian allows you to specify your own Endian Writer
+
+#### func (Encoder) EncodeByte
+
+```go
+func (e Encoder) EncodeByte(b Byte) error
+```
+EncodeByte will write a single Byte Data
+
+#### func (Encoder) EncodeByteArray
+
+```go
+func (e Encoder) EncodeByteArray(ba ByteArray) error
+```
+EncodeByteArray will write a ByteArray Data
+
+#### func (Encoder) EncodeCompound
+
+```go
+func (e Encoder) EncodeCompound(c Compound) error
+```
+EncodeCompound will write a Compound Data
+
+#### func (Encoder) EncodeDouble
+
+```go
+func (e Encoder) EncodeDouble(do Double) error
+```
+EncodeDouble will write a single Double Data
+
+#### func (Encoder) EncodeFloat
+
+```go
+func (e Encoder) EncodeFloat(f Float) error
+```
+EncodeFloat will write a single Float Data
+
+#### func (Encoder) EncodeInt
+
+```go
+func (e Encoder) EncodeInt(i Int) error
+```
+EncodeInt will write a single Int Data
+
+#### func (Encoder) EncodeIntArray
+
+```go
+func (e Encoder) EncodeIntArray(ints IntArray) error
+```
+EncodeIntArray will write a IntArray Data
+
+#### func (Encoder) EncodeList
+
+```go
+func (e Encoder) EncodeList(l *List) error
+```
+EncodeList will write a List Data
+
+#### func (Encoder) EncodeLong
+
+```go
+func (e Encoder) EncodeLong(l Long) error
+```
+EncodeLong will write a single Long Data
+
+#### func (Encoder) EncodeShort
+
+```go
+func (e Encoder) EncodeShort(s Short) error
+```
+EncodeShort will write a single Short Data
+
+#### func (Encoder) EncodeString
+
+```go
+func (e Encoder) EncodeString(s String) error
+```
+EncodeString will write a String Data
+
+#### func (Encoder) EncodeTag
+
+```go
+func (e Encoder) EncodeTag(t Tag) error
+```
+EncodeTag will encode a whole tag to the encoding stream
 
 #### type Float
 
@@ -319,60 +421,35 @@ func (n Double) WriteTo(f io.Writer) (total int64, err error)
 type Float float32
 ```
 
-
-#### func  NewFloat
-
-```go
-func NewFloat(d float32) *Float
-```
-
-#### func (*Float) CReadFrom
-
-```go
-func (n *Float) CReadFrom(config *Config, f io.Reader) (total int64, err error)
-```
-
-#### func (Float) CWriteTo
-
-```go
-func (n Float) CWriteTo(config *Config, f io.Writer) (total int64, err error)
-```
+Float is an implementation of the Data interface
 
 #### func (Float) Copy
 
 ```go
-func (n Float) Copy() Data
+func (f Float) Copy() Data
 ```
+Copy simply returns a copy the the data
 
-#### func (*Float) Equal
+#### func (Float) Equal
 
 ```go
-func (n *Float) Equal(e equaler.Equaler) bool
+func (f Float) Equal(e equaler.Equaler) bool
 ```
-
-#### func (*Float) ReadFrom
-
-```go
-func (n *Float) ReadFrom(f io.Reader) (total int64, err error)
-```
+Equal satisfies the equaler.Equaler interface, allowing for types to be checked
+for equality
 
 #### func (Float) String
 
 ```go
-func (n Float) String() string
+func (f Float) String() string
 ```
 
 #### func (Float) Type
 
 ```go
-func (Float) Type() TagId
+func (Float) Type() TagID
 ```
-
-#### func (Float) WriteTo
-
-```go
-func (n Float) WriteTo(f io.Writer) (total int64, err error)
-```
+Type returns the TagID of the data
 
 #### type Int
 
@@ -380,60 +457,35 @@ func (n Float) WriteTo(f io.Writer) (total int64, err error)
 type Int int32
 ```
 
-
-#### func  NewInt
-
-```go
-func NewInt(d int32) *Int
-```
-
-#### func (*Int) CReadFrom
-
-```go
-func (n *Int) CReadFrom(config *Config, f io.Reader) (total int64, err error)
-```
-
-#### func (Int) CWriteTo
-
-```go
-func (n Int) CWriteTo(config *Config, f io.Writer) (total int64, err error)
-```
+Int is an implementation of the Data interface
 
 #### func (Int) Copy
 
 ```go
-func (n Int) Copy() Data
+func (i Int) Copy() Data
 ```
+Copy simply returns a copy the the data
 
-#### func (*Int) Equal
+#### func (Int) Equal
 
 ```go
-func (n *Int) Equal(e equaler.Equaler) bool
+func (i Int) Equal(e equaler.Equaler) bool
 ```
-
-#### func (*Int) ReadFrom
-
-```go
-func (n *Int) ReadFrom(f io.Reader) (total int64, err error)
-```
+Equal satisfies the equaler.Equaler interface, allowing for types to be checked
+for equality
 
 #### func (Int) String
 
 ```go
-func (n Int) String() string
+func (i Int) String() string
 ```
 
 #### func (Int) Type
 
 ```go
-func (Int) Type() TagId
+func (Int) Type() TagID
 ```
-
-#### func (Int) WriteTo
-
-```go
-func (n Int) WriteTo(f io.Writer) (total int64, err error)
-```
+Type returns the TagID of the data
 
 #### type IntArray
 
@@ -441,60 +493,35 @@ func (n Int) WriteTo(f io.Writer) (total int64, err error)
 type IntArray []int32
 ```
 
-
-#### func  NewIntArray
-
-```go
-func NewIntArray(d []int32) *IntArray
-```
-
-#### func (*IntArray) CReadFrom
-
-```go
-func (n *IntArray) CReadFrom(config *Config, f io.Reader) (total int64, err error)
-```
-
-#### func (IntArray) CWriteTo
-
-```go
-func (n IntArray) CWriteTo(config *Config, f io.Writer) (total int64, err error)
-```
+IntArray is an implementation of the Data interface
 
 #### func (IntArray) Copy
 
 ```go
-func (n IntArray) Copy() Data
+func (i IntArray) Copy() Data
 ```
+Copy simply returns a copy the the data
 
-#### func (*IntArray) Equal
+#### func (IntArray) Equal
 
 ```go
-func (n *IntArray) Equal(e equaler.Equaler) bool
+func (i IntArray) Equal(e equaler.Equaler) bool
 ```
-
-#### func (*IntArray) ReadFrom
-
-```go
-func (n *IntArray) ReadFrom(f io.Reader) (total int64, err error)
-```
+Equal satisfies the equaler.Equaler interface, allowing for types to be checked
+for equality
 
 #### func (IntArray) String
 
 ```go
-func (n IntArray) String() string
+func (i IntArray) String() string
 ```
 
 #### func (IntArray) Type
 
 ```go
-func (IntArray) Type() TagId
+func (IntArray) Type() TagID
 ```
-
-#### func (IntArray) WriteTo
-
-```go
-func (n IntArray) WriteTo(f io.Writer) (total int64, err error)
-```
+Type returns the TagID of the data
 
 #### type List
 
@@ -503,108 +530,100 @@ type List struct {
 }
 ```
 
+List is an implementation of the Data interface
 
 #### func  NewEmptyList
 
 ```go
-func NewEmptyList(tagType TagId) *List
+func NewEmptyList(tagType TagID) *List
 ```
+NewEmptyList returns a new empty List Data type, set to the type given
 
 #### func  NewList
 
 ```go
 func NewList(data []Data) *List
 ```
+NewList returns a new List Data type, or nil if the given data is not of all the
+same Data type
 
 #### func (*List) Append
 
 ```go
-func (n *List) Append(data ...Data) error
+func (l *List) Append(data ...Data) error
 ```
-
-#### func (*List) CReadFrom
-
-```go
-func (n *List) CReadFrom(config *Config, f io.Reader) (total int64, err error)
-```
-
-#### func (*List) CWriteTo
-
-```go
-func (n *List) CWriteTo(config *Config, f io.Writer) (total int64, err error)
-```
+Append adds data to the list
 
 #### func (*List) Copy
 
 ```go
-func (n *List) Copy() Data
+func (l *List) Copy() Data
 ```
+Copy simply returns a deep-copy the the data
 
 #### func (*List) Equal
 
 ```go
-func (n *List) Equal(e equaler.Equaler) bool
+func (l *List) Equal(e equaler.Equaler) bool
 ```
+Equal satisfies the equaler.Equaler interface, allowing for types to be checked
+for equality
 
 #### func (*List) Get
 
 ```go
-func (n *List) Get(i int) Data
+func (l *List) Get(i int) Data
 ```
+Get returns the data at the given positon
 
 #### func (*List) Insert
 
 ```go
-func (n *List) Insert(i int, data ...Data) error
+func (l *List) Insert(i int, data ...Data) error
 ```
+Insert will add the given data at the specified position, moving other elements
+up.
 
 #### func (*List) Len
 
 ```go
-func (n *List) Len() int
+func (l *List) Len() int
 ```
-
-#### func (*List) ReadFrom
-
-```go
-func (n *List) ReadFrom(f io.Reader) (total int64, err error)
-```
+Len returns the length of the list
 
 #### func (*List) Remove
 
 ```go
-func (n *List) Remove(i int)
+func (l *List) Remove(i int)
 ```
+Remove deletes the specified position and shifts remaing data down
 
 #### func (*List) Set
 
 ```go
-func (n *List) Set(i int32, data Data) error
+func (l *List) Set(i int32, data Data) error
 ```
+Set sets the data at the given position. It does not append
 
 #### func (*List) String
 
 ```go
-func (n *List) String() string
+func (l *List) String() string
 ```
 
 #### func (*List) TagType
 
 ```go
-func (n *List) TagType() TagId
+func (l *List) TagType() TagID
 ```
+TagType returns the TagID of the type of tag this list contains
 
 #### func (List) Type
 
 ```go
-func (List) Type() TagId
+func (List) Type() TagID
 ```
-
-#### func (*List) WriteTo
-
-```go
-func (n *List) WriteTo(f io.Writer) (total int64, err error)
-```
+Type returns the TagID of the data
 
 #### type Long
 
@@ -612,60 +631,35 @@ func (n *List) WriteTo(f io.Writer) (total int64, err error)
 type Long int64
 ```
 
-
-#### func  NewLong
-
-```go
-func NewLong(d int64) *Long
-```
-
-#### func (*Long) CReadFrom
-
-```go
-func (n *Long) CReadFrom(config *Config, f io.Reader) (total int64, err error)
-```
-
-#### func (Long) CWriteTo
-
-```go
-func (n Long) CWriteTo(config *Config, f io.Writer) (total int64, err error)
-```
+Long is an implementation of the Data interface
 
 #### func (Long) Copy
 
 ```go
-func (n Long) Copy() Data
+func (l Long) Copy() Data
 ```
+Copy simply returns a copy the the data
 
-#### func (*Long) Equal
+#### func (Long) Equal
 
 ```go
-func (n *Long) Equal(e equaler.Equaler) bool
+func (l Long) Equal(e equaler.Equaler) bool
 ```
-
-#### func (*Long) ReadFrom
-
-```go
-func (n *Long) ReadFrom(f io.Reader) (total int64, err error)
-```
+Equal satisfies the equaler.Equaler interface, allowing for types to be checked
+for equality
 
 #### func (Long) String
 
 ```go
-func (n Long) String() string
+func (l Long) String() string
 ```
 
 #### func (Long) Type
 
 ```go
-func (Long) Type() TagId
+func (Long) Type() TagID
 ```
-
-#### func (Long) WriteTo
-
-```go
-func (n Long) WriteTo(f io.Writer) (total int64, err error)
-```
+Type returns the TagID of the data
 
 #### type ReadError
 
@@ -676,6 +670,7 @@ type ReadError struct {
 }
 ```
 
+ReadError is an error returned when a read error occurs
 
 #### func (ReadError) Error
 
@@ -689,60 +684,35 @@ func (r ReadError) Error() string
 type Short int16
 ```
 
-
-#### func  NewShort
-
-```go
-func NewShort(d int16) *Short
-```
-
-#### func (*Short) CReadFrom
-
-```go
-func (n *Short) CReadFrom(config *Config, f io.Reader) (total int64, err error)
-```
-
-#### func (Short) CWriteTo
-
-```go
-func (n Short) CWriteTo(config *Config, f io.Writer) (total int64, err error)
-```
+Short is an implementation of the Data interface
 
 #### func (Short) Copy
 
 ```go
-func (n Short) Copy() Data
+func (s Short) Copy() Data
 ```
+Copy simply returns a copy the the data
 
-#### func (*Short) Equal
+#### func (Short) Equal
 
 ```go
-func (n *Short) Equal(e equaler.Equaler) bool
+func (s Short) Equal(e equaler.Equaler) bool
 ```
-
-#### func (*Short) ReadFrom
-
-```go
-func (n *Short) ReadFrom(f io.Reader) (total int64, err error)
-```
+Equal satisfies the equaler.Equaler interface, allowing for types to be checked
+for equality
 
 #### func (Short) String
 
 ```go
-func (n Short) String() string
+func (s Short) String() string
 ```
 
 #### func (Short) Type
 
 ```go
-func (Short) Type() TagId
+func (Short) Type() TagID
 ```
-
-#### func (Short) WriteTo
-
-```go
-func (n Short) WriteTo(f io.Writer) (total int64, err error)
-```
+Type returns the TagID of the data
 
 #### type String
 
@@ -750,60 +720,35 @@ func (n Short) WriteTo(f io.Writer) (total int64, err error)
 type String string
 ```
 
-
-#### func  NewString
-
-```go
-func NewString(d string) *String
-```
-
-#### func (*String) CReadFrom
-
-```go
-func (n *String) CReadFrom(config *Config, f io.Reader) (total int64, err error)
-```
-
-#### func (String) CWriteTo
-
-```go
-func (n String) CWriteTo(config *Config, f io.Writer) (int64, error)
-```
+String is an implementation of the Data interface
 
 #### func (String) Copy
 
 ```go
-func (n String) Copy() Data
+func (s String) Copy() Data
 ```
+Copy simply returns a copy the the data
 
-#### func (*String) Equal
+#### func (String) Equal
 
 ```go
-func (n *String) Equal(e equaler.Equaler) bool
+func (s String) Equal(e equaler.Equaler) bool
 ```
-
-#### func (*String) ReadFrom
-
-```go
-func (n *String) ReadFrom(f io.Reader) (total int64, err error)
-```
+Equal satisfies the equaler.Equaler interface, allowing for types to be checked
+for equality
 
 #### func (String) String
 
 ```go
-func (n String) String() string
+func (s String) String() string
 ```
 
 #### func (String) Type
 
 ```go
-func (String) Type() TagId
+func (String) Type() TagID
 ```
-
-#### func (String) WriteTo
-
-```go
-func (n String) WriteTo(f io.Writer) (int64, error)
-```
+Type returns the TagID of the data
 
 #### type Tag
 
@@ -812,118 +757,100 @@ type Tag struct {
 }
 ```
 
+Tag is the main NBT type, a combination of a name and a Data type
 
 #### func  NewTag
 
 ```go
-func NewTag(name string, d Data) (n *Tag)
+func NewTag(name string, d Data) Tag
 ```
+NewTag constructs a new tag with the given name and data.
 
-#### func  ReadNBTFrom
+#### func (Tag) Copy
 
 ```go
-func ReadNBTFrom(f io.Reader) (*Tag, int64, error)
+func (t Tag) Copy() Tag
 ```
+Copy simply returns a deep-copy the the tag
 
-#### func (*Tag) CReadFrom
+#### func (Tag) Data
 
 ```go
-func (n *Tag) CReadFrom(config *Config, f io.Reader) (total int64, err error)
+func (t Tag) Data() Data
 ```
+Data returns the tags data type
 
-#### func (*Tag) CWriteTo
+#### func (Tag) Equal
 
 ```go
-func (n *Tag) CWriteTo(config *Config, f io.Writer) (total int64, err error)
+func (t Tag) Equal(e equaler.Equaler) bool
 ```
+Equal satisfies the equaler.Equaler interface, allowing for types to be checked
+for equality
 
-#### func (*Tag) Copy
+#### func (Tag) Name
 
 ```go
-func (n *Tag) Copy() *Tag
+func (t Tag) Name() string
 ```
+Name returns the tags' name
 
-#### func (*Tag) Data
+#### func (Tag) String
 
 ```go
-func (n *Tag) Data() Data
+func (t Tag) String() string
 ```
+String returns a textual representation of the tag
 
-#### func (*Tag) Equal
+#### func (Tag) TagID
 
 ```go
-func (n *Tag) Equal(e equaler.Equaler) bool
+func (t Tag) TagID() TagID
 ```
+TagID returns the type of the data
 
-#### func (*Tag) Name
+#### type TagID
 
 ```go
-func (n *Tag) Name() string
+type TagID uint8
 ```
 
-#### func (*Tag) ReadFrom
-
-```go
-func (n *Tag) ReadFrom(f io.Reader) (total int64, err error)
-```
-
-#### func (*Tag) String
-
-```go
-func (n *Tag) String() string
-```
-
-#### func (*Tag) TagId
-
-```go
-func (n *Tag) TagId() TagId
-```
-
-#### func (*Tag) WriteTo
-
-```go
-func (n *Tag) WriteTo(f io.Writer) (total int64, err error)
-```
-
-#### type TagId
-
-```go
-type TagId uint8
-```
-
+TagID represents the type of nbt tag
 
 ```go
 const (
-	Tag_End TagId = iota
-	Tag_Byte
-	Tag_Short
-	Tag_Int
-	Tag_Long
-	Tag_Float
-	Tag_Double
-	Tag_ByteArray
-	Tag_String
-	Tag_List
-	Tag_Compound
-	Tag_IntArray
+	TagEnd       TagID = 0
+	TagByte      TagID = 1
+	TagShort     TagID = 2
+	TagInt       TagID = 3
+	TagLong      TagID = 4
+	TagFloat     TagID = 5
+	TagDouble    TagID = 6
+	TagByteArray TagID = 7
+	TagString    TagID = 8
+	TagList      TagID = 9
+	TagCompound  TagID = 10
+	TagIntArray  TagID = 11
 )
 ```
 Tag Types
 
-#### func (TagId) String
+#### func (TagID) String
 
 ```go
-func (t TagId) String() string
+func (t TagID) String() string
 ```
 
 #### type UnknownTag
 
 ```go
 type UnknownTag struct {
-	TagId
+	TagID
 }
 ```
 
+UnknownTag is an error that occurs when an unknown tag id is discovered. This
+could also indicate corrupted or non-compliant data.
 
 #### func (UnknownTag) Error
 
@@ -940,6 +867,7 @@ type WriteError struct {
 }
 ```
 
+WriteError is an error returned when a write error occurs
 
 #### func (WriteError) Error
 
@@ -951,10 +879,12 @@ func (w WriteError) Error() string
 
 ```go
 type WrongTag struct {
-	Expecting, Got TagId
+	Expecting, Got TagID
 }
 ```
 
+WrongTag is an error returned when a tag of the incorrect type was intended to
+be added to a list.
 
 #### func (WrongTag) Error
 
