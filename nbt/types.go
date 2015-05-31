@@ -425,7 +425,7 @@ func (l *List) String() string {
 // Set sets the data at the given position. It does not append
 func (l *List) Set(i int32, data Data) error {
 	if i < 0 || i >= int32(len(l.data)) {
-		return &BadRange{}
+		return BadRange
 	}
 	if err := l.valid(data); err != nil {
 		return err

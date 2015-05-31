@@ -1,6 +1,9 @@
 package nbt
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 // ReadError is an error returned when a read error occurs
 type ReadError struct {
@@ -44,8 +47,4 @@ func (w WrongTag) Error() string {
 
 // BadRange is an error that occurs when trying to set an item on a list which
 // is outside of the current limits of the list.
-type BadRange struct{}
-
-func (BadRange) Error() string {
-	return "given index was out-of-range"
-}
+var BadRange = errors.New("given index was out-of-range")

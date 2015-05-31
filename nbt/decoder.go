@@ -76,8 +76,8 @@ func (d Decoder) decodeData(tagID TagID) (Data, error) {
 		err = UnknownTag{tagID}
 	}
 	if err != nil {
-		if _, ok := err.(*ReadError); !ok {
-			err = &ReadError{tagID.String(), err}
+		if _, ok := err.(ReadError); !ok {
+			err = ReadError{tagID.String(), err}
 		}
 		return nil, err
 	}

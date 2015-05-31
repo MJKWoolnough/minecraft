@@ -146,7 +146,7 @@ func (e Encoder) EncodeList(l *List) error {
 	if l.TagType() != TagEnd {
 		for _, data := range l.data {
 			if tagID := data.Type(); tagID != l.tagType {
-				return &WrongTag{l.tagType, tagID}
+				return WrongTag{l.tagType, tagID}
 			}
 			err = e.encodeData(data)
 			if err != nil {
