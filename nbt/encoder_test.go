@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestSize(t *testing.T) {
+/*func TestSize(t *testing.T) {
 	for i := TagID(1); i < 12; i++ {
 		o := new(bytes.Buffer)
 		tag, _ := defaultConfig.newFromTag(i)
@@ -17,13 +17,13 @@ func TestSize(t *testing.T) {
 			t.Errorf("written and read sizes for %s do not match, written %d, read %d", i, n, m)
 		}
 	}
-}
+}*/
 
 func TestSmall(t *testing.T) { //test.nbt
 	testNBT(`CgALaGVsbG8gd29ybGQIAARuYW1lAAlCYW5hbnJhbWEA`,
-		NewTag("hello world", NewCompound([]*Tag{
-			NewTag("name", NewString("Bananrama")),
-		})), t)
+		NewTag("hello world", Compound{
+			NewTag("name", String("Bananrama")),
+		}), t)
 }
 
 func TestLarge(t *testing.T) { //bigtest.nbt
@@ -59,65 +59,61 @@ func TestLarge(t *testing.T) { //bigtest.nbt
 		`EAgKFixMEkYgBFZOUFwOLlgoAko4MDI+VBA6CkgsGhIUIDZWHFAqDmBYWgIYOGIyDFRCOjxIXhpE`+
 		`FFI2JBweKkBgJlo0GAZiAAwiQgg8Fl5MREZSBCROHlxALiYoNEoGMAYACmRvdWJsZVRlc3Q/349r`+
 		`u/9qXgA=`,
-		NewTag("Level", NewCompound([]*Tag{
-			NewTag("longTest", NewLong(9223372036854775807)),
-			NewTag("shortTest", NewShort(32767)),
-			NewTag("stringTest", NewString("HELLO WORLD THIS IS A TEST STRING ÅÄÖ!")),
-			NewTag("floatTest", NewFloat(0.49823147)),
-			NewTag("intTest", NewInt(2147483647)),
-			NewTag("nested compound test", NewCompound([]*Tag{
-				NewTag("ham", NewCompound([]*Tag{
-					NewTag("name", NewString("Hampus")),
-					NewTag("value", NewFloat(0.75)),
-				})),
-				NewTag("egg", NewCompound([]*Tag{
-					NewTag("name", NewString("Eggbert")),
-					NewTag("value", NewFloat(0.5)),
-				})),
-			})),
+		NewTag("Level", Compound{
+			NewTag("longTest", Long(9223372036854775807)),
+			NewTag("shortTest", Short(32767)),
+			NewTag("stringTest", String("HELLO WORLD THIS IS A TEST STRING ÅÄÖ!")),
+			NewTag("floatTest", Float(0.49823147)),
+			NewTag("intTest", Int(2147483647)),
+			NewTag("nested compound test", Compound{
+				NewTag("ham", Compound{
+					NewTag("name", String("Hampus")),
+					NewTag("value", Float(0.75)),
+				}),
+				NewTag("egg", Compound{
+					NewTag("name", String("Eggbert")),
+					NewTag("value", Float(0.5)),
+				}),
+			}),
 			NewTag("listTest (long)", NewList([]Data{
-				NewLong(11),
-				NewLong(12),
-				NewLong(13),
-				NewLong(14),
-				NewLong(15),
+				Long(11),
+				Long(12),
+				Long(13),
+				Long(14),
+				Long(15),
 			})),
 			NewTag("listTest (compound)", NewList([]Data{
-				NewCompound([]*Tag{
-					NewTag("name", NewString("Compound tag #0")),
-					NewTag("created-on", NewLong(1264099775885)),
-				}),
-				NewCompound([]*Tag{
-					NewTag("name", NewString("Compound tag #1")),
-					NewTag("created-on", NewLong(1264099775885)),
-				}),
+				Compound{
+					NewTag("name", String("Compound tag #0")),
+					NewTag("created-on", Long(1264099775885)),
+				},
+				Compound{
+					NewTag("name", String("Compound tag #1")),
+					NewTag("created-on", Long(1264099775885)),
+				},
 			})),
-			NewTag("byteTest", NewByte(127)),
-			NewTag("byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))", NewByteArray(data)),
-			NewTag("doubleTest", NewDouble(0.4931287132182315)),
-		})), t)
+			NewTag("byteTest", Byte(127)),
+			NewTag("byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))", ByteArray(data)),
+			NewTag("doubleTest", Double(0.4931287132182315)),
+		}), t)
 }
 
-func testNBT(input string, middle *Tag, t *testing.T) {
-	n, c, err := ReadNBTFrom(base64.NewDecoder(base64.StdEncoding, bytes.NewBufferString(input)))
+func testNBT(input string, middle Tag, t *testing.T) {
+	tag, err := NewDecoder(base64.NewDecoder(base64.StdEncoding, bytes.NewBufferString(input))).DecodeTag()
 	if err != nil {
 		t.Errorf("error encountered while reading nbt data: %q", err)
 		return
 	}
-	if !n.Equal(middle) {
+	if !tag.Equal(middle) {
 		t.Error("parsed nbt data did not match given nbt structure")
 		return
 	}
 	o := new(bytes.Buffer)
 	b := base64.NewEncoder(base64.StdEncoding, o)
-	d, err := n.WriteTo(b)
+	err = NewEncoder(b).EncodeTag(tag)
 	b.Close()
 	if err != nil {
 		t.Errorf("error encountered while writing nbt data: %q", err)
-		return
-	}
-	if c != d {
-		t.Errorf("read and write byte counts do not match, read %d, wrote %d", c, d)
 		return
 	}
 	if o.String() != input {
