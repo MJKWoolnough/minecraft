@@ -6,18 +6,22 @@ import (
 	"github.com/MJKWoolnough/byteio"
 )
 
+// Decoder is a type used to decode NBT streams
 type Decoder struct {
 	r byteio.EndianReader
 }
 
+// NewDecoder returns a Decoder using Big Endian
 func NewDecoder(r io.Reader) Decoder {
 	return NewDecoderEndian(byteio.BigEndianReader{r})
 }
 
+// NewDecoderEndian allows you to specify your own Endian Reader
 func NewDecoderEndian(e byteio.EndianReader) Decoder {
 	return Decoder{r: e}
 }
 
+// DecodeTag will read a whole tag out of the decoding stream
 func (d Decoder) DecodeTag() (Tag, error) {
 	t, _, err := d.r.ReadUint8()
 	if err != nil {
@@ -80,36 +84,43 @@ func (d Decoder) decodeData(tagID TagID) (Data, error) {
 	return data, nil
 }
 
+// DecodeByte will read a single Byte Data
 func (d Decoder) DecodeByte() (Byte, error) {
 	b, _, err := d.r.ReadInt8()
 	return Byte(b), err
 }
 
+// DecodeShort will read a single Short Data
 func (d Decoder) DecodeShort() (Short, error) {
 	s, _, err := d.r.ReadInt16()
 	return Short(s), err
 }
 
+// DecodeInt will read a single Int Data
 func (d Decoder) DecodeInt() (Int, error) {
 	i, _, err := d.r.ReadInt32()
 	return Int(i), err
 }
 
+// DecodeLong will read a single Long Data
 func (d Decoder) DecodeLong() (Long, error) {
 	l, _, err := d.r.ReadInt64()
 	return Long(l), err
 }
 
+// DecodeFloat will read a single Float Data
 func (d Decoder) DecodeFloat() (Float, error) {
 	f, _, err := d.r.ReadFloat32()
 	return Float(f), err
 }
 
+// DecodeDouble will read a single Double Data
 func (d Decoder) DecodeDouble() (Double, error) {
 	do, _, err := d.r.ReadFloat64()
 	return Double(do), err
 }
 
+// DecodeByteArray will read a ByteArray Data
 func (d Decoder) DecodeByteArray() (ByteArray, error) {
 	l, _, err := d.r.ReadUint32()
 	if err != nil {
@@ -127,6 +138,7 @@ func (d Decoder) DecodeByteArray() (ByteArray, error) {
 	return ByteArray(ba), nil
 }
 
+// DecodeString will read a String Data
 func (d Decoder) DecodeString() (String, error) {
 	l, _, err := d.r.ReadUint16()
 	if err != nil {
@@ -140,6 +152,7 @@ func (d Decoder) DecodeString() (String, error) {
 	return String(data), nil
 }
 
+// DecodeList will read a List Data
 func (d Decoder) DecodeList() (*List, error) {
 	t, _, err := d.r.ReadUint8()
 	if err != nil {
@@ -163,6 +176,7 @@ func (d Decoder) DecodeList() (*List, error) {
 	}, nil
 }
 
+// DecodeCompound will read a Compound Data
 func (d Decoder) DecodeCompound() (Compound, error) {
 	data := make(Compound, 0)
 	for {
@@ -178,6 +192,7 @@ func (d Decoder) DecodeCompound() (Compound, error) {
 	return data, nil
 }
 
+// DecodeIntArray will read an IntArray Data
 func (d Decoder) DecodeIntArray() (IntArray, error) {
 	l, _, err := d.r.ReadUint32()
 	if err != nil {
