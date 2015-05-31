@@ -26,7 +26,7 @@ func (d Decoder) DecodeTag() (Tag, error) {
 	}
 	tagID := TagID(t)
 	if tagID == TagEnd {
-		return &Tag{data: End{}}, nil
+		return Tag{data: end{}}, nil
 	}
 	n, err := d.DecodeString()
 	if err != nil {
@@ -37,11 +37,14 @@ func (d Decoder) DecodeTag() (Tag, error) {
 	if err != nil {
 		return Tag{}, err
 	}
-	return Tag{name: n, data: data}, nil
+	return Tag{name: string(n), data: data}, nil
 }
 
 func (d Decoder) decodeData(tagID TagID) (Data, error) {
-	var data Data
+	var (
+		data Data
+		err  error
+	)
 	switch tagID {
 	case TagByte:
 		data, err = d.DecodeByte()
@@ -66,11 +69,11 @@ func (d Decoder) decodeData(tagID TagID) (Data, error) {
 	case TagIntArray:
 		data, err = d.DecodeIntArray()
 	default:
-		err = UnknownTag{id}
+		err = UnknownTag{tagID}
 	}
 	if err != nil {
 		if _, ok := err.(*ReadError); !ok {
-			err = &ReadError{tagType.String(), err}
+			err = &ReadError{tagID.String(), err}
 		}
 		return nil, err
 	}
@@ -172,7 +175,7 @@ func (d Decoder) DecodeCompound() (Compound, error) {
 		}
 		data = append(data, t)
 	}
-	return nil
+	return data, nil
 }
 
 func (d Decoder) DecodeIntArray() (IntArray, error) {

@@ -11,7 +11,7 @@ type Encoder struct {
 }
 
 func NewEncoder(w io.Writer) Encoder {
-	return NewEncoderEndian(byteio.BigEndianWriter{w})
+	return NewEncoderEndian(&byteio.BigEndianWriter{Writer: w})
 }
 
 func NewEncoderEndian(e byteio.EndianWriter) Encoder {
@@ -28,7 +28,7 @@ func (e Encoder) EncodeTag(t Tag) error {
 		return nil
 	}
 	s := String(t.name)
-	err = e.EncodeString(&s)
+	err = e.EncodeString(s)
 	if err != nil {
 		return err
 	}
@@ -36,6 +36,7 @@ func (e Encoder) EncodeTag(t Tag) error {
 }
 
 func (e Encoder) encodeData(d Data) error {
+	var err error
 	switch d := d.(type) {
 	case Byte:
 		err = e.EncodeByte(d)
@@ -55,7 +56,7 @@ func (e Encoder) encodeData(d Data) error {
 		err = e.EncodeString(d)
 	case *List:
 		err = e.EncodeList(d)
-	case *Compound:
+	case Compound:
 		err = e.EncodeCompound(d)
 	case IntArray:
 		err = e.EncodeIntArray(d)
@@ -75,6 +76,7 @@ func (e Encoder) EncodeByte(b Byte) error {
 
 func (e Encoder) EncodeShort(s Short) error {
 	_, err := e.w.WriteInt16(int16(s))
+	return err
 }
 
 func (e Encoder) EncodeInt(i Int) error {
@@ -84,6 +86,7 @@ func (e Encoder) EncodeInt(i Int) error {
 
 func (e Encoder) EncodeLong(l Long) error {
 	_, err := e.w.WriteInt64(int64(l))
+	return err
 }
 
 func (e Encoder) EncodeFloat(f Float) error {
@@ -97,7 +100,7 @@ func (e Encoder) EncodeDouble(do Double) error {
 }
 
 func (e Encoder) EncodeByteArray(ba ByteArray) error {
-	_, err := e.w.WriteUint32(len(ba))
+	_, err := e.w.WriteUint32(uint32(len(ba)))
 	if err != nil {
 		return err
 	}
@@ -110,7 +113,7 @@ func (e Encoder) EncodeByteArray(ba ByteArray) error {
 }
 
 func (e Encoder) EncodeString(s String) error {
-	_, err := e.w.WriteUint16(len(s))
+	_, err := e.w.WriteUint16(uint16(len(s)))
 	if err != nil {
 		return err
 	}
@@ -123,13 +126,13 @@ func (e Encoder) EncodeList(l *List) error {
 	if err != nil {
 		return err
 	}
-	_, err = e.w.WriteUint32(len(l.data))
+	_, err = e.w.WriteUint32(uint32(len(l.data)))
 	if err != nil {
 		return err
 	}
-	if l.TagType != TagEnd {
+	if l.TagType() != TagEnd {
 		for _, data := range l.data {
-			if tagID := data.Type(); tagID != n.tagType {
+			if tagID := data.Type(); tagID != l.tagType {
 				return &WrongTag{l.tagType, tagID}
 			}
 			err = e.encodeData(data)
@@ -141,7 +144,7 @@ func (e Encoder) EncodeList(l *List) error {
 	return nil
 }
 
-func (e Encoder) EncodeComponent(c Compound) error {
+func (e Encoder) EncodeCompound(c Compound) error {
 	for _, data := range c {
 		if data.TagID() == TagEnd {
 			break
@@ -156,7 +159,7 @@ func (e Encoder) EncodeComponent(c Compound) error {
 }
 
 func (e Encoder) EncodeIntArray(ints IntArray) error {
-	_, err := e.w.WriteUint32(len(ints))
+	_, err := e.w.WriteUint32(uint32(len(ints)))
 	for _, i := range ints {
 		_, err = e.w.WriteInt32(i)
 		if err != nil {

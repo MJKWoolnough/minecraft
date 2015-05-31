@@ -3,7 +3,6 @@
 package nbt
 
 import (
-	"bytes"
 	"fmt"
 
 	"github.com/MJKWoolnough/equaler"
@@ -67,48 +66,48 @@ type Tag struct {
 // NewTag constructs a new tag with the given name and data.
 func NewTag(name string, d Data) Tag {
 	return Tag{
-		name: String(name),
+		name: name,
 		data: d,
 	}
 }
 
 // Copy simply returns a deep-copy the the tag
-func (n Tag) Copy() *Tag {
+func (t Tag) Copy() Tag {
 	return Tag{
-		n.name,
-		n.data.Copy(),
+		t.name,
+		t.data.Copy(),
 	}
 }
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (n Tag) Equal(e equaler.Equaler) bool {
+func (t Tag) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(Tag); ok {
-		if n.data.Type() == m.data.Type() && n.name == m.name {
-			return n.data.Equal(m.data)
+		if t.data.Type() == m.data.Type() && t.name == m.name {
+			return t.data.Equal(m.data)
 		}
 	}
 	return false
 }
 
 // Data returns the tags data type
-func (n Tag) Data() Data {
-	return n.data
+func (t Tag) Data() Data {
+	return t.data
 }
 
 // Name returns the tags' name
-func (n Tag) Name() string {
-	return n.name
+func (t Tag) Name() string {
+	return t.name
 }
 
 // TagID returns the type of the data
-func (n Tag) TagID() TagID {
-	return n.data.Type()
+func (t Tag) TagID() TagID {
+	return t.data.Type()
 }
 
 // String returns a textual representation of the tag
-func (n Tag) String() string {
-	return fmt.Sprintf("%s(%q): %s", n.data.Type(), n.name, n.data)
+func (t Tag) String() string {
+	return fmt.Sprintf("%s(%q): %s", t.data.Type(), t.name, t.data)
 }
 
 type end struct{}
@@ -246,7 +245,7 @@ func (f Float) Copy() Data {
 // checked for equality
 func (f Float) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(Float); ok {
-		return f == *m
+		return f == m
 	}
 	return false
 }
@@ -300,7 +299,12 @@ func (b ByteArray) Copy() Data {
 // checked for equality
 func (b ByteArray) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(ByteArray); ok {
-		return bytes.Equal([]byte(b), []byte(e))
+		for i := 0; i < len(b); i++ {
+			if b[i] != m[i] {
+				return false
+			}
+		}
+		return true
 	}
 	return false
 }
@@ -326,7 +330,7 @@ func (s String) Copy() Data {
 // checked for equality
 func (s String) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(String); ok {
-		return n == m
+		return s == m
 	}
 	return false
 }
@@ -380,7 +384,7 @@ func (l *List) TagType() TagID {
 // Copy simply returns a deep-copy the the data
 func (l *List) Copy() Data {
 	c := new(List)
-	c.tagType = n.tagType
+	c.tagType = l.tagType
 	c.data = make([]Data, len(l.data))
 	for i, d := range l.data {
 		c.data[i] = d.Copy()
@@ -406,8 +410,8 @@ func (l *List) Equal(e equaler.Equaler) bool {
 
 func (l *List) String() string {
 	s := fmt.Sprintf("%d entries of type %s {", len(l.data), l.tagType)
-	for _, d := range n.data {
-		s += fmt.Sprintf("\n	%s: %s", n.tagType, indent(l.String()))
+	for _, d := range l.data {
+		s += fmt.Sprintf("\n	%s: %s", l.tagType, indent(d.String()))
 	}
 	return s + "\n}"
 }
@@ -497,7 +501,7 @@ func (c Compound) Equal(e equaler.Equaler) bool {
 	if m, ok := e.(Compound); ok {
 		if len(c) == len(m) {
 			for _, o := range c {
-				if p := m.Get(o.Name()); p == nil || !p.Equal(o) {
+				if p := m.Get(o.Name()); !p.Equal(o) {
 					return false
 				}
 			}
@@ -516,13 +520,13 @@ func (c Compound) String() string {
 }
 
 // Get returns the tag for the given name
-func (c Compound) Get(name string) *Tag {
+func (c Compound) Get(name string) Tag {
 	for _, t := range c {
 		if t.Name() == name {
 			return t
 		}
 	}
-	return nil
+	return Tag{}
 }
 
 // Remove removes the tag corresponding to the given name
@@ -530,7 +534,6 @@ func (c *Compound) Remove(name string) {
 	for i, t := range *c {
 		if t.Name() == name {
 			copy((*c)[i:], (*c)[i+1:])
-			(*c)[len((*c))-1] = nil
 			(*c) = (*c)[:len((*c))-1]
 			return
 		}
@@ -539,7 +542,7 @@ func (c *Compound) Remove(name string) {
 
 // Set adds the given tag to the compound, or, if the tags name is already
 // present, overrides the old data
-func (c *Compound) Set(tag *Tag) {
+func (c *Compound) Set(tag Tag) {
 	if tag.TagID() == TagEnd {
 		return
 	}
