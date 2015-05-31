@@ -7,20 +7,11 @@ http://web.archive.org/web/20110723210920/http://www.minecraft.net/docs/NBT.txt
 
 ## Usage
 
-#### type BadRange
-
 ```go
-type BadRange struct{}
+var BadRange = errors.New("given index was out-of-range")
 ```
-
 BadRange is an error that occurs when trying to set an item on a list which is
 outside of the current limits of the list.
-
-#### func (BadRange) Error
-
-```go
-func (BadRange) Error() string
-```
 
 #### type Byte
 
