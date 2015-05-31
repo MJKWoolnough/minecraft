@@ -23,7 +23,7 @@ func NewEncoderEndian(e byteio.EndianWriter) Encoder {
 
 // EncodeTag will encode a whole tag to the encoding stream
 func (e Encoder) EncodeTag(t Tag) error {
-	tagType := t.data.Type()
+	tagType := t.Type()
 	_, err := e.w.WriteUint8(uint8(tagType))
 	if err != nil {
 		return WriteError{"named TagId", err}

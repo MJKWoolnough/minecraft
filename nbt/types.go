@@ -92,6 +92,9 @@ func (t Tag) Equal(e equaler.Equaler) bool {
 
 // Data returns the tags data type
 func (t Tag) Data() Data {
+	if t.data == nil {
+		return end{}
+	}
 	return t.data
 }
 
@@ -102,6 +105,9 @@ func (t Tag) Name() string {
 
 // TagID returns the type of the data
 func (t Tag) TagID() TagID {
+	if t.data == nil {
+		return TagEnd
+	}
 	return t.data.Type()
 }
 
