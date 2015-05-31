@@ -1,164 +1,165 @@
 package minecraft
 
 import (
-	"github.com/MJKWoolnough/minecraft/nbt"
 	"testing"
+
+	"github.com/MJKWoolnough/minecraft/nbt"
 )
 
 func TestNew(t *testing.T) {
-	biomes := make([]int8, 256)
+	biomes := make(nbt.ByteArray, 256)
 	biome := int8(-1)
-	blocks := make([]int8, 4096)
-	add := make([]int8, 2048)
-	data := make([]int8, 2048)
+	blocks := make(nbt.ByteArray, 4096)
+	add := make(nbt.ByteArray, 2048)
+	data := make(nbt.ByteArray, 2048)
 	for i := 0; i < 256; i++ {
 		biomes[i] = biome
 		//if biome++; biome >= 23 {
 		//	biome = -1
 		//}
 	}
-	dataTag := nbt.NewTag("", nbt.NewCompound(nbt.Compound{
-		nbt.NewTag("Level", nbt.NewCompound(nbt.Compound{
-			nbt.NewTag("Biomes", nbt.NewByteArray(biomes)),
-			nbt.NewTag("HeightMap", nbt.NewIntArray(make([]int32, 256))),
-			nbt.NewTag("InhabitedTime", nbt.NewLong(0)),
-			nbt.NewTag("LastUpdate", nbt.NewLong(0)),
+	dataTag := nbt.NewTag("", nbt.Compound{
+		nbt.NewTag("Level", nbt.Compound{
+			nbt.NewTag("Biomes", biomes),
+			nbt.NewTag("HeightMap", make(nbt.IntArray, 256)),
+			nbt.NewTag("InhabitedTime", nbt.Long(0)),
+			nbt.NewTag("LastUpdate", nbt.Long(0)),
 			nbt.NewTag("Sections", nbt.NewList([]nbt.Data{
-				nbt.NewCompound(nbt.Compound{
-					nbt.NewTag("Blocks", nbt.NewByteArray(blocks)),
-					nbt.NewTag("Add", nbt.NewByteArray(add)),
-					nbt.NewTag("Data", nbt.NewByteArray(data)),
-					nbt.NewTag("BlockLight", nbt.NewByteArray(make([]int8, 2048))),
-					nbt.NewTag("SkyLight", nbt.NewByteArray(make([]int8, 2048))),
-					nbt.NewTag("Y", nbt.NewByte(0)),
-				}),
-				nbt.NewCompound(nbt.Compound{
-					nbt.NewTag("Blocks", nbt.NewByteArray(blocks)),
-					nbt.NewTag("Add", nbt.NewByteArray(add)),
-					nbt.NewTag("Data", nbt.NewByteArray(data)),
-					nbt.NewTag("BlockLight", nbt.NewByteArray(make([]int8, 2048))),
-					nbt.NewTag("SkyLight", nbt.NewByteArray(make([]int8, 2048))),
-					nbt.NewTag("Y", nbt.NewByte(1)),
-				}),
-				nbt.NewCompound(nbt.Compound{
-					nbt.NewTag("Blocks", nbt.NewByteArray(blocks)),
-					nbt.NewTag("Add", nbt.NewByteArray(add)),
-					nbt.NewTag("Data", nbt.NewByteArray(data)),
-					nbt.NewTag("BlockLight", nbt.NewByteArray(make([]int8, 2048))),
-					nbt.NewTag("SkyLight", nbt.NewByteArray(make([]int8, 2048))),
-					nbt.NewTag("Y", nbt.NewByte(3)),
-				}),
-				nbt.NewCompound(nbt.Compound{
-					nbt.NewTag("Blocks", nbt.NewByteArray(blocks)),
-					nbt.NewTag("Add", nbt.NewByteArray(add)),
-					nbt.NewTag("Data", nbt.NewByteArray(data)),
-					nbt.NewTag("BlockLight", nbt.NewByteArray(make([]int8, 2048))),
-					nbt.NewTag("SkyLight", nbt.NewByteArray(make([]int8, 2048))),
-					nbt.NewTag("Y", nbt.NewByte(10)),
-				}),
+				nbt.Compound{
+					nbt.NewTag("Blocks", blocks),
+					nbt.NewTag("Add", add),
+					nbt.NewTag("Data", data),
+					nbt.NewTag("BlockLight", make(nbt.ByteArray, 2048)),
+					nbt.NewTag("SkyLight", make(nbt.ByteArray, 2048)),
+					nbt.NewTag("Y", nbt.Byte(0)),
+				},
+				nbt.Compound{
+					nbt.NewTag("Blocks", blocks),
+					nbt.NewTag("Add", add),
+					nbt.NewTag("Data", data),
+					nbt.NewTag("BlockLight", make(nbt.ByteArray, 2048)),
+					nbt.NewTag("SkyLight", make(nbt.ByteArray, 2048)),
+					nbt.NewTag("Y", nbt.Byte(1)),
+				},
+				nbt.Compound{
+					nbt.NewTag("Blocks", blocks),
+					nbt.NewTag("Add", add),
+					nbt.NewTag("Data", data),
+					nbt.NewTag("BlockLight", make(nbt.ByteArray, 2048)),
+					nbt.NewTag("SkyLight", make(nbt.ByteArray, 2048)),
+					nbt.NewTag("Y", nbt.Byte(3)),
+				},
+				nbt.Compound{
+					nbt.NewTag("Blocks", blocks),
+					nbt.NewTag("Add", add),
+					nbt.NewTag("Data", data),
+					nbt.NewTag("BlockLight", make(nbt.ByteArray, 2048)),
+					nbt.NewTag("SkyLight", make(nbt.ByteArray, 2048)),
+					nbt.NewTag("Y", nbt.Byte(10)),
+				},
 			})),
 			nbt.NewTag("TileEntities", nbt.NewList([]nbt.Data{
-				nbt.NewCompound(nbt.Compound{
-					nbt.NewTag("id", nbt.NewString("test1")),
-					nbt.NewTag("x", nbt.NewInt(-191)),
-					nbt.NewTag("y", nbt.NewInt(13)),
-					nbt.NewTag("z", nbt.NewInt(379)),
-					nbt.NewTag("testTag", nbt.NewByte(1)),
-				}),
-				nbt.NewCompound(nbt.Compound{
-					nbt.NewTag("id", nbt.NewString("test2")),
-					nbt.NewTag("x", nbt.NewInt(-191)),
-					nbt.NewTag("y", nbt.NewInt(17)),
-					nbt.NewTag("z", nbt.NewInt(372)),
-					nbt.NewTag("testTag", nbt.NewLong(8)),
-				}),
+				nbt.Compound{
+					nbt.NewTag("id", nbt.String("test1")),
+					nbt.NewTag("x", nbt.Int(-191)),
+					nbt.NewTag("y", nbt.Int(13)),
+					nbt.NewTag("z", nbt.Int(379)),
+					nbt.NewTag("testTag", nbt.Byte(1)),
+				},
+				nbt.Compound{
+					nbt.NewTag("id", nbt.String("test2")),
+					nbt.NewTag("x", nbt.Int(-191)),
+					nbt.NewTag("y", nbt.Int(17)),
+					nbt.NewTag("z", nbt.Int(372)),
+					nbt.NewTag("testTag", nbt.Long(8)),
+				},
 			})),
 			nbt.NewTag("Entities", nbt.NewList([]nbt.Data{
-				nbt.NewCompound(nbt.Compound{
-					nbt.NewTag("id", nbt.NewString("testEntity1")),
+				nbt.Compound{
+					nbt.NewTag("id", nbt.String("testEntity1")),
 					nbt.NewTag("Pos", nbt.NewList([]nbt.Data{
-						nbt.NewDouble(-190),
-						nbt.NewDouble(13),
-						nbt.NewDouble(375),
+						nbt.Double(-190),
+						nbt.Double(13),
+						nbt.Double(375),
 					})),
 					nbt.NewTag("Motion", nbt.NewList([]nbt.Data{
-						nbt.NewDouble(1),
-						nbt.NewDouble(13),
-						nbt.NewDouble(11),
+						nbt.Double(1),
+						nbt.Double(13),
+						nbt.Double(11),
 					})),
 					nbt.NewTag("Rotation", nbt.NewList([]nbt.Data{
-						nbt.NewFloat(13),
-						nbt.NewFloat(11),
+						nbt.Float(13),
+						nbt.Float(11),
 					})),
-					nbt.NewTag("FallDistance", nbt.NewFloat(0)),
-					nbt.NewTag("Fire", nbt.NewShort(-1)),
-					nbt.NewTag("Air", nbt.NewShort(300)),
-					nbt.NewTag("OnGround", nbt.NewByte(1)),
-					nbt.NewTag("Dimension", nbt.NewInt(0)),
-					nbt.NewTag("Invulnerable", nbt.NewByte(0)),
-					nbt.NewTag("PortalCooldown", nbt.NewInt(0)),
-					nbt.NewTag("UUIDMost", nbt.NewLong(0)),
-					nbt.NewTag("UUIDLease", nbt.NewLong(0)),
-					nbt.NewTag("Riding", nbt.NewCompound(nbt.Compound{})),
-				}),
-				nbt.NewCompound(nbt.Compound{
-					nbt.NewTag("id", nbt.NewString("testEntity2")),
+					nbt.NewTag("FallDistance", nbt.Float(0)),
+					nbt.NewTag("Fire", nbt.Short(-1)),
+					nbt.NewTag("Air", nbt.Short(300)),
+					nbt.NewTag("OnGround", nbt.Byte(1)),
+					nbt.NewTag("Dimension", nbt.Int(0)),
+					nbt.NewTag("Invulnerable", nbt.Byte(0)),
+					nbt.NewTag("PortalCooldown", nbt.Int(0)),
+					nbt.NewTag("UUIDMost", nbt.Long(0)),
+					nbt.NewTag("UUIDLease", nbt.Long(0)),
+					nbt.NewTag("Riding", nbt.Compound{}),
+				},
+				nbt.Compound{
+					nbt.NewTag("id", nbt.String("testEntity2")),
 					nbt.NewTag("Pos", nbt.NewList([]nbt.Data{
-						nbt.NewDouble(-186),
-						nbt.NewDouble(2),
-						nbt.NewDouble(378),
+						nbt.Double(-186),
+						nbt.Double(2),
+						nbt.Double(378),
 					})),
 					nbt.NewTag("Motion", nbt.NewList([]nbt.Data{
-						nbt.NewDouble(17.5),
-						nbt.NewDouble(1000),
-						nbt.NewDouble(54),
+						nbt.Double(17.5),
+						nbt.Double(1000),
+						nbt.Double(54),
 					})),
 					nbt.NewTag("Rotation", nbt.NewList([]nbt.Data{
-						nbt.NewFloat(11),
-						nbt.NewFloat(13),
+						nbt.Float(11),
+						nbt.Float(13),
 					})),
-					nbt.NewTag("FallDistance", nbt.NewFloat(30)),
-					nbt.NewTag("Fire", nbt.NewShort(4)),
-					nbt.NewTag("Air", nbt.NewShort(30)),
-					nbt.NewTag("OnGround", nbt.NewByte(0)),
-					nbt.NewTag("Dimension", nbt.NewInt(0)),
-					nbt.NewTag("Invulnerable", nbt.NewByte(1)),
-					nbt.NewTag("PortalCooldown", nbt.NewInt(10)),
-					nbt.NewTag("UUIDMost", nbt.NewLong(1450)),
-					nbt.NewTag("UUIDLease", nbt.NewLong(6435)),
-					nbt.NewTag("Riding", nbt.NewCompound(nbt.Compound{})),
-				}),
+					nbt.NewTag("FallDistance", nbt.Float(30)),
+					nbt.NewTag("Fire", nbt.Short(4)),
+					nbt.NewTag("Air", nbt.Short(30)),
+					nbt.NewTag("OnGround", nbt.Byte(0)),
+					nbt.NewTag("Dimension", nbt.Int(0)),
+					nbt.NewTag("Invulnerable", nbt.Byte(1)),
+					nbt.NewTag("PortalCooldown", nbt.Int(10)),
+					nbt.NewTag("UUIDMost", nbt.Long(1450)),
+					nbt.NewTag("UUIDLease", nbt.Long(6435)),
+					nbt.NewTag("Riding", nbt.Compound{}),
+				},
 			})),
 			nbt.NewTag("TileTicks", nbt.NewList([]nbt.Data{
-				nbt.NewCompound(nbt.Compound{
-					nbt.NewTag("i", nbt.NewInt(0)),
-					nbt.NewTag("t", nbt.NewInt(0)),
-					nbt.NewTag("p", nbt.NewInt(0)),
-					nbt.NewTag("x", nbt.NewInt(-192)),
-					nbt.NewTag("y", nbt.NewInt(0)),
-					nbt.NewTag("z", nbt.NewInt(368)),
-				}),
-				nbt.NewCompound(nbt.Compound{
-					nbt.NewTag("i", nbt.NewInt(1)),
-					nbt.NewTag("t", nbt.NewInt(34)),
-					nbt.NewTag("p", nbt.NewInt(12)),
-					nbt.NewTag("x", nbt.NewInt(-186)),
-					nbt.NewTag("y", nbt.NewInt(11)),
-					nbt.NewTag("z", nbt.NewInt(381)),
-				}),
+				nbt.Compound{
+					nbt.NewTag("i", nbt.Int(0)),
+					nbt.NewTag("t", nbt.Int(0)),
+					nbt.NewTag("p", nbt.Int(0)),
+					nbt.NewTag("x", nbt.Int(-192)),
+					nbt.NewTag("y", nbt.Int(0)),
+					nbt.NewTag("z", nbt.Int(368)),
+				},
+				nbt.Compound{
+					nbt.NewTag("i", nbt.Int(1)),
+					nbt.NewTag("t", nbt.Int(34)),
+					nbt.NewTag("p", nbt.Int(12)),
+					nbt.NewTag("x", nbt.Int(-186)),
+					nbt.NewTag("y", nbt.Int(11)),
+					nbt.NewTag("z", nbt.Int(381)),
+				},
 			})),
-			nbt.NewTag("TerrainPopulated", nbt.NewByte(1)),
-			nbt.NewTag("xPos", nbt.NewInt(-12)),
-			nbt.NewTag("zPos", nbt.NewInt(23)),
-		})),
-	}))
+			nbt.NewTag("TerrainPopulated", nbt.Byte(1)),
+			nbt.NewTag("xPos", nbt.Int(-12)),
+			nbt.NewTag("zPos", nbt.Int(23)),
+		}),
+	})
 	if _, err := newChunk(-12, 23, dataTag); err != nil {
 		t.Fatalf("reveived unexpected error during testing, %q", err.Error())
 	}
 }
 
 func TestBiomes(t *testing.T) {
-	chunk, _ := newChunk(0, 0, nil)
+	chunk, _ := newChunk(0, 0, nbt.Tag{})
 	for b := Biome(0); b < 23; b++ {
 		biome := b
 		for x := int32(0); x < 16; x++ {
@@ -173,7 +174,7 @@ func TestBiomes(t *testing.T) {
 }
 
 func TestBlock(t *testing.T) {
-	chunk, _ := newChunk(0, 0, nil)
+	chunk, _ := newChunk(0, 0, nbt.Tag{})
 	testBlocks := []struct {
 		Block
 		x, y, z int32
@@ -238,8 +239,8 @@ func TestBlock(t *testing.T) {
 		{
 			Block{
 				metadata: nbt.Compound{
-					nbt.NewTag("testInt2", nbt.NewInt(1743)),
-					nbt.NewTag("testString2", nbt.NewString("world")),
+					nbt.NewTag("testInt2", nbt.Int(1743)),
+					nbt.NewTag("testString2", nbt.String("world")),
 				},
 			},
 			0, 0, 1,
@@ -248,8 +249,8 @@ func TestBlock(t *testing.T) {
 		{
 			Block{
 				metadata: nbt.Compound{
-					nbt.NewTag("testInt", nbt.NewInt(15)),
-					nbt.NewTag("testString", nbt.NewString("hello")),
+					nbt.NewTag("testInt", nbt.Int(15)),
+					nbt.NewTag("testString", nbt.String("hello")),
 				},
 			},
 			1, 0, 1,
@@ -324,7 +325,7 @@ func TestHeightMap(t *testing.T) {
 		{5, 32, 0, &Block{}, 17},
 		{5, 16, 0, &Block{}, 0},
 	}
-	chunk, _ := newChunk(0, 0, nil)
+	chunk, _ := newChunk(0, 0, nbt.Tag{})
 	for n, test := range tests {
 		chunk.SetBlock(test.x, test.y, test.z, test.Block)
 		if h := chunk.GetHeight(test.x, test.z); h != test.height {

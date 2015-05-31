@@ -66,7 +66,7 @@ func testPathChunkSetGet(t *testing.T, path Path) {
 				t.Fatal(err.Error())
 			} else if thatChunk, err := path.GetChunk(x, z); err != nil {
 				t.Fatal(err.Error())
-			} else if thatChunk == nil {
+			} else if thatChunk.TagID() == 0 {
 				t.Fatalf("testPathChunkSetGet: 0-%d-%d: no chunk returned", num, i)
 			} else if !thatChunk.Equal(chunk) {
 				t.Fatalf("testPathChunkSetGet: 0-%d-%d: returned chunk not equal to set chunk, expecting: -\n%s\ngot: -\n%s", num, i, chunk.String(), thatChunk.String())
@@ -79,7 +79,7 @@ func testPathChunkSetGet(t *testing.T, path Path) {
 				t.Fatal(err.Error())
 			} else if thatChunk, err := path.GetChunk(x, z); err != nil {
 				t.Fatal(err.Error())
-			} else if thatChunk == nil {
+			} else if thatChunk.TagID() == 0 {
 				t.Fatalf("testPathChunkSetGet: 1-%d-%d: no chunk returned", num, i)
 			} else if thatChunk.Equal(chunk) != retest[0] {
 				if retest[0] {
@@ -94,12 +94,12 @@ func testPathChunkSetGet(t *testing.T, path Path) {
 }
 
 func testPathLevelSetGet(t *testing.T, path Path) {
-	levelDat := nbt.NewTag("", nbt.NewCompound(nbt.Compound{
-		nbt.NewTag("Beep", nbt.NewCompound(nbt.Compound{
-			nbt.NewTag("SomeInt", nbt.NewInt(45)),
-			nbt.NewTag("SomeString", nbt.NewString("hello")),
-		})),
-	}))
+	levelDat := nbt.NewTag("", nbt.Compound{
+		nbt.NewTag("Beep", nbt.Compound{
+			nbt.NewTag("SomeInt", nbt.Int(45)),
+			nbt.NewTag("SomeString", nbt.String("hello")),
+		}),
+	})
 	if err := path.WriteLevelDat(levelDat); err != nil {
 		t.Error(err.Error())
 	} else if newLevelDat, err := path.ReadLevelDat(); err != nil {
@@ -120,7 +120,7 @@ func testPathChunkRemove(t *testing.T, path Path) {
 			t.Error(err.Error())
 		} else if tC, err := path.GetChunk(tR[0], tR[1]); err != nil {
 			t.Error(err.Error())
-		} else if tC != nil {
+		} else if tC.TagID() != 0 {
 			t.Errorf("testPathChunkRemove %d: failed to remove chunk at %d,%d", num, tR[0], tR[1])
 		}
 	}
@@ -151,11 +151,11 @@ func testPathRegionsGet(t *testing.T, path *FilePath) {
 	}
 }
 
-func addPos(x, z int32, chunkNum uint8) *nbt.Tag {
+func addPos(x, z int32, chunkNum uint8) nbt.Tag {
 	e := chunksNBT[chunkNum].Copy()
-	f := e.Data().(*nbt.Compound).Get("Level").Data().(*nbt.Compound)
-	f.Set(nbt.NewTag("xPos", nbt.NewInt(x)))
-	f.Set(nbt.NewTag("zPos", nbt.NewInt(z)))
+	f := e.Data().(nbt.Compound).Get("Level").Data().(nbt.Compound)
+	f.Set(nbt.NewTag("xPos", nbt.Int(x)))
+	f.Set(nbt.NewTag("zPos", nbt.Int(z)))
 	return e
 }
 
@@ -303,13 +303,13 @@ func TestFilePathLock(t *testing.T) {
 	}
 }
 
-var chunksNBT [4]*nbt.Tag
+var chunksNBT [4]nbt.Tag
 
 func init() {
-	a, _ := newChunk(0, 0, nil)
-	b, _ := newChunk(0, 0, nil)
-	c, _ := newChunk(0, 0, nil)
-	d, _ := newChunk(0, 0, nil)
+	a, _ := newChunk(0, 0, nbt.Tag{})
+	b, _ := newChunk(0, 0, nbt.Tag{})
+	c, _ := newChunk(0, 0, nbt.Tag{})
+	d, _ := newChunk(0, 0, nbt.Tag{})
 	chunks := [4]chunk{
 		*a,
 		*b,
@@ -328,7 +328,7 @@ func init() {
 						uint16(i+j+k) % 4096,
 						uint8(i),
 						nbt.Compound{
-							nbt.NewTag("testMD", nbt.NewInt(int32(i*j*k))),
+							nbt.NewTag("testMD", nbt.Int(i*j*k)),
 						},
 						tick,
 					})
@@ -340,7 +340,7 @@ func init() {
 						1,
 						0,
 						nbt.Compound{
-							nbt.NewTag("testMD", nbt.NewInt(int32(i*j*k))),
+							nbt.NewTag("testMD", nbt.Int(i*j*k)),
 						},
 						nil,
 					})
@@ -350,18 +350,18 @@ func init() {
 				uint16(i*j + i + j),
 				uint8(i),
 				nbt.Compound{
-					nbt.NewTag("testMD1", nbt.NewInt(int32(i))),
-					nbt.NewTag("testMD2", nbt.NewInt(int32(i+1))),
-					nbt.NewTag("testMD3", nbt.NewInt(int32(i+2))),
-					nbt.NewTag("testMD4", nbt.NewInt(int32(i+3))),
-					nbt.NewTag("testMD5", nbt.NewInt(int32(i+4))),
+					nbt.NewTag("testMD1", nbt.Int(i)),
+					nbt.NewTag("testMD2", nbt.Int(i+1)),
+					nbt.NewTag("testMD3", nbt.Int(i+2)),
+					nbt.NewTag("testMD4", nbt.Int(i+3)),
+					nbt.NewTag("testMD5", nbt.Int(i+4)),
 				},
 				[]Tick{{int32(i*j+i+j) % 4096, 1, -1}},
 			})
 		}
 		chunks[0].SetBlock(int32(i), int32(i), int32(i), &Block{uint16(i), uint8(i), nil, nil})
 	}
-	chunksNBT = [4]*nbt.Tag{
+	chunksNBT = [4]nbt.Tag{
 		a.GetNBT(),
 		b.GetNBT(),
 		c.GetNBT(),

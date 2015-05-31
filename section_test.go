@@ -1,33 +1,34 @@
 package minecraft
 
 import (
-	"github.com/MJKWoolnough/minecraft/nbt"
 	"testing"
+
+	"github.com/MJKWoolnough/minecraft/nbt"
 )
 
 func TestY(t *testing.T) {
 	section := newSection(0)
-	if y := *section.section.Get("Y").Data().(*nbt.Byte); y != 0 {
+	if y := section.section.Get("Y").Data().(nbt.Byte); y != 0 {
 		t.Errorf("expecting %d, got %d", 0, y)
 	}
 	section = newSection(16)
-	if y := *section.section.Get("Y").Data().(*nbt.Byte); y != 1 {
+	if y := section.section.Get("Y").Data().(nbt.Byte); y != 1 {
 		t.Errorf("expecting %d, got %d", 1, y)
 	}
 	section.SetY(48)
-	if y := *section.section.Get("Y").Data().(*nbt.Byte); y != 3 {
+	if y := section.section.Get("Y").Data().(nbt.Byte); y != 3 {
 		t.Errorf("expecting %d, got %d", 3, y)
 	}
 	section.SetY(255)
-	if y := *section.section.Get("Y").Data().(*nbt.Byte); y != 15 {
+	if y := section.section.Get("Y").Data().(nbt.Byte); y != 15 {
 		t.Errorf("expecting %d, got %d", 15, y)
 	}
 }
 
 func TestGetBlock(t *testing.T) {
-	blocks := make([]int8, 4096)
-	add := make([]int8, 2048)
-	data := make([]int8, 2048)
+	blocks := make(nbt.ByteArray, 4096)
+	add := make(nbt.ByteArray, 2048)
+	data := make(nbt.ByteArray, 2048)
 	blocks[0] = 1
 	blocks[10] = 2
 	blocks[18] = 24
@@ -38,14 +39,14 @@ func TestGetBlock(t *testing.T) {
 	add[2027] = 5
 	data[1737] = b2i(9 << 4)
 	data[2027] = 8
-	section, _ := loadSection(nbt.NewCompound(nbt.Compound{
-		nbt.NewTag("Blocks", nbt.NewByteArray(blocks)),
-		nbt.NewTag("Add", nbt.NewByteArray(add)),
-		nbt.NewTag("Data", nbt.NewByteArray(data)),
-		nbt.NewTag("BlockLight", nbt.NewByteArray(make([]int8, 2048))),
-		nbt.NewTag("SkyLight", nbt.NewByteArray(make([]int8, 2048))),
-		nbt.NewTag("Y", nbt.NewByte(0)),
-	}))
+	section, _ := loadSection(nbt.Compound{
+		nbt.NewTag("Blocks", blocks),
+		nbt.NewTag("Add", add),
+		nbt.NewTag("Data", data),
+		nbt.NewTag("BlockLight", make(nbt.ByteArray, 2048)),
+		nbt.NewTag("SkyLight", make(nbt.ByteArray, 2048)),
+		nbt.NewTag("Y", nbt.Byte(0)),
+	})
 	tests := []struct {
 		xyz [3]int32
 		Block

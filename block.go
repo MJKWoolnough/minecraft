@@ -102,7 +102,7 @@ func (b *Block) GetMetadata() nbt.Compound {
 	if b.metadata == nil {
 		return nil
 	}
-	return *b.metadata.Copy().(*nbt.Compound)
+	return b.metadata.Copy().(nbt.Compound)
 }
 
 // SetMetadata sets the blocks metadata to a copy of the given metadata

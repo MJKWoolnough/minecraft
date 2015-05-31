@@ -22,95 +22,95 @@ var (
 type Level struct {
 	path      Path
 	chunks    map[uint64]*chunk
-	levelData *nbt.Compound
+	levelData nbt.Compound
 	changed   bool
 }
 
 // NewLevel creates/Loads a minecraft level from the given path.
 func NewLevel(location Path) (*Level, error) {
 	var (
-		levelDat *nbt.Tag
-		data     *nbt.Compound
+		levelDat nbt.Tag
+		data     nbt.Compound
 		changed  bool
 	)
 	levelDat, err := location.ReadLevelDat()
 	if err != nil {
 		return nil, err
-	} else if levelDat == nil {
-		levelDat = nbt.NewTag("", nbt.NewCompound([]*nbt.Tag{
-			nbt.NewTag("Data", nbt.NewCompound([]*nbt.Tag{
-				nbt.NewTag("version", nbt.NewInt(19133)),
-				nbt.NewTag("initialized", nbt.NewByte(0)),
-				nbt.NewTag("LevelName", nbt.NewString("")),
-				nbt.NewTag("generatorName", nbt.NewString(DefaultGenerator)),
-				nbt.NewTag("generatorVersion", nbt.NewInt(0)),
-				nbt.NewTag("generatorOptions", nbt.NewString("0")),
-				nbt.NewTag("RandomSeed", nbt.NewLong(rand.New(rand.NewSource(time.Now().Unix())).Int63())),
-				nbt.NewTag("MapFeatures", nbt.NewByte(1)),
-				nbt.NewTag("LastPlayed", nbt.NewLong(time.Now().Unix()*1000)),
-				nbt.NewTag("SizeOnDisk", nbt.NewLong(0)),
-				nbt.NewTag("allowCommands", nbt.NewByte(0)),
-				nbt.NewTag("hardcore", nbt.NewByte(0)),
-				nbt.NewTag("GameType", nbt.NewInt(Survival)),
-				nbt.NewTag("Time", nbt.NewLong(0)),
-				nbt.NewTag("DayTime", nbt.NewLong(0)),
-				nbt.NewTag("SpawnX", nbt.NewInt(0)),
-				nbt.NewTag("SpawnY", nbt.NewInt(0)),
-				nbt.NewTag("SpawnZ", nbt.NewInt(0)),
-				nbt.NewTag("BorderCenterX", nbt.NewDouble(0)),
-				nbt.NewTag("BorderCenterZ", nbt.NewDouble(0)),
-				nbt.NewTag("BorderSize", nbt.NewDouble(60000000)),
-				nbt.NewTag("BorderSafeZone", nbt.NewDouble(5)),
-				nbt.NewTag("BorderWarningTime", nbt.NewDouble(15)),
-				nbt.NewTag("BorderSizeLerpTarget", nbt.NewDouble(60000000)),
-				nbt.NewTag("BorderSizeLerpTime", nbt.NewLong(0)),
-				nbt.NewTag("BorderDamagePerBlock", nbt.NewDouble(0.2)),
-				nbt.NewTag("raining", nbt.NewByte(0)),
-				nbt.NewTag("rainTime", nbt.NewInt(0)),
-				nbt.NewTag("thundering", nbt.NewByte(0)),
-				nbt.NewTag("thunderTime", nbt.NewInt(0)),
-				nbt.NewTag("clearWeatherTime", nbt.NewInt(0)),
-				nbt.NewTag("GameRules", nbt.NewCompound([]*nbt.Tag{
-					nbt.NewTag("commandBlockOutput", nbt.NewString("True")),
-					nbt.NewTag("doDaylightCycle", nbt.NewString("True")),
-					nbt.NewTag("doFireTick", nbt.NewString("True")),
-					nbt.NewTag("doMobLoot", nbt.NewString("True")),
-					nbt.NewTag("doMobSpawning", nbt.NewString("True")),
-					nbt.NewTag("doTileDrops", nbt.NewString("True")),
-					nbt.NewTag("keepInventory", nbt.NewString("False")),
-					nbt.NewTag("logAdminCommands", nbt.NewString("True")),
-					nbt.NewTag("mobGriefing", nbt.NewString("True")),
-					nbt.NewTag("naturalRegeneration", nbt.NewString("True")),
-					nbt.NewTag("randomTickSpeed", nbt.NewString("3")),
-					nbt.NewTag("sendCommandFeedback", nbt.NewString("True")),
-					nbt.NewTag("showDeathMessages", nbt.NewString("True")),
-				})),
-			})),
-		}))
+	} else if levelDat.TagID() == 0 {
+		levelDat = nbt.NewTag("", nbt.Compound{
+			nbt.NewTag("Data", nbt.Compound{
+				nbt.NewTag("version", nbt.Int(19133)),
+				nbt.NewTag("initialized", nbt.Byte(0)),
+				nbt.NewTag("LevelName", nbt.String("")),
+				nbt.NewTag("generatorName", nbt.String(DefaultGenerator)),
+				nbt.NewTag("generatorVersion", nbt.Int(0)),
+				nbt.NewTag("generatorOptions", nbt.String("0")),
+				nbt.NewTag("RandomSeed", nbt.Long(rand.New(rand.NewSource(time.Now().Unix())).Int63())),
+				nbt.NewTag("MapFeatures", nbt.Byte(1)),
+				nbt.NewTag("LastPlayed", nbt.Long(time.Now().Unix()*1000)),
+				nbt.NewTag("SizeOnDisk", nbt.Long(0)),
+				nbt.NewTag("allowCommands", nbt.Byte(0)),
+				nbt.NewTag("hardcore", nbt.Byte(0)),
+				nbt.NewTag("GameType", nbt.Int(Survival)),
+				nbt.NewTag("Time", nbt.Long(0)),
+				nbt.NewTag("DayTime", nbt.Long(0)),
+				nbt.NewTag("SpawnX", nbt.Int(0)),
+				nbt.NewTag("SpawnY", nbt.Int(0)),
+				nbt.NewTag("SpawnZ", nbt.Int(0)),
+				nbt.NewTag("BorderCenterX", nbt.Double(0)),
+				nbt.NewTag("BorderCenterZ", nbt.Double(0)),
+				nbt.NewTag("BorderSize", nbt.Double(60000000)),
+				nbt.NewTag("BorderSafeZone", nbt.Double(5)),
+				nbt.NewTag("BorderWarningTime", nbt.Double(15)),
+				nbt.NewTag("BorderSizeLerpTarget", nbt.Double(60000000)),
+				nbt.NewTag("BorderSizeLerpTime", nbt.Long(0)),
+				nbt.NewTag("BorderDamagePerBlock", nbt.Double(0.2)),
+				nbt.NewTag("raining", nbt.Byte(0)),
+				nbt.NewTag("rainTime", nbt.Int(0)),
+				nbt.NewTag("thundering", nbt.Byte(0)),
+				nbt.NewTag("thunderTime", nbt.Int(0)),
+				nbt.NewTag("clearWeatherTime", nbt.Int(0)),
+				nbt.NewTag("GameRules", nbt.Compound{
+					nbt.NewTag("commandBlockOutput", nbt.String("True")),
+					nbt.NewTag("doDaylightCycle", nbt.String("True")),
+					nbt.NewTag("doFireTick", nbt.String("True")),
+					nbt.NewTag("doMobLoot", nbt.String("True")),
+					nbt.NewTag("doMobSpawning", nbt.String("True")),
+					nbt.NewTag("doTileDrops", nbt.String("True")),
+					nbt.NewTag("keepInventory", nbt.String("False")),
+					nbt.NewTag("logAdminCommands", nbt.String("True")),
+					nbt.NewTag("mobGriefing", nbt.String("True")),
+					nbt.NewTag("naturalRegeneration", nbt.String("True")),
+					nbt.NewTag("randomTickSpeed", nbt.String("3")),
+					nbt.NewTag("sendCommandFeedback", nbt.String("True")),
+					nbt.NewTag("showDeathMessages", nbt.String("True")),
+				}),
+			}),
+		})
 		changed = true
 	}
 	if levelDat.TagID() != nbt.TagCompound {
-		return nil, &WrongTypeError{"[BASE]", nbt.TagCompound, levelDat.TagID()}
-	} else if d := levelDat.Data().(*nbt.Compound).Get("Data"); d != nil {
+		return nil, WrongTypeError{"[BASE]", nbt.TagCompound, levelDat.TagID()}
+	} else if d := levelDat.Data().(nbt.Compound).Get("Data"); d.TagID() != 0 {
 		if d.TagID() == nbt.TagCompound {
-			data = d.Data().(*nbt.Compound)
+			data = d.Data().(nbt.Compound)
 		} else {
-			return nil, &WrongTypeError{"Data", nbt.TagCompound, d.TagID()}
+			return nil, WrongTypeError{"Data", nbt.TagCompound, d.TagID()}
 		}
 	} else {
-		return nil, &MissingTagError{"Data"}
+		return nil, MissingTagError{"Data"}
 	}
 	for name, tagType := range levelRequired {
-		if x := data.Get(name); x == nil {
-			return nil, &MissingTagError{name}
+		if x := data.Get(name); x.TagID() == 0 {
+			return nil, MissingTagError{name}
 		} else if x.TagID() != tagType {
-			return nil, &WrongTypeError{name, tagType, x.TagID()}
+			return nil, WrongTypeError{name, tagType, x.TagID()}
 		}
 	}
 	return &Level{
 		location,
 		make(map[uint64]*chunk),
-		levelDat.Data().(*nbt.Compound).Get("Data").Data().(*nbt.Compound),
+		levelDat.Data().(nbt.Compound).Get("Data").Data().(nbt.Compound),
 		changed,
 	}, nil
 }
@@ -338,14 +338,14 @@ func (l *Level) getChunk(x, z int32, create bool) (*chunk, error) {
 		if err != nil {
 			return nil, err
 		}
-		if chunkData != nil {
+		if chunkData.TagID() != 0 {
 			chunk, err := newChunk(x, z, chunkData)
 			if err != nil {
 				return nil, err
 			}
 			l.chunks[pos] = chunk
 		} else if create {
-			l.chunks[pos], _ = newChunk(x, z, nil)
+			l.chunks[pos], _ = newChunk(x, z, nbt.Tag{})
 		}
 	}
 	return l.chunks[pos], nil
@@ -354,12 +354,12 @@ func (l *Level) getChunk(x, z int32, create bool) (*chunk, error) {
 // Save saves all open chunks, but does not close them.
 func (l *Level) Save() error {
 	if l.changed {
-		if err := l.path.WriteLevelDat(nbt.NewTag("", nbt.NewCompound([]*nbt.Tag{nbt.NewTag("Data", l.levelData)}))); err != nil {
+		if err := l.path.WriteLevelDat(nbt.NewTag("", nbt.Compound{nbt.NewTag("Data", l.levelData)})); err != nil {
 			return err
 		}
 		l.changed = false
 	}
-	var toSave []*nbt.Tag
+	var toSave []nbt.Tag
 	for _, c := range l.chunks {
 		toSave = append(toSave, c.GetNBT())
 	}

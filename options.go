@@ -7,12 +7,12 @@ type Option func(*Level)
 
 // GetLevelName sets the given string to the name of the minecraft level.
 func (l *Level) GetLevelName() string {
-	return string(*l.levelData.Get("LevelName").Data().(*nbt.String))
+	return string(l.levelData.Get("LevelName").Data().(nbt.String))
 }
 
 // LevelName sets the name of the minecraft level.
 func (l *Level) LevelName(name string) {
-	l.setOption("LevelName", nbt.NewString(name))
+	l.setOption("LevelName", nbt.String(name))
 }
 
 // Default minecraft generators
@@ -27,17 +27,17 @@ const (
 
 // Generator sets the generator type
 func (l *Level) Generator(generator string) {
-	l.setOption("generatorName", nbt.NewString(generator))
+	l.setOption("generatorName", nbt.String(generator))
 }
 
 // GeneratorOptions sets the generator options for a flat or cusom generator. The syntax is not checked.
 func (l *Level) GeneratorOptions(options string) {
-	l.setOption("generatorOptions", nbt.NewString(options))
+	l.setOption("generatorOptions", nbt.String(options))
 }
 
 // Seed sets the random seed for the level
 func (l *Level) Seed(seed int64) {
-	l.setOption("RandomSeed", nbt.NewLong(seed))
+	l.setOption("RandomSeed", nbt.Long(seed))
 }
 
 // MapFeatures enables/disables map feature generation (villages, strongholds, mineshafts, etc.)
@@ -65,7 +65,7 @@ const (
 
 // GameMode sets the game mode type
 func (l *Level) GameMode(gm int32) {
-	l.setOption("GameType", nbt.NewInt(gm))
+	l.setOption("GameType", nbt.Int(gm))
 }
 
 // Difficulty Settings
@@ -78,7 +78,7 @@ const (
 
 // Difficulty sets the level difficulty
 func (l *Level) Difficulty(d int8) {
-	l.setOption("Difficulty", nbt.NewByte(d))
+	l.setOption("Difficulty", nbt.Byte(d))
 }
 
 // DifficultyLocked locks the difficulty in game
@@ -88,7 +88,7 @@ func (l *Level) DifficultyLocked(dl bool) {
 
 // TicksExisted sets how many ticks have passed in game
 func (l *Level) TicksExisted(t int64) {
-	l.setOption("Time", nbt.NewLong(t))
+	l.setOption("Time", nbt.Long(t))
 }
 
 // Time-of-day convenience constants
@@ -102,36 +102,36 @@ const (
 
 // Time sets the in world time.
 func (l *Level) Time(t int64) {
-	l.setOption("DayTime", nbt.NewLong(t))
+	l.setOption("DayTime", nbt.Long(t))
 }
 
 // GetSpawn sets the given x, y, z coordinates to the current spawn point.
 func (l *Level) GetSpawn() (x int32, y int32, z int32) {
 	xTag, yTag, zTag := l.levelData.Get("SpawnX"), l.levelData.Get("SpawnY"), l.levelData.Get("SpawnZ")
-	x = int32(*xTag.Data().(*nbt.Int))
-	y = int32(*yTag.Data().(*nbt.Int))
-	z = int32(*zTag.Data().(*nbt.Int))
+	x = int32(xTag.Data().(nbt.Int))
+	y = int32(yTag.Data().(nbt.Int))
+	z = int32(zTag.Data().(nbt.Int))
 	return x, y, z
 }
 
 // Spawn sets the spawn point to the given coordinates.
 func (l *Level) Spawn(x, y, z int32) {
-	l.levelData.Set(nbt.NewTag("SpawnX", nbt.NewInt(x)))
-	l.levelData.Set(nbt.NewTag("SpawnY", nbt.NewInt(y)))
-	l.levelData.Set(nbt.NewTag("SpawnZ", nbt.NewInt(z)))
+	l.levelData.Set(nbt.NewTag("SpawnX", nbt.Int(x)))
+	l.levelData.Set(nbt.NewTag("SpawnY", nbt.Int(y)))
+	l.levelData.Set(nbt.NewTag("SpawnZ", nbt.Int(z)))
 	l.changed = true
 }
 
 //BorderCenter sets the position of the center of the World Border
 func (l *Level) BorderCenter(x, z float64) {
-	l.levelData.Set(nbt.NewTag("BorderCenterX", nbt.NewDouble(x)))
-	l.levelData.Set(nbt.NewTag("BorderCenterZ", nbt.NewDouble(z)))
+	l.levelData.Set(nbt.NewTag("BorderCenterX", nbt.Double(x)))
+	l.levelData.Set(nbt.NewTag("BorderCenterZ", nbt.Double(z)))
 	l.changed = true
 }
 
 //BorderSize sets the width of the border
 func (l *Level) BorderSize(w float64) {
-	l.setOption("BorderSize", nbt.NewDouble(w))
+	l.setOption("BorderSize", nbt.Double(w))
 }
 
 // Raining sets the rain on or off
@@ -141,7 +141,7 @@ func (l *Level) Raining(raining bool) {
 
 // RainTime sets the time until the rain state changes
 func (l *Level) RainTime(time int32) {
-	l.setOption("rainTime", nbt.NewInt(time))
+	l.setOption("rainTime", nbt.Int(time))
 }
 
 // Thundering sets the lightning/thunder on or off
@@ -149,9 +149,9 @@ func (l *Level) Thundering(thundering bool) {
 	l.setOption("thundering", boolToByte(thundering))
 }
 
-// ThunderTime sets the tune until the tunder state changes
+// ThunderTime sets the tune until the thunder state changes
 func (l *Level) ThunderTime(time int32) {
-	l.setOption("thunderTime", nbt.NewInt(time))
+	l.setOption("thunderTime", nbt.Int(time))
 }
 
 // CommandBlockOutput enables/disables chat echo for command blocks
@@ -221,28 +221,27 @@ func (l *Level) setOption(name string, data nbt.Data) {
 }
 
 func (l *Level) setGameRule(name string, data bool) {
-	var grc *nbt.Compound
+	var grc nbt.Compound
 	gr := l.levelData.Get("GameRules")
-	if gr != nil {
-		grc = gr.Data().(*nbt.Compound)
+	if gr.TagID() != 0 {
+		grc = gr.Data().(nbt.Compound)
 	}
-	if grc == nil {
-		grc = nbt.NewCompound([]*nbt.Tag{})
+	if grc.Type() == 0 {
 		l.levelData.Set(nbt.NewTag("GameRules", grc))
 	}
-	var d *nbt.String
+	var d nbt.String
 	if data {
-		d = nbt.NewString("True")
+		d = nbt.String("True")
 	} else {
-		d = nbt.NewString("False")
+		d = nbt.String("False")
 	}
 	grc.Set(nbt.NewTag(name, d))
 	l.changed = true
 }
 
-func boolToByte(b bool) *nbt.Byte {
+func boolToByte(b bool) nbt.Byte {
 	if b {
-		return nbt.NewByte(1)
+		return nbt.Byte(1)
 	}
-	return nbt.NewByte(0)
+	return nbt.Byte(0)
 }
