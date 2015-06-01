@@ -57,7 +57,7 @@ func NewFilePath(dirname string) (*FilePath, error) {
 // GetChunk returns the chunk at chunk coords x, z.
 func (p *FilePath) GetChunk(x, z int32) (nbt.Tag, error) {
 	if !p.HasLock() {
-		return nbt.Tag{}, NoLock
+		return nbt.Tag{}, ErrNoLock
 	}
 	f, err := os.Open(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x>>5, z>>5)))
 	if err != nil {
@@ -122,7 +122,7 @@ type rc struct {
 // multiple errors were encountered.
 func (p *FilePath) SetChunk(data ...nbt.Tag) error {
 	if !p.HasLock() {
-		return NoLock
+		return ErrNoLock
 	}
 	regions := make(map[uint64][]rc)
 	var (
@@ -292,7 +292,7 @@ func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
 // RemoveChunk deletes the chunk at chunk coords x, z.
 func (p *FilePath) RemoveChunk(x, z int32) error {
 	if !p.HasLock() {
-		return NoLock
+		return ErrNoLock
 	}
 	chunkX := x & 31
 	regionX := x >> 5
@@ -315,7 +315,7 @@ func (p *FilePath) RemoveChunk(x, z int32) error {
 // ReadLevelDat returns the level data.
 func (p *FilePath) ReadLevelDat() (nbt.Tag, error) {
 	if !p.HasLock() {
-		return nbt.Tag{}, NoLock
+		return nbt.Tag{}, ErrNoLock
 	}
 	f, err := os.Open(path.Join(p.dirname, "level.dat"))
 	if os.IsNotExist(err) {
@@ -335,7 +335,7 @@ func (p *FilePath) ReadLevelDat() (nbt.Tag, error) {
 // WriteLevelDat Writes the level data.
 func (p *FilePath) WriteLevelDat(data nbt.Tag) error {
 	if !p.HasLock() {
-		return NoLock
+		return ErrNoLock
 	}
 	f, err := os.OpenFile(path.Join(p.dirname, "level.dat"), os.O_WRONLY|os.O_CREATE, 0666)
 	if err != nil {
@@ -368,7 +368,7 @@ func (p *FilePath) GetRegions() [][2]int32 {
 // GetChunks returns a list of all chunks within a region with coords x,z
 func (p *FilePath) GetChunks(x, z int32) ([][2]int32, error) {
 	if !p.HasLock() {
-		return nil, NoLock
+		return nil, ErrNoLock
 	}
 	f, err := os.Open(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x, z)))
 	if err != nil {
@@ -431,7 +431,7 @@ func (p *FilePath) Lock() error {
 // Defrag rewrites a region file to reduce wasted space.
 func (p *FilePath) Defrag(x, z int32) error {
 	if !p.HasLock() {
-		return NoLock
+		return ErrNoLock
 	}
 	f, err := os.OpenFile(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x, z)), os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {

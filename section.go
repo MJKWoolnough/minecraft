@@ -69,7 +69,7 @@ func loadSection(c nbt.Compound) (*section, error) {
 	}
 	s.blocks = blocks.Data().(nbt.ByteArray)
 	if len(s.blocks) != 4096 {
-		return nil, OOB
+		return nil, ErrOOB
 	}
 	add := c.Get("Add")
 	if add.TagID() != 0 {
@@ -82,7 +82,7 @@ func loadSection(c nbt.Compound) (*section, error) {
 		c.Set(nbt.NewTag("Add", s.add))
 	}
 	if len(s.add) != 2048 {
-		return nil, OOB
+		return nil, ErrOOB
 	}
 	data := c.Get("Data")
 	if data.TagID() == 0 {
@@ -92,7 +92,7 @@ func loadSection(c nbt.Compound) (*section, error) {
 	}
 	s.data = data.Data().(nbt.ByteArray)
 	if len(s.data) != 2048 {
-		return nil, OOB
+		return nil, ErrOOB
 	}
 	blockLight := c.Get("BlockLight")
 	if blockLight.TagID() == 0 {
@@ -102,7 +102,7 @@ func loadSection(c nbt.Compound) (*section, error) {
 	}
 	s.blockLight = blockLight.Data().(nbt.ByteArray)
 	if len(s.blockLight) != 2048 {
-		return nil, OOB
+		return nil, ErrOOB
 	}
 	skyLight := c.Get("SkyLight")
 	if skyLight.TagID() == 0 {
@@ -112,7 +112,7 @@ func loadSection(c nbt.Compound) (*section, error) {
 	}
 	s.skyLight = skyLight.Data().(nbt.ByteArray)
 	if len(s.skyLight) != 2048 {
-		return nil, OOB
+		return nil, ErrOOB
 	}
 	y := c.Get("Y")
 	if y.TagID() == 0 {
