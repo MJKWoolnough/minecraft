@@ -2,6 +2,7 @@ package nbt
 
 import (
 	"io"
+	"unsafe"
 
 	"github.com/MJKWoolnough/byteio"
 )
@@ -126,16 +127,12 @@ func (d Decoder) DecodeByteArray() (ByteArray, error) {
 	if err != nil {
 		return nil, err
 	}
-	data := make([]byte, l)
-	_, err = io.ReadFull(d.r, data)
+	data := make(ByteArray, l)
+	_, err = io.ReadFull(d.r, *(*[]byte)(unsafe.Pointer(&data)))
 	if err != nil {
 		return nil, err
 	}
-	ba := make([]int8, l)
-	for i := uint32(0); i < l; i++ {
-		ba[i] = int8(data[i])
-	}
-	return ByteArray(ba), nil
+	return data, nil
 }
 
 // DecodeString will read a String Data
