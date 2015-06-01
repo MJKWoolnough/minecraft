@@ -42,7 +42,7 @@ type WrongTag struct {
 }
 
 func (w WrongTag) Error() string {
-	return fmt.Sprintf("expecting tag id %d, got %d", w.Expecting, w.Got)
+	return fmt.Sprintf("expecting tag id %s, got %s", w.Expecting, w.Got)
 }
 
 // BadRange is an error that occurs when trying to set an item on a list which
