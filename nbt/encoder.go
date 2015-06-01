@@ -21,8 +21,13 @@ func NewEncoderEndian(e byteio.EndianWriter) Encoder {
 	return Encoder{w: e}
 }
 
-// EncodeTag will encode a whole tag to the encoding stream
-func (e Encoder) EncodeTag(t Tag) error {
+// Encode will encode a single tag to the writer using the default settings
+func Encode(w io.Writer, t Tag) error {
+	return NewEncoder(w).Encode(t)
+}
+
+// Encode will encode a whole tag to the encoding stream
+func (e Encoder) Encode(t Tag) error {
 	tagType := t.TagID()
 	_, err := e.w.WriteUint8(uint8(tagType))
 	if err != nil {
@@ -32,7 +37,7 @@ func (e Encoder) EncodeTag(t Tag) error {
 		return nil
 	}
 	s := String(t.name)
-	err = e.EncodeString(s)
+	err = e.encodeString(s)
 	if err != nil {
 		return err
 	}
@@ -43,27 +48,27 @@ func (e Encoder) encodeData(d Data) error {
 	var err error
 	switch d := d.(type) {
 	case Byte:
-		err = e.EncodeByte(d)
+		err = e.encodeByte(d)
 	case Short:
-		err = e.EncodeShort(d)
+		err = e.encodeShort(d)
 	case Int:
-		err = e.EncodeInt(d)
+		err = e.encodeInt(d)
 	case Long:
-		err = e.EncodeLong(d)
+		err = e.encodeLong(d)
 	case Float:
-		err = e.EncodeFloat(d)
+		err = e.encodeFloat(d)
 	case Double:
-		err = e.EncodeDouble(d)
+		err = e.encodeDouble(d)
 	case ByteArray:
-		err = e.EncodeByteArray(d)
+		err = e.encodeByteArray(d)
 	case String:
-		err = e.EncodeString(d)
+		err = e.encodeString(d)
 	case *List:
-		err = e.EncodeList(d)
+		err = e.encodeList(d)
 	case Compound:
-		err = e.EncodeCompound(d)
+		err = e.encodeCompound(d)
 	case IntArray:
-		err = e.EncodeIntArray(d)
+		err = e.encodeIntArray(d)
 	default:
 		err = UnknownTag{d.Type()}
 	}
@@ -74,43 +79,43 @@ func (e Encoder) encodeData(d Data) error {
 }
 
 // EncodeByte will write a single Byte Data
-func (e Encoder) EncodeByte(b Byte) error {
+func (e Encoder) encodeByte(b Byte) error {
 	_, err := e.w.WriteInt8(int8(b))
 	return err
 }
 
 // EncodeShort will write a single Short Data
-func (e Encoder) EncodeShort(s Short) error {
+func (e Encoder) encodeShort(s Short) error {
 	_, err := e.w.WriteInt16(int16(s))
 	return err
 }
 
 // EncodeInt will write a single Int Data
-func (e Encoder) EncodeInt(i Int) error {
+func (e Encoder) encodeInt(i Int) error {
 	_, err := e.w.WriteInt32(int32(i))
 	return err
 }
 
 // EncodeLong will write a single Long Data
-func (e Encoder) EncodeLong(l Long) error {
+func (e Encoder) encodeLong(l Long) error {
 	_, err := e.w.WriteInt64(int64(l))
 	return err
 }
 
 // EncodeFloat will write a single Float Data
-func (e Encoder) EncodeFloat(f Float) error {
+func (e Encoder) encodeFloat(f Float) error {
 	_, err := e.w.WriteFloat32(float32(f))
 	return err
 }
 
 // EncodeDouble will write a single Double Data
-func (e Encoder) EncodeDouble(do Double) error {
+func (e Encoder) encodeDouble(do Double) error {
 	_, err := e.w.WriteFloat64(float64(do))
 	return err
 }
 
 // EncodeByteArray will write a ByteArray Data
-func (e Encoder) EncodeByteArray(ba ByteArray) error {
+func (e Encoder) encodeByteArray(ba ByteArray) error {
 	_, err := e.w.WriteUint32(uint32(len(ba)))
 	if err != nil {
 		return err
@@ -120,7 +125,7 @@ func (e Encoder) EncodeByteArray(ba ByteArray) error {
 }
 
 // EncodeString will write a String Data
-func (e Encoder) EncodeString(s String) error {
+func (e Encoder) encodeString(s String) error {
 	_, err := e.w.WriteUint16(uint16(len(s)))
 	if err != nil {
 		return err
@@ -130,7 +135,7 @@ func (e Encoder) EncodeString(s String) error {
 }
 
 // EncodeList will write a List Data
-func (e Encoder) EncodeList(l *List) error {
+func (e Encoder) encodeList(l *List) error {
 	_, err := e.w.WriteUint8(uint8(l.tagType))
 	if err != nil {
 		return err
@@ -154,12 +159,12 @@ func (e Encoder) EncodeList(l *List) error {
 }
 
 // EncodeCompound will write a Compound Data
-func (e Encoder) EncodeCompound(c Compound) error {
+func (e Encoder) encodeCompound(c Compound) error {
 	for _, data := range c {
 		if data.TagID() == TagEnd {
 			break
 		}
-		err := e.EncodeTag(data)
+		err := e.Encode(data)
 		if err != nil {
 			return err
 		}
@@ -169,7 +174,7 @@ func (e Encoder) EncodeCompound(c Compound) error {
 }
 
 // EncodeIntArray will write a IntArray Data
-func (e Encoder) EncodeIntArray(ints IntArray) error {
+func (e Encoder) encodeIntArray(ints IntArray) error {
 	_, err := e.w.WriteUint32(uint32(len(ints)))
 	for _, i := range ints {
 		_, err = e.w.WriteInt32(i)

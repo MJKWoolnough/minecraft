@@ -22,8 +22,13 @@ func NewDecoderEndian(e byteio.EndianReader) Decoder {
 	return Decoder{r: e}
 }
 
-// DecodeTag will read a whole tag out of the decoding stream
-func (d Decoder) DecodeTag() (Tag, error) {
+// Decode will eencode a single tag from the reader using the default settings
+func Decode(r io.Reader) (Tag, error) {
+	return NewDecoder(r).Decode()
+}
+
+// Decode will read a whole tag out of the decoding stream
+func (d Decoder) Decode() (Tag, error) {
 	t, _, err := d.r.ReadUint8()
 	if err != nil {
 		err = ReadError{"named TagId", err}
@@ -33,7 +38,7 @@ func (d Decoder) DecodeTag() (Tag, error) {
 	if tagID == TagEnd {
 		return Tag{data: end{}}, nil
 	}
-	n, err := d.DecodeString()
+	n, err := d.decodeString()
 	if err != nil {
 		err = ReadError{"name", err}
 		return Tag{}, err
@@ -52,27 +57,27 @@ func (d Decoder) decodeData(tagID TagID) (Data, error) {
 	)
 	switch tagID {
 	case TagByte:
-		data, err = d.DecodeByte()
+		data, err = d.decodeByte()
 	case TagShort:
-		data, err = d.DecodeShort()
+		data, err = d.decodeShort()
 	case TagInt:
-		data, err = d.DecodeInt()
+		data, err = d.decodeInt()
 	case TagLong:
-		data, err = d.DecodeLong()
+		data, err = d.decodeLong()
 	case TagFloat:
-		data, err = d.DecodeFloat()
+		data, err = d.decodeFloat()
 	case TagDouble:
-		data, err = d.DecodeDouble()
+		data, err = d.decodeDouble()
 	case TagByteArray:
-		data, err = d.DecodeByteArray()
+		data, err = d.decodeByteArray()
 	case TagString:
-		data, err = d.DecodeString()
+		data, err = d.decodeString()
 	case TagList:
-		data, err = d.DecodeList()
+		data, err = d.decodeList()
 	case TagCompound:
-		data, err = d.DecodeCompound()
+		data, err = d.decodeCompound()
 	case TagIntArray:
-		data, err = d.DecodeIntArray()
+		data, err = d.decodeIntArray()
 	default:
 		err = UnknownTag{tagID}
 	}
@@ -86,43 +91,43 @@ func (d Decoder) decodeData(tagID TagID) (Data, error) {
 }
 
 // DecodeByte will read a single Byte Data
-func (d Decoder) DecodeByte() (Byte, error) {
+func (d Decoder) decodeByte() (Byte, error) {
 	b, _, err := d.r.ReadInt8()
 	return Byte(b), err
 }
 
 // DecodeShort will read a single Short Data
-func (d Decoder) DecodeShort() (Short, error) {
+func (d Decoder) decodeShort() (Short, error) {
 	s, _, err := d.r.ReadInt16()
 	return Short(s), err
 }
 
 // DecodeInt will read a single Int Data
-func (d Decoder) DecodeInt() (Int, error) {
+func (d Decoder) decodeInt() (Int, error) {
 	i, _, err := d.r.ReadInt32()
 	return Int(i), err
 }
 
 // DecodeLong will read a single Long Data
-func (d Decoder) DecodeLong() (Long, error) {
+func (d Decoder) decodeLong() (Long, error) {
 	l, _, err := d.r.ReadInt64()
 	return Long(l), err
 }
 
 // DecodeFloat will read a single Float Data
-func (d Decoder) DecodeFloat() (Float, error) {
+func (d Decoder) decodeFloat() (Float, error) {
 	f, _, err := d.r.ReadFloat32()
 	return Float(f), err
 }
 
 // DecodeDouble will read a single Double Data
-func (d Decoder) DecodeDouble() (Double, error) {
+func (d Decoder) decodeDouble() (Double, error) {
 	do, _, err := d.r.ReadFloat64()
 	return Double(do), err
 }
 
 // DecodeByteArray will read a ByteArray Data
-func (d Decoder) DecodeByteArray() (ByteArray, error) {
+func (d Decoder) decodeByteArray() (ByteArray, error) {
 	l, _, err := d.r.ReadUint32()
 	if err != nil {
 		return nil, err
@@ -136,7 +141,7 @@ func (d Decoder) DecodeByteArray() (ByteArray, error) {
 }
 
 // DecodeString will read a String Data
-func (d Decoder) DecodeString() (String, error) {
+func (d Decoder) decodeString() (String, error) {
 	l, _, err := d.r.ReadUint16()
 	if err != nil {
 		return "", err
@@ -150,7 +155,7 @@ func (d Decoder) DecodeString() (String, error) {
 }
 
 // DecodeList will read a List Data
-func (d Decoder) DecodeList() (*List, error) {
+func (d Decoder) decodeList() (*List, error) {
 	t, _, err := d.r.ReadUint8()
 	if err != nil {
 		return nil, err
@@ -174,10 +179,10 @@ func (d Decoder) DecodeList() (*List, error) {
 }
 
 // DecodeCompound will read a Compound Data
-func (d Decoder) DecodeCompound() (Compound, error) {
+func (d Decoder) decodeCompound() (Compound, error) {
 	data := make(Compound, 0)
 	for {
-		t, err := d.DecodeTag()
+		t, err := d.Decode()
 		if err != nil {
 			return nil, err
 		}
@@ -190,7 +195,7 @@ func (d Decoder) DecodeCompound() (Compound, error) {
 }
 
 // DecodeIntArray will read an IntArray Data
-func (d Decoder) DecodeIntArray() (IntArray, error) {
+func (d Decoder) decodeIntArray() (IntArray, error) {
 	l, _, err := d.r.ReadUint32()
 	if err != nil {
 		return nil, err

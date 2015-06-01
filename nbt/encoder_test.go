@@ -99,7 +99,7 @@ func TestLarge(t *testing.T) { //bigtest.nbt
 }
 
 func testNBT(input string, middle Tag, t *testing.T) {
-	tag, err := NewDecoder(base64.NewDecoder(base64.StdEncoding, bytes.NewBufferString(input))).DecodeTag()
+	tag, err := Decode(base64.NewDecoder(base64.StdEncoding, bytes.NewBufferString(input)))
 	if err != nil {
 		t.Errorf("error encountered while reading nbt data: %q", err)
 		return
@@ -110,7 +110,7 @@ func testNBT(input string, middle Tag, t *testing.T) {
 	}
 	o := new(bytes.Buffer)
 	b := base64.NewEncoder(base64.StdEncoding, o)
-	err = NewEncoder(b).EncodeTag(tag)
+	err = Encode(b, tag)
 	b.Close()
 	if err != nil {
 		t.Errorf("error encountered while writing nbt data: %q", err)

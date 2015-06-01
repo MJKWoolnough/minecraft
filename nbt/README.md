@@ -13,6 +13,12 @@ var BadRange = errors.New("given index was out-of-range")
 BadRange is an error that occurs when trying to set an item on a list which is
 outside of the current limits of the list.
 
+#### func  Encode
+
+```go
+func Encode(w io.Writer, t Tag) error
+```
+
 #### type Byte
 
 ```go
@@ -187,89 +193,12 @@ func NewDecoderEndian(e byteio.EndianReader) Decoder
 ```
 NewDecoderEndian allows you to specify your own Endian Reader
 
-#### func (Decoder) DecodeByte
+#### func (Decoder) Decode
 
 ```go
-func (d Decoder) DecodeByte() (Byte, error)
+func (d Decoder) Decode() (Tag, error)
 ```
-DecodeByte will read a single Byte Data
-
-#### func (Decoder) DecodeByteArray
-
-```go
-func (d Decoder) DecodeByteArray() (ByteArray, error)
-```
-DecodeByteArray will read a ByteArray Data
-
-#### func (Decoder) DecodeCompound
-
-```go
-func (d Decoder) DecodeCompound() (Compound, error)
-```
-DecodeCompound will read a Compound Data
-
-#### func (Decoder) DecodeDouble
-
-```go
-func (d Decoder) DecodeDouble() (Double, error)
-```
-DecodeDouble will read a single Double Data
-
-#### func (Decoder) DecodeFloat
-
-```go
-func (d Decoder) DecodeFloat() (Float, error)
-```
-DecodeFloat will read a single Float Data
-
-#### func (Decoder) DecodeInt
-
-```go
-func (d Decoder) DecodeInt() (Int, error)
-```
-DecodeInt will read a single Int Data
-
-#### func (Decoder) DecodeIntArray
-
-```go
-func (d Decoder) DecodeIntArray() (IntArray, error)
-```
-DecodeIntArray will read an IntArray Data
-
-#### func (Decoder) DecodeList
-
-```go
-func (d Decoder) DecodeList() (*List, error)
-```
-DecodeList will read a List Data
-
-#### func (Decoder) DecodeLong
-
-```go
-func (d Decoder) DecodeLong() (Long, error)
-```
-DecodeLong will read a single Long Data
-
-#### func (Decoder) DecodeShort
-
-```go
-func (d Decoder) DecodeShort() (Short, error)
-```
-DecodeShort will read a single Short Data
-
-#### func (Decoder) DecodeString
-
-```go
-func (d Decoder) DecodeString() (String, error)
-```
-DecodeString will read a String Data
-
-#### func (Decoder) DecodeTag
-
-```go
-func (d Decoder) DecodeTag() (Tag, error)
-```
-DecodeTag will read a whole tag out of the decoding stream
+Decode will read a whole tag out of the decoding stream
 
 #### type Double
 
@@ -330,87 +259,10 @@ func NewEncoderEndian(e byteio.EndianWriter) Encoder
 ```
 NewEncoderEndian allows you to specify your own Endian Writer
 
-#### func (Encoder) EncodeByte
+#### func (Encoder) Encode
 
 ```go
-func (e Encoder) EncodeByte(b Byte) error
-```
-EncodeByte will write a single Byte Data
-
-#### func (Encoder) EncodeByteArray
-
-```go
-func (e Encoder) EncodeByteArray(ba ByteArray) error
-```
-EncodeByteArray will write a ByteArray Data
-
-#### func (Encoder) EncodeCompound
-
-```go
-func (e Encoder) EncodeCompound(c Compound) error
-```
-EncodeCompound will write a Compound Data
-
-#### func (Encoder) EncodeDouble
-
-```go
-func (e Encoder) EncodeDouble(do Double) error
-```
-EncodeDouble will write a single Double Data
-
-#### func (Encoder) EncodeFloat
-
-```go
-func (e Encoder) EncodeFloat(f Float) error
-```
-EncodeFloat will write a single Float Data
-
-#### func (Encoder) EncodeInt
-
-```go
-func (e Encoder) EncodeInt(i Int) error
-```
-EncodeInt will write a single Int Data
-
-#### func (Encoder) EncodeIntArray
-
-```go
-func (e Encoder) EncodeIntArray(ints IntArray) error
-```
-EncodeIntArray will write a IntArray Data
-
-#### func (Encoder) EncodeList
-
-```go
-func (e Encoder) EncodeList(l *List) error
-```
-EncodeList will write a List Data
-
-#### func (Encoder) EncodeLong
-
-```go
-func (e Encoder) EncodeLong(l Long) error
-```
-EncodeLong will write a single Long Data
-
-#### func (Encoder) EncodeShort
-
-```go
-func (e Encoder) EncodeShort(s Short) error
-```
-EncodeShort will write a single Short Data
-
-#### func (Encoder) EncodeString
-
-```go
-func (e Encoder) EncodeString(s String) error
-```
-EncodeString will write a String Data
-
-#### func (Encoder) EncodeTag
-
-```go
-func (e Encoder) EncodeTag(t Tag) error
+func (e Encoder) Encode(t Tag) error
 ```
 EncodeTag will encode a whole tag to the encoding stream
 
@@ -757,6 +609,12 @@ type Tag struct {
 ```
 
 Tag is the main NBT type, a combination of a name and a Data type
+
+#### func  Decode
+
+```go
+func Decode(r io.Reader) (Tag, error)
+```
 
 #### func  NewTag
 
