@@ -57,6 +57,14 @@ type ByteArray []int8
 
 ByteArray is an implementation of the Data interface
 
+#### func (ByteArray) Bytes
+
+```go
+func (b ByteArray) Bytes() []byte
+```
+Converts the ByteArray (actually int8) to an actual slice of bytes. NB: Uses
+unsafe, so the underlying array is the same.
+
 #### func (ByteArray) Copy
 
 ```go
