@@ -325,7 +325,7 @@ func (ByteArray) Type() TagID {
 	return TagByteArray
 }
 
-// Converts the ByteArray (actually int8) to an actual slice of bytes.
+// Bytes converts the ByteArray (actually int8) to an actual slice of bytes.
 // NB: Uses unsafe, so the underlying array is the same.
 func (b ByteArray) Bytes() []byte {
 	return *(*[]byte)(unsafe.Pointer(&b))
@@ -432,7 +432,7 @@ func (l *List) String() string {
 // Set sets the data at the given position. It does not append
 func (l *List) Set(i int32, data Data) error {
 	if i < 0 || i >= int32(len(l.data)) {
-		return BadRange
+		return ErrBadRange
 	}
 	if err := l.valid(data); err != nil {
 		return err

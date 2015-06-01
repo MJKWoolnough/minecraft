@@ -47,4 +47,4 @@ func (w WrongTag) Error() string {
 
 // BadRange is an error that occurs when trying to set an item on a list which
 // is outside of the current limits of the list.
-var BadRange = errors.New("given index was out-of-range")
+var ErrBadRange = errors.New("given index was out-of-range")
