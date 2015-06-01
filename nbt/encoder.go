@@ -115,11 +115,7 @@ func (e Encoder) EncodeByteArray(ba ByteArray) error {
 	if err != nil {
 		return err
 	}
-	data := make([]byte, len(ba))
-	for i := 0; i < len(ba); i++ {
-		data[i] = byte(ba[i])
-	}
-	_, err = e.w.Write(data)
+	_, err = e.w.Write(ba.Bytes())
 	return err
 }
 
