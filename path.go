@@ -110,7 +110,7 @@ func (p *FilePath) GetChunk(x, z int32) (nbt.Tag, error) {
 		return nbt.Tag{}, UnknownCompression{compression}
 	}
 
-	return nbt.NewDecoder(reader).DecodeTag()
+	return nbt.Decode(reader)
 }
 
 type rc struct {
@@ -146,7 +146,7 @@ func (p *FilePath) SetChunk(data ...nbt.Tag) error {
 		r := uint64(z>>5)<<32 | uint64(uint32(x>>5))
 		reg := rc{pos: (z&31)<<5 | (x & 31)}
 		zl := zlib.NewWriter(memio.Create(&reg.buf))
-		err = nbt.NewEncoder(zl).EncodeTag(d)
+		err = nbt.Encode(zl, d)
 		zl.Close()
 		if err != nil {
 			errors = append(errors, FilePathSetError{x, z, err})
@@ -328,7 +328,7 @@ func (p *FilePath) ReadLevelDat() (nbt.Tag, error) {
 	if err != nil {
 		return nbt.Tag{}, err
 	}
-	data, err := nbt.NewDecoder(g).DecodeTag()
+	data, err := nbt.Decode(g)
 	return data, err
 }
 
@@ -344,7 +344,7 @@ func (p *FilePath) WriteLevelDat(data nbt.Tag) error {
 	defer f.Close()
 	g := gzip.NewWriter(f)
 	defer g.Close()
-	err = nbt.NewEncoder(g).EncodeTag(data)
+	err = nbt.Encode(g, data)
 	return err
 }
 
@@ -558,14 +558,14 @@ func (m *MemPath) read(buf []byte) (nbt.Tag, error) {
 	if err != nil {
 		return nbt.Tag{}, err
 	}
-	data, err := nbt.NewDecoder(z).DecodeTag()
+	data, err := nbt.Decode(z)
 	return data, err
 }
 
 func (m *MemPath) write(data nbt.Tag, buf *[]byte) error {
 	z := zlib.NewWriter(memio.Create(buf))
 	defer z.Close()
-	err := nbt.NewEncoder(z).EncodeTag(data)
+	err := nbt.Encode(z, data)
 	return err
 }
 
