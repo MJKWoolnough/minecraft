@@ -547,6 +547,7 @@ func (c *Compound) Remove(name string) {
 	for i, t := range *c {
 		if t.Name() == name {
 			copy((*c)[i:], (*c)[i+1:])
+			(*c)[len((*c))-1] = Tag{data: end{}}
 			(*c) = (*c)[:len((*c))-1]
 			return
 		}
