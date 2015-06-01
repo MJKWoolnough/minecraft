@@ -10,6 +10,7 @@ import (
 	"path"
 	"regexp"
 	"sort"
+	"strconv"
 	"time"
 
 	"github.com/MJKWoolnough/byteio"
@@ -40,8 +41,9 @@ const (
 // FilePath implements the Path interface and provides a standard minecraft
 // save format.
 type FilePath struct {
-	dirname string
-	lock    int64
+	dirname   string
+	lock      int64
+	dimension string
 }
 
 // NewFilePath constructs a new directory based path to read from.
@@ -54,12 +56,25 @@ func NewFilePath(dirname string) (*FilePath, error) {
 	return p, p.Lock()
 }
 
+// NewFilePathDimension create a new FilePath, but with the option to set the
+// dimension that chunks are loaded from.
+//
+// Example. Dimension -1 == The Nether
+//          Dimension  1 == The End
+func NewFilePathDimension(dirname string, dimension int) (*FilePath, error) {
+	fp, err := NewFilePath(dirname)
+	if dimension != 0 {
+		fp.dimension = "DIM" + strconv.Itoa(dimension)
+	}
+	return fp, err
+}
+
 // GetChunk returns the chunk at chunk coords x, z.
 func (p *FilePath) GetChunk(x, z int32) (nbt.Tag, error) {
 	if !p.HasLock() {
 		return nbt.Tag{}, ErrNoLock
 	}
-	f, err := os.Open(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x>>5, z>>5)))
+	f, err := os.Open(path.Join(p.dirname, p.dimension, "region", fmt.Sprintf("r.%d.%d.mca", x>>5, z>>5)))
 	if err != nil {
 		if os.IsNotExist(err) {
 			err = nil
@@ -185,10 +200,10 @@ func (s sia) Swap(i, j int) {
 }
 
 func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
-	if err := os.MkdirAll(path.Join(p.dirname, "region"), 0755); err != nil {
+	if err := os.MkdirAll(path.Join(p.dirname, p.dimension, "region"), 0755); err != nil {
 		return err
 	}
-	f, err := os.OpenFile(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x, z)), os.O_RDWR|os.O_CREATE, 0666)
+	f, err := os.OpenFile(path.Join(p.dirname, p.dimension, "region", fmt.Sprintf("r.%d.%d.mca", x, z)), os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		return err
 	}
@@ -298,7 +313,7 @@ func (p *FilePath) RemoveChunk(x, z int32) error {
 	regionX := x >> 5
 	chunkZ := z & 31
 	regionZ := z >> 5
-	f, err := os.OpenFile(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", regionX, regionZ)), os.O_WRONLY, 0666)
+	f, err := os.OpenFile(path.Join(p.dirname, p.dimension, "region", fmt.Sprintf("r.%d.%d.mca", regionX, regionZ)), os.O_WRONLY, 0666)
 	if os.IsNotExist(err) {
 		return nil
 	} else if err != nil {
@@ -350,7 +365,7 @@ func (p *FilePath) WriteLevelDat(data nbt.Tag) error {
 
 // GetRegions returns a list of region x,z coords of all generated regions.
 func (p *FilePath) GetRegions() [][2]int32 {
-	files, _ := ioutil.ReadDir(path.Join(p.dirname, "region"))
+	files, _ := ioutil.ReadDir(path.Join(p.dirname, p.dimension, "region"))
 	var toRet [][2]int32
 	var x, z int32
 	for _, file := range files {
@@ -370,7 +385,7 @@ func (p *FilePath) GetChunks(x, z int32) ([][2]int32, error) {
 	if !p.HasLock() {
 		return nil, ErrNoLock
 	}
-	f, err := os.Open(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x, z)))
+	f, err := os.Open(path.Join(p.dirname, p.dimension, "region", fmt.Sprintf("r.%d.%d.mca", x, z)))
 	if err != nil {
 		return nil, err
 	}
@@ -433,7 +448,7 @@ func (p *FilePath) Defrag(x, z int32) error {
 	if !p.HasLock() {
 		return ErrNoLock
 	}
-	f, err := os.OpenFile(path.Join(p.dirname, "region", fmt.Sprintf("r.%d.%d.mca", x, z)), os.O_RDWR|os.O_CREATE, 0666)
+	f, err := os.OpenFile(path.Join(p.dirname, p.dimension, "region", fmt.Sprintf("r.%d.%d.mca", x, z)), os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		return err
 	}
