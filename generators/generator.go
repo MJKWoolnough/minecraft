@@ -2,6 +2,10 @@ package generator
 
 import "github.com/MJKWoolnough/minecraft"
 
+type Rand interface {
+	Intn(int) int
+}
+
 type Generator struct {
 	*minecraft.Level
 }
