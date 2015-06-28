@@ -3,7 +3,7 @@ package generator
 import "github.com/MJKWoolnough/minecraft"
 
 type Rand interface {
-	Intn(int) int
+	Int31n(int32) int32
 }
 
 type Generator struct {
