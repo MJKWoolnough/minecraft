@@ -297,7 +297,7 @@ type ByteArray []int8
 
 // Copy simply returns a copy the the data
 func (b ByteArray) Copy() Data {
-	c := ByteArray(make([]int8, len(b)))
+	c := make(ByteArray, len(b))
 	copy(c, b)
 	return c
 }
