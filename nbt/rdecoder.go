@@ -112,6 +112,48 @@ func (rd rDecoder) decodeData(tagID TagID, rv reflect.Value) error {
 			return err
 		}
 		rv.Set(reflect.ValueOf([]int32(data)))
+	case TagBool:
+		data, err := rd.decodeBool()
+		if err != nil {
+			return err
+		}
+		rv.SetBool(bool(data))
+	case TagUint8:
+		data, err := rd.decodeUint8()
+		if err != nil {
+			return err
+		}
+		rv.SetUint(uint64(data))
+	case TagUint16:
+		data, err := rd.decodeUint16()
+		if err != nil {
+			return err
+		}
+		rv.SetUint(uint64(data))
+	case TagUint32:
+		data, err := rd.decodeUint32()
+		if err != nil {
+			return err
+		}
+		rv.SetUint(uint64(data))
+	case TagUint64:
+		data, err := rd.decodeUint64()
+		if err != nil {
+			return err
+		}
+		rv.SetUint(uint64(data))
+	case TagComplex64:
+		data, err := rd.decodeComplex64()
+		if err != nil {
+			return err
+		}
+		rv.SetComplex(complex128(data))
+	case TagComplex128:
+		data, err := rd.decodeComplex128()
+		if err != nil {
+			return err
+		}
+		rv.SetComplex(complex128(data))
 	default:
 		return UnknownTag{tagID}
 	}
@@ -130,6 +172,13 @@ var typeToKind = [...]reflect.Kind{
 	reflect.Slice,
 	reflect.Struct,
 	reflect.Slice,
+	reflect.Bool,
+	reflect.Uint8,
+	reflect.Uint16,
+	reflect.Uint32,
+	reflect.Uint64,
+	reflect.Complex64,
+	reflect.Complex128,
 }
 
 func checkType(tagID TagID, rk reflect.Kind) bool {
@@ -259,6 +308,20 @@ func (rd rDecoder) skipData(tagID TagID) error {
 		err = rd.skipCompound()
 	case TagIntArray:
 		err = rd.skipIntArray()
+	case TagBool:
+		_, err = rd.decodeBool()
+	case TagUint8:
+		_, err = rd.decodeUint8()
+	case TagUint16:
+		_, err = rd.decodeUint16()
+	case TagUint32:
+		_, err = rd.decodeUint32()
+	case TagUint64:
+		_, err = rd.decodeUint64()
+	case TagComplex64:
+		_, err = rd.decodeComplex64()
+	case TagComplex128:
+		_, err = rd.decodeComplex128()
 	default:
 		return UnknownTag{tagID}
 	}

@@ -78,6 +78,20 @@ func (d Decoder) decodeData(tagID TagID) (Data, error) {
 		data, err = d.decodeCompound()
 	case TagIntArray:
 		data, err = d.decodeIntArray()
+	case TagBool:
+		data, err = d.decodeBool()
+	case TagUint8:
+		data, err = d.decodeUint8()
+	case TagUint16:
+		data, err = d.decodeUint16()
+	case TagUint32:
+		data, err = d.decodeUint32()
+	case TagUint64:
+		data, err = d.decodeUint64()
+	case TagComplex64:
+		data, err = d.decodeComplex64()
+	case TagComplex128:
+		data, err = d.decodeComplex128()
 	default:
 		err = UnknownTag{tagID}
 	}
@@ -208,4 +222,65 @@ func (d Decoder) decodeIntArray() (IntArray, error) {
 		}
 	}
 	return ints, nil
+}
+
+func (d Decoder) decodeBool() (Bool, error) {
+	b, _, err := d.r.ReadUint8()
+	return b == 1, err
+}
+
+func (d Decoder) decodeUint8() (Uint8, error) {
+	u, _, err := d.r.ReadUint8()
+	if err != nil {
+		return 0, err
+	}
+	return Uint8(u), err
+}
+
+func (d Decoder) decodeUint16() (Uint16, error) {
+	u, _, err := d.r.ReadUint16()
+	if err != nil {
+		return 0, err
+	}
+	return Uint16(u), err
+}
+
+func (d Decoder) decodeUint32() (Uint32, error) {
+	u, _, err := d.r.ReadUint32()
+	if err != nil {
+		return 0, err
+	}
+	return Uint32(u), err
+}
+
+func (d Decoder) decodeUint64() (Uint64, error) {
+	u, _, err := d.r.ReadUint64()
+	if err != nil {
+		return 0, err
+	}
+	return Uint64(u), err
+}
+
+func (d Decoder) decodeComplex64() (Complex64, error) {
+	r, _, err := d.r.ReadFloat32()
+	if err != nil {
+		return 0, err
+	}
+	i, _, err := d.r.ReadFloat32()
+	if err != nil {
+		return 0, err
+	}
+	return Complex64(complex(r, i)), nil
+}
+
+func (d Decoder) decodeComplex128() (Complex128, error) {
+	r, _, err := d.r.ReadFloat64()
+	if err != nil {
+		return 0, err
+	}
+	i, _, err := d.r.ReadFloat64()
+	if err != nil {
+		return 0, err
+	}
+	return Complex128(complex(r, i)), nil
 }

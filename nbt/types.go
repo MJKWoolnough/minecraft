@@ -11,18 +11,25 @@ import (
 
 // Tag Types
 const (
-	TagEnd       TagID = 0
-	TagByte      TagID = 1
-	TagShort     TagID = 2
-	TagInt       TagID = 3
-	TagLong      TagID = 4
-	TagFloat     TagID = 5
-	TagDouble    TagID = 6
-	TagByteArray TagID = 7
-	TagString    TagID = 8
-	TagList      TagID = 9
-	TagCompound  TagID = 10
-	TagIntArray  TagID = 11
+	TagEnd        TagID = 0
+	TagByte       TagID = 1
+	TagShort      TagID = 2
+	TagInt        TagID = 3
+	TagLong       TagID = 4
+	TagFloat      TagID = 5
+	TagDouble     TagID = 6
+	TagByteArray  TagID = 7
+	TagString     TagID = 8
+	TagList       TagID = 9
+	TagCompound   TagID = 10
+	TagIntArray   TagID = 11
+	TagBool       TagID = 12
+	TagUint8      TagID = 13
+	TagUint16     TagID = 14
+	TagUint32     TagID = 15
+	TagUint64     TagID = 16
+	TagComplex64  TagID = 17
+	TagComplex128 TagID = 18
 )
 
 var tagIDNames = [...]string{
@@ -137,6 +144,8 @@ func (end) String() string {
 }
 
 // Byte is an implementation of the Data interface
+// NB: Despite being an unsigned integer, it is still called a byte to match
+// the spec.
 type Byte int8
 
 // Copy simply returns a copy the the data
@@ -608,4 +617,189 @@ func (i IntArray) String() string {
 // Type returns the TagID of the data
 func (IntArray) Type() TagID {
 	return TagIntArray
+}
+
+// Bool is an implementation of the Data interface
+type Bool bool
+
+// Copy simply returns a copy the the data
+func (b Bool) Copy() Data {
+	return b
+}
+
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
+func (b Bool) Equal(e equaler.Equaler) bool {
+	if m, ok := e.(Bool); ok {
+		return b == m
+	}
+	return false
+}
+
+func (b Bool) String() string {
+	if b {
+		return "true"
+	}
+	return "false"
+}
+
+// Type returns the TagID of the data
+func (Bool) Type() TagID {
+	return TagBool
+}
+
+// Uint8 is an implementation of the Data interface
+type Uint8 uint8
+
+// Copy simply returns a copy the the data
+func (u Uint8) Copy() Data {
+	return u
+}
+
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
+func (u Uint8) Equal(e equaler.Equaler) bool {
+	if m, ok := e.(Uint8); ok {
+		return u == m
+	}
+	return false
+}
+
+func (u Uint8) String() string {
+	return fmt.Sprintf("%d", u)
+}
+
+// Type returns the TagID of the data
+func (Uint8) Type() TagID {
+	return TagUint8
+}
+
+// Uint8 is an implementation of the Data interface
+type Uint16 uint16
+
+// Copy simply returns a copy the the data
+func (u Uint16) Copy() Data {
+	return u
+}
+
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
+func (u Uint16) Equal(e equaler.Equaler) bool {
+	if m, ok := e.(Uint16); ok {
+		return u == m
+	}
+	return false
+}
+
+func (u Uint16) String() string {
+	return fmt.Sprintf("%d", u)
+}
+
+// Type returns the TagID of the data
+func (Uint16) Type() TagID {
+	return TagUint16
+}
+
+// Uint32 is an implementation of the Data interface
+type Uint32 uint32
+
+// Copy simply returns a copy the the data
+func (u Uint32) Copy() Data {
+	return u
+}
+
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
+func (u Uint32) Equal(e equaler.Equaler) bool {
+	if m, ok := e.(Uint32); ok {
+		return u == m
+	}
+	return false
+}
+
+func (u Uint32) String() string {
+	return fmt.Sprintf("%d", u)
+}
+
+// Type returns the TagID of the data
+func (Uint32) Type() TagID {
+	return TagUint32
+}
+
+// Uint64 is an implementation of the Data interface
+type Uint64 uint64
+
+// Copy simply returns a copy the the data
+func (u Uint64) Copy() Data {
+	return u
+}
+
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
+func (u Uint64) Equal(e equaler.Equaler) bool {
+	if m, ok := e.(Uint64); ok {
+		return u == m
+	}
+	return false
+}
+
+func (u Uint64) String() string {
+	return fmt.Sprintf("%d", u)
+}
+
+// Type returns the TagID of the data
+func (Uint64) Type() TagID {
+	return TagUint64
+}
+
+// Complex64 is an implementation of the Data interface
+type Complex64 complex64
+
+// Copy simply returns a copy the the data
+func (c Complex64) Copy() Data {
+	return c
+}
+
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
+func (c Complex64) Equal(e equaler.Equaler) bool {
+	if m, ok := e.(Complex64); ok {
+		return c == m
+	}
+	return false
+}
+
+func (c Complex64) String() string {
+	return fmt.Sprintf("%v", c)
+}
+
+// Type returns the TagID of the data
+func (Complex64) Type() TagID {
+	return TagComplex64
+}
+
+// Complex128 is an implementation of the Data interface
+type Complex128 complex128
+
+// Copy simply returns a copy the the data
+func (c Complex128) Copy() Data {
+	return c
+}
+
+// Equal satisfies the equaler.Equaler interface, allowing for types to be
+// checked for equality
+func (c Complex128) Equal(e equaler.Equaler) bool {
+	if m, ok := e.(Complex128); ok {
+		return c == m
+	}
+	return false
+}
+
+func (c Complex128) String() string {
+	return fmt.Sprintf("%v", c)
+}
+
+// Type returns the TagID of the data
+func (Complex128) Type() TagID {
+	return TagComplex128
 }

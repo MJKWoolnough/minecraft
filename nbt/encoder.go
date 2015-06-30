@@ -69,6 +69,20 @@ func (e Encoder) encodeData(d Data) error {
 		err = e.encodeCompound(d)
 	case IntArray:
 		err = e.encodeIntArray(d)
+	case Bool:
+		err = e.encodeBool(d)
+	case Uint8:
+		err = e.encodeUint8(d)
+	case Uint16:
+		err = e.encodeUint16(d)
+	case Uint32:
+		err = e.encodeUint32(d)
+	case Uint64:
+		err = e.encodeUint64(d)
+	case Complex64:
+		err = e.encodeComplex64(d)
+	case Complex128:
+		err = e.encodeComplex128(d)
 	default:
 		err = UnknownTag{d.Type()}
 	}
@@ -183,4 +197,52 @@ func (e Encoder) encodeIntArray(ints IntArray) error {
 		}
 	}
 	return nil
+}
+
+func (e Encoder) encodeBool(b Bool) error {
+	var err error
+	if b {
+		_, err = e.w.WriteUint8(1)
+	} else {
+		_, err = e.w.WriteUint8(0)
+	}
+	return err
+}
+
+func (e Encoder) encodeUint8(u Uint8) error {
+	_, err := e.w.WriteUint8(uint8(u))
+	return err
+}
+
+func (e Encoder) encodeUint16(u Uint16) error {
+	_, err := e.w.WriteUint16(uint16(u))
+	return err
+}
+
+func (e Encoder) encodeUint32(u Uint32) error {
+	_, err := e.w.WriteUint32(uint32(u))
+	return err
+}
+
+func (e Encoder) encodeUint64(u Uint64) error {
+	_, err := e.w.WriteUint64(uint64(u))
+	return err
+}
+
+func (e Encoder) encodeComplex64(c Complex64) error {
+	_, err := e.w.WriteFloat32(real(c))
+	if err != nil {
+		return err
+	}
+	_, err = e.w.WriteFloat32(imag(c))
+	return err
+}
+
+func (e Encoder) encodeComplex128(c Complex128) error {
+	_, err := e.w.WriteFloat64(real(c))
+	if err != nil {
+		return err
+	}
+	_, err = e.w.WriteFloat64(imag(c))
+	return err
 }
