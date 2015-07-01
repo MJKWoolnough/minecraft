@@ -3,26 +3,65 @@ package nbt
 import (
 	"bytes"
 	"encoding/base64"
+	"reflect"
 	"testing"
 )
 
-func TestSmall(t *testing.T) { //test.nbt
-	testNBT(`CgALaGVsbG8gd29ybGQIAARuYW1lAAlCYW5hbnJhbWEA`,
-		NewTag("hello world", Compound{
-			NewTag("name", String("Bananrama")),
-		}), t)
+type smallTest struct {
+	Name string `nbt:"name"`
 }
 
-func byteArrayTestData() []int8 {
-	data := make([]int8, 1000)
-	for i := 0; i < 1000; i++ {
-		data[i] = int8((i*i*255 + i*7) % 100)
-	}
-	return data
+func TestRSmall(t *testing.T) {
+	var expecting smallTest
+	expecting.Name = "Bananrama"
+	testRNBT(`CgALaGVsbG8gd29ybGQIAARuYW1lAAlCYW5hbnJhbWEA`, new(smallTest), &expecting, t)
 }
 
-func TestLarge(t *testing.T) { //bigtest.nbt
-	testNBT(`CgAFTGV2ZWwEAAhsb25nVGVzdH//////////AgAJc2hvcnRUZXN0f/8IAApzdHJpbmdUZXN0AClI`+
+type largeTest struct {
+	LongTest   int64   `nbt:"longTest"`
+	ShortTest  int16   `nbt:"shortTest"`
+	StringTest string  `nbt:"stringTest"`
+	FloatTest  float32 `nbt:"floatTest"`
+	IntTest    int32   `nbt:"intTest"`
+	Nested     struct {
+		Ham nv `nbt:"ham"`
+		Egg nv `nbt:"egg"`
+	} `nbt:"nested compound test"`
+	ListTestLong     []int64 `nbt:"listTest (long)"`
+	ListTestCompound [2]struct {
+		Name    string `nbt:"name"`
+		Created int64  `nbt:"created-on"`
+	} `nbt:"listTest (compound)"`
+	ByteTest      int8    `nbt:"byteTest"`
+	ByteArrayTest []int8  `nbt:"byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))"`
+	DoubleTest    float64 `nbt:"doubleTest"`
+}
+
+type nv struct {
+	Name  string  `nbt:"name"`
+	Value float32 `nbt:"value"`
+}
+
+func TestRLarge(t *testing.T) {
+	var expecting largeTest
+	expecting.LongTest = 9223372036854775807
+	expecting.ShortTest = 32767
+	expecting.StringTest = "HELLO WORLD THIS IS A TEST STRING ÅÄÖ!"
+	expecting.FloatTest = 0.49823147
+	expecting.IntTest = 2147483647
+	expecting.Nested.Ham.Name = "Hampus"
+	expecting.Nested.Ham.Value = 0.75
+	expecting.Nested.Egg.Name = "Eggbert"
+	expecting.Nested.Egg.Value = 0.5
+	expecting.ListTestLong = []int64{11, 12, 13, 14, 15}
+	expecting.ListTestCompound[0].Name = "Compound tag #0"
+	expecting.ListTestCompound[0].Created = 1264099775885
+	expecting.ListTestCompound[1].Name = "Compound tag #1"
+	expecting.ListTestCompound[1].Created = 1264099775885
+	expecting.ByteTest = 127
+	expecting.ByteArrayTest = byteArrayTestData()
+	expecting.DoubleTest = 0.4931287132182315
+	testRNBT(`CgAFTGV2ZWwEAAhsb25nVGVzdH//////////AgAJc2hvcnRUZXN0f/8IAApzdHJpbmdUZXN0AClI`+
 		`RUxMTyBXT1JMRCBUSElTIElTIEEgVEVTVCBTVFJJTkcgw4XDhMOWIQUACWZsb2F0VGVzdD7/GDID`+
 		`AAdpbnRUZXN0f////woAFG5lc3RlZCBjb21wb3VuZCB0ZXN0CgADaGFtCAAEbmFtZQAGSGFtcHVz`+
 		`BQAFdmFsdWU/QAAAAAoAA2VnZwgABG5hbWUAB0VnZ2JlcnQFAAV2YWx1ZT8AAAAAAAkAD2xpc3RU`+
@@ -49,59 +88,22 @@ func TestLarge(t *testing.T) { //bigtest.nbt
 		`Ahg4YjIMVEI6PEheGkQUUjYkHB4qQGAmWjQYBmIADCJCCDwWXkxERlIEJE4eXEAuJig0SgYwAD4i`+
 		`EAgKFixMEkYgBFZOUFwOLlgoAko4MDI+VBA6CkgsGhIUIDZWHFAqDmBYWgIYOGIyDFRCOjxIXhpE`+
 		`FFI2JBweKkBgJlo0GAZiAAwiQgg8Fl5MREZSBCROHlxALiYoNEoGMAYACmRvdWJsZVRlc3Q/349r`+
-		`u/9qXgA=`,
-		NewTag("Level", Compound{
-			NewTag("longTest", Long(9223372036854775807)),
-			NewTag("shortTest", Short(32767)),
-			NewTag("stringTest", String("HELLO WORLD THIS IS A TEST STRING ÅÄÖ!")),
-			NewTag("floatTest", Float(0.49823147)),
-			NewTag("intTest", Int(2147483647)),
-			NewTag("nested compound test", Compound{
-				NewTag("ham", Compound{
-					NewTag("name", String("Hampus")),
-					NewTag("value", Float(0.75)),
-				}),
-				NewTag("egg", Compound{
-					NewTag("name", String("Eggbert")),
-					NewTag("value", Float(0.5)),
-				}),
-			}),
-			NewTag("listTest (long)", NewList([]Data{
-				Long(11),
-				Long(12),
-				Long(13),
-				Long(14),
-				Long(15),
-			})),
-			NewTag("listTest (compound)", NewList([]Data{
-				Compound{
-					NewTag("name", String("Compound tag #0")),
-					NewTag("created-on", Long(1264099775885)),
-				},
-				Compound{
-					NewTag("name", String("Compound tag #1")),
-					NewTag("created-on", Long(1264099775885)),
-				},
-			})),
-			NewTag("byteTest", Byte(127)),
-			NewTag("byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))", ByteArray(byteArrayTestData())),
-			NewTag("doubleTest", Double(0.4931287132182315)),
-		}), t)
+		`u/9qXgA=`, new(largeTest), &expecting, t)
 }
 
-func testNBT(input string, middle Tag, t *testing.T) {
-	tag, err := Decode(base64.NewDecoder(base64.StdEncoding, bytes.NewBufferString(input)))
+func testRNBT(input string, into, match interface{}, t *testing.T) {
+	name, err := RDecode(base64.NewDecoder(base64.StdEncoding, bytes.NewBufferString(input)), into)
 	if err != nil {
 		t.Errorf("error encountered while reading nbt data: %q", err)
 		return
 	}
-	if !tag.Equal(middle) {
+	if !reflect.DeepEqual(into, match) {
 		t.Error("parsed nbt data did not match given nbt structure")
 		return
 	}
 	o := new(bytes.Buffer)
 	b := base64.NewEncoder(base64.StdEncoding, o)
-	err = Encode(b, tag)
+	err = REncode(b, name, into)
 	b.Close()
 	if err != nil {
 		t.Errorf("error encountered while writing nbt data: %q", err)
