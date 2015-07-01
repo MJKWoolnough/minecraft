@@ -2,6 +2,7 @@ package nbt
 
 import (
 	"errors"
+	"io"
 	"reflect"
 	"unsafe"
 )
@@ -10,12 +11,16 @@ type rEncoder struct {
 	Encoder
 }
 
-func (e Encoder) REncode(v interface{}) error {
+func REncode(w io.Writer, name string, v interface{}) error {
+	return NewEncoder(w).REncode(name, v)
+}
+
+func (e Encoder) REncode(name string, v interface{}) error {
 	rv := reflect.ValueOf(v)
 	for rv.Kind() == reflect.Ptr && !rv.IsNil() {
 		rv = rv.Elem()
 	}
-	if rv.Kind() != reflect.Struct || rv.IsNil() {
+	if rv.Kind() != reflect.Struct {
 		return ErrIncorrectValue
 	}
 	re := rEncoder{e}
@@ -23,7 +28,7 @@ func (e Encoder) REncode(v interface{}) error {
 	if err != nil {
 		return err
 	}
-	err = re.encodeString("")
+	err = re.encodeString(String(name))
 	if err != nil {
 		return err
 	}
@@ -75,7 +80,7 @@ func (re rEncoder) encodeData(tagType TagID, rv reflect.Value) error {
 }
 
 func (re rEncoder) encodeList(rv reflect.Value) error {
-	tagType := tagFromValue(rv.Elem())
+	tagType := tagFromType(rv.Type().Elem())
 	_, err := re.w.WriteUint8(uint8(tagType))
 	if err != nil {
 		return err
@@ -105,7 +110,7 @@ func (re rEncoder) encodeCompound(rv reflect.Value) error {
 			} else if n != "" {
 				n = m
 			}
-			tagType := tagFromValue(f)
+			tagType := tagFromType(f.Type())
 			_, err := re.w.WriteUint8(uint8(tagType))
 			if err != nil {
 				return err
@@ -114,16 +119,17 @@ func (re rEncoder) encodeCompound(rv reflect.Value) error {
 			if err != nil {
 				return err
 			}
-			err = re.encodeData(tagType, rv)
+			err = re.encodeData(tagType, f)
 			if err != nil {
 				return err
 			}
 		}
 	}
-	return nil
+	_, err := re.w.Write([]byte{byte(TagEnd)})
+	return err
 }
 
-func tagFromValue(rv reflect.Value) TagID {
+func tagFromType(rv reflect.Type) TagID {
 	switch rv.Kind() {
 	case reflect.Int8:
 		return TagByte
@@ -131,7 +137,7 @@ func tagFromValue(rv reflect.Value) TagID {
 		return TagShort
 	case reflect.Int32:
 		return TagInt
-	case reflect.Int64:
+	case reflect.Int64, reflect.Int:
 		return TagLong
 	case reflect.Float32:
 		return TagFloat
@@ -156,7 +162,7 @@ func tagFromValue(rv reflect.Value) TagID {
 	case reflect.Complex128:
 		return TagComplex128
 	case reflect.Slice, reflect.Array:
-		switch rv.Type().Elem().Kind() {
+		switch rv.Elem().Kind() {
 		case reflect.Int8:
 			return TagByteArray
 		case reflect.Int32:

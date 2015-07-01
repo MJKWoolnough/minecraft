@@ -15,28 +15,32 @@ type rDecoder struct {
 	io.Seeker
 }
 
-func (d Decoder) RDecode(v interface{}) error {
+func RDecode(r io.Reader, v interface{}) (string, error) {
+	return NewDecoder(r).RDecode(v)
+}
+
+func (d Decoder) RDecode(v interface{}) (string, error) {
 	rv := reflect.ValueOf(v)
 	if rv.Kind() != reflect.Ptr || rv.IsNil() || rv.Elem().Kind() != reflect.Struct {
-		return ErrInvalidValue
+		return "", ErrInvalidValue
 	}
 	rd := rDecoder{d, makeSeeker(d.r)}
 	t, _, err := d.r.ReadUint8()
 	if err != nil {
-		return err
+		return "", err
 	}
 	tagID := TagID(t)
 	if tagID != TagCompound {
-		return ErrIncorrectType
+		return "", ErrIncorrectType
 	}
-	_, err = d.decodeString()
+	n, err := d.decodeString()
 	if err != nil {
-		return err
+		return "", err
 	}
-	if !checkType(tagID, rv.Kind()) {
-		return ErrIncorrectType
+	if !checkType(tagID, rv.Elem().Kind()) {
+		return "", ErrIncorrectType
 	}
-	return rd.decodeCompound(rv.Elem())
+	return string(n), rd.decodeCompound(rv.Elem())
 }
 
 func (rd rDecoder) decodeData(tagID TagID, rv reflect.Value) error {
@@ -161,6 +165,7 @@ func (rd rDecoder) decodeData(tagID TagID, rv reflect.Value) error {
 }
 
 var typeToKind = [...]reflect.Kind{
+	reflect.Invalid,
 	reflect.Int8,
 	reflect.Int16,
 	reflect.Int32,
@@ -225,14 +230,17 @@ func (rd rDecoder) decodeList(rv reflect.Value) error {
 	if err != nil {
 		return err
 	}
-	data := reflect.MakeSlice(rv.Elem().Type(), int(l), int(l))
+	if rv.Kind() == reflect.Slice {
+		rv.Set(reflect.MakeSlice(rv.Type(), int(l), int(l)))
+	} else if int(l) > rv.Len() {
+		return ErrTooShort
+	}
 	for i := uint32(0); i < l; i++ {
-		err = rd.decodeData(tagID, data.Index(int(i)))
+		err = rd.decodeData(tagID, rv.Index(int(i)))
 		if err != nil {
 			return err
 		}
 	}
-	rv.Set(data)
 	return nil
 }
 
@@ -251,7 +259,7 @@ func (rd rDecoder) decodeCompound(rv reflect.Value) error {
 			return err
 		}
 		nv := getValueKey(rv, string(n))
-		if nv.IsNil() {
+		if !nv.IsValid() {
 			rd.skipData(tagID)
 		} else {
 			rd.decodeData(tagID, nv)
@@ -448,4 +456,5 @@ var (
 	ErrInvalidType       = errors.New("invalid type for NBT data")
 	ErrUnsupportedWhence = errors.New("unsupported seek whence")
 	ErrIncorrectType     = errors.New("incorrect type")
+	ErrTooShort          = errors.New("array size given too short")
 )
