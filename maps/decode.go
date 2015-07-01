@@ -65,15 +65,22 @@ func Decode(r io.Reader) (image.Image, error) {
 	}, nil
 }
 
+type config struct {
+	Data struct {
+		Width  int16 `nbt:"width"`
+		Height int16 `nbt:"height"`
+	} `nbt:"data"`
+}
+
 func Config(r io.Reader) (image.Config, error) {
-	d, err := readData(r)
+	var c config
+	_, err := nbt.RDecode(r, &c)
 	if err != nil {
 		return image.Config{}, err
 	}
-	rect := getDimensions(d)
 	return image.Config{
 		ColorModel: palette,
-		Width:      rect.Max.X,
-		Height:     rect.Max.Y,
+		Width:      int(c.Data.Width),
+		Height:     int(c.Data.Height),
 	}, nil
 }
