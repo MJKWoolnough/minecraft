@@ -282,7 +282,7 @@ func getValueKey(rv reflect.Value, k string) reflect.Value {
 			if tr.CanSet() {
 				for tr.Kind() == reflect.Ptr {
 					if tr.IsNil() {
-						return reflect.Value{}
+						tr.Set(reflect.New(tr.Type().Elem()))
 					}
 					tr = tr.Elem()
 				}
