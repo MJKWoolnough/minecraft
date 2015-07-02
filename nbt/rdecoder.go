@@ -15,10 +15,12 @@ type rDecoder struct {
 	io.Seeker
 }
 
+// RDecode will decode an NBT stream into the given structure.
 func RDecode(r io.Reader, v interface{}) (string, error) {
 	return NewDecoder(r).RDecode(v)
 }
 
+// RDecode will decode an NBT stream into the given structure.
 func (d Decoder) RDecode(v interface{}) (string, error) {
 	rv := reflect.ValueOf(v)
 	if rv.Kind() != reflect.Ptr || rv.IsNil() || rv.Elem().Kind() != reflect.Struct {
@@ -193,7 +195,7 @@ func checkType(tagID TagID, rk reflect.Kind) bool {
 	return typeToKind[tagID] == rk
 }
 
-type Seeker struct {
+type seeker struct {
 	io.Reader
 }
 
@@ -207,10 +209,10 @@ func makeSeeker(r byteio.EndianReader) io.Seeker {
 			return s
 		}
 	}
-	return Seeker{r}
+	return seeker{r}
 }
 
-func (s Seeker) Seek(offset int64, whence int) (int64, error) {
+func (s seeker) Seek(offset int64, whence int) (int64, error) {
 	if whence != os.SEEK_CUR || whence < 0 {
 		return 0, ErrUnsupportedWhence
 	}
@@ -450,7 +452,6 @@ func (rd rDecoder) skipIntArray() error {
 }
 
 // Errors
-
 var (
 	ErrInvalidValue      = errors.New("invalid value type")
 	ErrInvalidType       = errors.New("invalid type for NBT data")

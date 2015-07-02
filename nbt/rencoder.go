@@ -11,10 +11,12 @@ type rEncoder struct {
 	Encoder
 }
 
+// REncode will write the structure (with the given name) to the writer
 func REncode(w io.Writer, name string, v interface{}) error {
 	return NewEncoder(w).REncode(name, v)
 }
 
+// REncode will write the structure (with the given name) to the writer
 func (e Encoder) REncode(name string, v interface{}) error {
 	rv := reflect.ValueOf(v)
 	for rv.Kind() == reflect.Ptr && !rv.IsNil() {
@@ -176,5 +178,4 @@ func tagFromType(rv reflect.Type) TagID {
 }
 
 // Errors
-
 var ErrIncorrectValue = errors.New("incorrect value")
