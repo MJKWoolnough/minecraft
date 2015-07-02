@@ -674,7 +674,7 @@ func (Uint8) Type() TagID {
 	return TagUint8
 }
 
-// Uint8 is an implementation of the Data interface
+// Uint16 is an implementation of the Data interface
 type Uint16 uint16
 
 // Copy simply returns a copy the the data
