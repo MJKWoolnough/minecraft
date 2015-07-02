@@ -102,8 +102,15 @@ func (re rEncoder) encodeList(rv reflect.Value) error {
 }
 
 func (re rEncoder) encodeCompound(rv reflect.Value) error {
+Loop:
 	for i := 0; i < rv.Type().NumField(); i++ {
 		f := rv.Field(i)
+		for f.Kind() == reflect.Ptr {
+			if f.IsNil() {
+				continue Loop
+			}
+			f = f.Elem()
+		}
 		if f.CanSet() {
 			tf := rv.Type().Field(i)
 			n := tf.Name
