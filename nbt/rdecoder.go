@@ -213,7 +213,7 @@ func makeSeeker(r byteio.EndianReader) io.Seeker {
 }
 
 func (s seeker) Seek(offset int64, whence int) (int64, error) {
-	if whence != os.SEEK_CUR || whence < 0 {
+	if whence != os.SEEK_CUR || offset < 0 {
 		return 0, ErrUnsupportedWhence
 	}
 	return io.CopyN(ioutil.Discard, s, offset)
