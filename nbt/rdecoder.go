@@ -246,6 +246,15 @@ func (rd rDecoder) decodeList(rv reflect.Value) error {
 	return nil
 }
 
+var (
+	nbtCompoundType, nbtListType reflect.Type
+)
+
+func init() {
+	nbtCompoundType = reflect.TypeOf(Compound{})
+	nbtListType = reflect.TypeOf(List{})
+}
+
 func (rd rDecoder) decodeCompound(rv reflect.Value) error {
 	for {
 		t, _, err := rd.r.ReadUint8()
@@ -263,6 +272,24 @@ func (rd rDecoder) decodeCompound(rv reflect.Value) error {
 		nv := getValueKey(rv, string(n))
 		if !nv.IsValid() {
 			rd.skipData(tagID)
+		} else if nv.Type() == nbtCompoundType {
+			if tagID != TagCompound {
+				return ErrInvalidType
+			}
+			c, err := rd.Decoder.decodeCompound()
+			if err != nil {
+				return err
+			}
+			nv.Set(reflect.ValueOf(c))
+		} else if nv.Type() == nbtListType {
+			if tagID != TagList {
+				return ErrInvalidType
+			}
+			l, err := rd.Decoder.decodeList()
+			if err != nil {
+				return err
+			}
+			nv.Set(reflect.ValueOf(*l))
 		} else {
 			rd.decodeData(tagID, nv)
 		}
