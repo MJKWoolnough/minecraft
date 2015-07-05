@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	smallTestDate = `CgALaGVsbG8gd29ybGQIAARuYW1lAAlCYW5hbnJhbWEA`
+	smallTestData = `CgALaGVsbG8gd29ybGQIAARuYW1lAAlCYW5hbnJhbWEA`
 	largeTestData = `CgAFTGV2ZWwEAAhsb25nVGVzdH//////////AgAJc2hvcnRUZXN0f/8IAApzdHJpbmdUZXN0AClI` +
 		`RUxMTyBXT1JMRCBUSElTIElTIEEgVEVTVCBTVFJJTkcgw4XDhMOWIQUACWZsb2F0VGVzdD7/GDID` +
 		`AAdpbnRUZXN0f////woAFG5lc3RlZCBjb21wb3VuZCB0ZXN0CgADaGFtCAAEbmFtZQAGSGFtcHVz` +
