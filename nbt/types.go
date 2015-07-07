@@ -267,7 +267,7 @@ func (f Float) Equal(e equaler.Equaler) bool {
 }
 
 func (f Float) String() string {
-	return fmt.Sprintf("%f", f)
+	return fmt.Sprintf("%g", f)
 }
 
 // Type returns the TagID of the data
@@ -293,7 +293,7 @@ func (d Double) Equal(e equaler.Equaler) bool {
 }
 
 func (d Double) String() string {
-	return fmt.Sprintf("%f", d)
+	return fmt.Sprintf("%g", d)
 }
 
 // Type returns the TagID of the data
@@ -770,7 +770,7 @@ func (c Complex64) Equal(e equaler.Equaler) bool {
 }
 
 func (c Complex64) String() string {
-	return fmt.Sprintf("%v", c)
+	return fmt.Sprintf("%g", c)
 }
 
 // Type returns the TagID of the data
@@ -796,7 +796,7 @@ func (c Complex128) Equal(e equaler.Equaler) bool {
 }
 
 func (c Complex128) String() string {
-	return fmt.Sprintf("%v", c)
+	return fmt.Sprintf("%g", c)
 }
 
 // Type returns the TagID of the data
