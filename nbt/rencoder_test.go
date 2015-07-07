@@ -41,17 +41,17 @@ type largeTest struct {
 }
 
 type largeTest2 struct {
-	LongTest         Long        `nbt:"longTest"`
-	ShortTest        Short       `nbt:"shortTest"`
-	StringTest       *string     `nbt:"stringTest"`
-	FloatTest        Float       `nbt:"floatTest"`
-	IntTest          *Int        `nbt:"intTest"`
-	Nested           *Compound   `nbt:"nested compound test"`
-	ListTestLong     *List       `nbt:"listTest (long)"`
-	ListTestCompound [2]Compound `nbt:"listTest (compound)"`
-	ByteTest         Byte        `nbt:"byteTest"`
-	ByteArrayTest    **ByteArray `nbt:"byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))"`
-	DoubleTest       Double      `nbt:"doubleTest"`
+	LongTest         Long         `nbt:"longTest"`
+	ShortTest        Short        `nbt:"shortTest"`
+	StringTest       *string      `nbt:"stringTest"`
+	FloatTest        Float        `nbt:"floatTest"`
+	IntTest          *Int         `nbt:"intTest"`
+	Nested           *Compound    `nbt:"nested compound test"`
+	ListTestLong     *List        `nbt:"listTest (long)"`
+	ListTestCompound [2]*Compound `nbt:"listTest (compound)"`
+	ByteTest         Byte         `nbt:"byteTest"`
+	ByteArrayTest    **ByteArray  `nbt:"byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))"`
+	DoubleTest       Double       `nbt:"doubleTest"`
 }
 
 type nv struct {
@@ -101,11 +101,11 @@ func TestRLarge(t *testing.T) {
 	expecting.ListTestCompound[0].Created = 1264099775885
 	expecting.ListTestCompound[1].Name = "Compound tag #1"
 	expecting.ListTestCompound[1].Created = 1264099775885
-	expecting2.ListTestCompound[0] = Compound{
+	expecting2.ListTestCompound[0] = &Compound{
 		NewTag("name", String(expecting.ListTestCompound[0].Name)),
 		NewTag("created-on", Long(expecting.ListTestCompound[0].Created)),
 	}
-	expecting2.ListTestCompound[1] = Compound{
+	expecting2.ListTestCompound[1] = &Compound{
 		NewTag("name", String(expecting.ListTestCompound[1].Name)),
 		NewTag("created-on", Long(expecting.ListTestCompound[1].Created)),
 	}

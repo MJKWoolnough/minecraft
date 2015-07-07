@@ -39,129 +39,150 @@ func (d Decoder) RDecode(v interface{}) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if !checkType(tagID, rv.Elem().Kind()) {
+	if !checkType(tagID, rv.Elem().Type()) {
 		return "", ErrIncorrectType
 	}
 	return string(n), rd.decodeCompound(rv.Elem())
 }
 
 func (rd rDecoder) decodeData(tagID TagID, rv reflect.Value) error {
-	switch tagID {
-	case TagByte:
-		data, err := rd.decodeByte()
+	for rv.Kind() == reflect.Ptr {
+		if rv.IsNil() {
+			rv.Set(reflect.New(rv.Type().Elem()))
+		}
+		rv = rv.Elem()
+	}
+	switch rv.Type() {
+	case nbtListType:
+		data, err := rd.Decoder.decodeList()
 		if err != nil {
 			return err
 		}
-		rv.SetInt(int64(data))
-	case TagShort:
-		data, err := rd.decodeShort()
+		rv.Set(reflect.ValueOf(*data))
+	case nbtCompoundType:
+		data, err := rd.Decoder.decodeCompound()
 		if err != nil {
 			return err
 		}
-		rv.SetInt(int64(data))
-	case TagInt:
-		data, err := rd.decodeInt()
-		if err != nil {
-			return err
-		}
-		rv.SetInt(int64(data))
-	case TagLong:
-		data, err := rd.decodeLong()
-		if err != nil {
-			return err
-		}
-		rv.SetInt(int64(data))
-	case TagFloat:
-		data, err := rd.decodeFloat()
-		if err != nil {
-			return err
-		}
-		rv.SetFloat(float64(data))
-	case TagDouble:
-		data, err := rd.decodeDouble()
-		if err != nil {
-			return err
-		}
-		rv.SetFloat(float64(data))
-	case TagByteArray:
-		data, err := rd.decodeByteArray()
-		if err != nil {
-			return err
-		}
-		if k := rv.Type().Elem().Kind(); k == reflect.Uint8 {
-			rv.SetBytes(data.Bytes())
-		} else if k == reflect.Int8 {
-			rv.Set(reflect.ValueOf([]int8(data)))
-		} else {
-			return ErrInvalidType
-		}
-	case TagString:
-		data, err := rd.decodeString()
-		if err != nil {
-			return err
-		}
-		rv.SetString(string(data))
-	case TagList:
-		if err := rd.decodeList(rv); err != nil {
-			return err
-		}
-	case TagCompound:
-		if err := rd.decodeCompound(rv); err != nil {
-			return err
-		}
-	case TagIntArray:
-		if rv.Type().Elem().Kind() != reflect.Int32 {
-			return ErrInvalidType
-		}
-		data, err := rd.decodeIntArray()
-		if err != nil {
-			return err
-		}
-		rv.Set(reflect.ValueOf([]int32(data)))
-	case TagBool:
-		data, err := rd.decodeBool()
-		if err != nil {
-			return err
-		}
-		rv.SetBool(bool(data))
-	case TagUint8:
-		data, err := rd.decodeUint8()
-		if err != nil {
-			return err
-		}
-		rv.SetUint(uint64(data))
-	case TagUint16:
-		data, err := rd.decodeUint16()
-		if err != nil {
-			return err
-		}
-		rv.SetUint(uint64(data))
-	case TagUint32:
-		data, err := rd.decodeUint32()
-		if err != nil {
-			return err
-		}
-		rv.SetUint(uint64(data))
-	case TagUint64:
-		data, err := rd.decodeUint64()
-		if err != nil {
-			return err
-		}
-		rv.SetUint(uint64(data))
-	case TagComplex64:
-		data, err := rd.decodeComplex64()
-		if err != nil {
-			return err
-		}
-		rv.SetComplex(complex128(data))
-	case TagComplex128:
-		data, err := rd.decodeComplex128()
-		if err != nil {
-			return err
-		}
-		rv.SetComplex(complex128(data))
+		rv.Set(reflect.ValueOf(data))
 	default:
-		return UnknownTag{tagID}
+		switch tagID {
+		case TagByte:
+			data, err := rd.decodeByte()
+			if err != nil {
+				return err
+			}
+			rv.SetInt(int64(data))
+		case TagShort:
+			data, err := rd.decodeShort()
+			if err != nil {
+				return err
+			}
+			rv.SetInt(int64(data))
+		case TagInt:
+			data, err := rd.decodeInt()
+			if err != nil {
+				return err
+			}
+			rv.SetInt(int64(data))
+		case TagLong:
+			data, err := rd.decodeLong()
+			if err != nil {
+				return err
+			}
+			rv.SetInt(int64(data))
+		case TagFloat:
+			data, err := rd.decodeFloat()
+			if err != nil {
+				return err
+			}
+			rv.SetFloat(float64(data))
+		case TagDouble:
+			data, err := rd.decodeDouble()
+			if err != nil {
+				return err
+			}
+			rv.SetFloat(float64(data))
+		case TagByteArray:
+			data, err := rd.decodeByteArray()
+			if err != nil {
+				return err
+			}
+			if k := rv.Type().Elem().Kind(); k == reflect.Uint8 {
+				rv.SetBytes(data.Bytes())
+			} else if k == reflect.Int8 {
+				rv.Set(reflect.ValueOf([]int8(data)))
+			} else {
+				return ErrInvalidType
+			}
+		case TagString:
+			data, err := rd.decodeString()
+			if err != nil {
+				return err
+			}
+			rv.SetString(string(data))
+		case TagList:
+			if err := rd.decodeList(rv); err != nil {
+				return err
+			}
+		case TagCompound:
+			if err := rd.decodeCompound(rv); err != nil {
+				return err
+			}
+		case TagIntArray:
+			if rv.Type().Elem().Kind() != reflect.Int32 {
+				return ErrInvalidType
+			}
+			data, err := rd.decodeIntArray()
+			if err != nil {
+				return err
+			}
+			rv.Set(reflect.ValueOf([]int32(data)))
+		case TagBool:
+			data, err := rd.decodeBool()
+			if err != nil {
+				return err
+			}
+			rv.SetBool(bool(data))
+		case TagUint8:
+			data, err := rd.decodeUint8()
+			if err != nil {
+				return err
+			}
+			rv.SetUint(uint64(data))
+		case TagUint16:
+			data, err := rd.decodeUint16()
+			if err != nil {
+				return err
+			}
+			rv.SetUint(uint64(data))
+		case TagUint32:
+			data, err := rd.decodeUint32()
+			if err != nil {
+				return err
+			}
+			rv.SetUint(uint64(data))
+		case TagUint64:
+			data, err := rd.decodeUint64()
+			if err != nil {
+				return err
+			}
+			rv.SetUint(uint64(data))
+		case TagComplex64:
+			data, err := rd.decodeComplex64()
+			if err != nil {
+				return err
+			}
+			rv.SetComplex(complex128(data))
+		case TagComplex128:
+			data, err := rd.decodeComplex128()
+			if err != nil {
+				return err
+			}
+			rv.SetComplex(complex128(data))
+		default:
+			return UnknownTag{tagID}
+		}
 	}
 	return nil
 }
@@ -188,11 +209,11 @@ var typeToKind = [...]reflect.Kind{
 	reflect.Complex128,
 }
 
-func checkType(tagID TagID, rk reflect.Kind) bool {
+func checkType(tagID TagID, rt reflect.Type) bool {
 	if int(tagID) > len(typeToKind) {
 		return false
 	}
-	return typeToKind[tagID] == rk
+	return tagID == TagCompound && rt == nbtCompoundType || (tagID == TagList && rt == nbtListType) || typeToKind[tagID] == rt.Kind()
 }
 
 type seeker struct {
@@ -225,7 +246,11 @@ func (rd rDecoder) decodeList(rv reflect.Value) error {
 		return err
 	}
 	tagID := TagID(t)
-	if !checkType(tagID, rv.Type().Elem().Kind()) {
+	et := rv.Type().Elem()
+	for et.Kind() == reflect.Ptr {
+		et = et.Elem()
+	}
+	if !checkType(tagID, et) {
 		return ErrInvalidType
 	}
 	l, _, err := rd.r.ReadUint32()
@@ -272,24 +297,6 @@ func (rd rDecoder) decodeCompound(rv reflect.Value) error {
 		nv := getValueKey(rv, string(n))
 		if !nv.IsValid() {
 			rd.skipData(tagID)
-		} else if nv.Type() == nbtCompoundType {
-			if tagID != TagCompound {
-				return ErrInvalidType
-			}
-			c, err := rd.Decoder.decodeCompound()
-			if err != nil {
-				return err
-			}
-			nv.Set(reflect.ValueOf(c))
-		} else if nv.Type() == nbtListType {
-			if tagID != TagList {
-				return ErrInvalidType
-			}
-			l, err := rd.Decoder.decodeList()
-			if err != nil {
-				return err
-			}
-			nv.Set(reflect.ValueOf(*l))
 		} else {
 			rd.decodeData(tagID, nv)
 		}
