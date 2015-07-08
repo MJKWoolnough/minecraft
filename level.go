@@ -116,18 +116,18 @@ func NewLevel(location Path) (*Level, error) {
 }
 
 // GetBlock gets the block at coordinates x, y, z.
-func (l *Level) GetBlock(x, y, z int32) (*Block, error) {
+func (l *Level) GetBlock(x, y, z int32) (Block, error) {
 	c, err := l.getChunk(x, z, false)
 	if err != nil {
-		return nil, err
+		return Block{}, err
 	} else if c == nil {
-		return &Block{}, nil
+		return Block{}, nil
 	}
 	return c.GetBlock(x, y, z), nil
 }
 
 // SetBlock sets the block at coordinates x, y, z. Also processes any lighting updates if applicable.
-func (l *Level) SetBlock(x, y, z int32, block *Block) error {
+func (l *Level) SetBlock(x, y, z int32, block Block) error {
 	var (
 		c   *chunk
 		err error

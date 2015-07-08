@@ -12,13 +12,9 @@ func TestEquality(t *testing.T) {
 	}
 	for i, aBlock := range testData {
 		for j, bBlock := range testData {
-			match := aBlock.Equal(bBlock)
-			pmatch := aBlock.Equal(&bBlock)
-			if match != pmatch {
-				t.Errorf("Block %d didn't match with pointer and non-pointer arguments", j)
-			}
+			match := aBlock.EqualBlock(bBlock)
 			sameBlock := (i == j)
-			if sameBlock != match {
+			if sameBlock != aBlock.EqualBlock(bBlock) {
 				if match {
 					t.Errorf("Block %d matched block %d, expecting non-match", i, j)
 				} else {

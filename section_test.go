@@ -60,7 +60,7 @@ func TestGetBlock(t *testing.T) {
 		{[3]int32{9, 12, 11}, Block{}},
 	}
 	for n, test := range tests {
-		if b := section.GetBlock(test.xyz[0], test.xyz[1], test.xyz[2]); !test.Block.Equal(b) {
+		if b := section.GetBlock(test.xyz[0], test.xyz[1], test.xyz[2]); !test.Block.EqualBlock(b) {
 			t.Errorf("test %d failed\nExpecting: %s\nGot: %s", n+1, test.Block.String(), b.String())
 		}
 	}
@@ -82,14 +82,14 @@ func TestSetBlock(t *testing.T) {
 		{[3]int32{4, 7, 9}, Block{}, false},
 	}
 	for n, test := range tests {
-		section.SetBlock(test.xyz[0], test.xyz[1], test.xyz[2], &test.Block)
-		if b := section.GetBlock(test.xyz[0], test.xyz[1], test.xyz[2]); !test.Block.Equal(b) {
+		section.SetBlock(test.xyz[0], test.xyz[1], test.xyz[2], test.Block)
+		if b := section.GetBlock(test.xyz[0], test.xyz[1], test.xyz[2]); !test.Block.EqualBlock(b) {
 			t.Errorf("test %d failed\nExpecting: %s\nGot: %s", n+1, test.Block.String(), b.String())
 		}
 	}
 	for n, test := range tests {
 		if test.recheck {
-			if b := section.GetBlock(test.xyz[0], test.xyz[1], test.xyz[2]); !test.Block.Equal(b) {
+			if b := section.GetBlock(test.xyz[0], test.xyz[1], test.xyz[2]); !test.Block.EqualBlock(b) {
 				t.Errorf("retest %d failed\nExpecting: %s\nGot: %s", n+1, test.Block.String(), b.String())
 			}
 		}

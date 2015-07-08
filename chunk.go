@@ -218,10 +218,10 @@ func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
 	return c, nil
 }
 
-func (c *chunk) GetBlock(x, y, z int32) *Block {
+func (c *chunk) GetBlock(x, y, z int32) Block {
 	ys := y >> 4
 	if c.sections[ys] == nil {
-		return &Block{}
+		return Block{}
 	}
 	b := c.sections[ys].GetBlock(x, y, z)
 	pos := xyz(x, y, z)
@@ -241,10 +241,10 @@ func (c *chunk) GetBlock(x, y, z int32) *Block {
 	return b
 }
 
-func (c *chunk) SetBlock(x, y, z int32, b *Block) {
+func (c *chunk) SetBlock(x, y, z int32, b Block) {
 	ys := y >> 4
 	if c.sections[ys] == nil {
-		if b.Equal(&Block{}) {
+		if b.EqualBlock(Block{}) {
 			return
 		}
 		c.sections[ys] = newSection(y)

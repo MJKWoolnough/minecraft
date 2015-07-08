@@ -283,14 +283,14 @@ func TestBlock(t *testing.T) {
 		},
 	}
 	for _, tB := range testBlocks {
-		chunk.SetBlock(tB.x, tB.y, tB.z, &tB.Block)
-		if block := chunk.GetBlock(tB.x, tB.y, tB.z); !tB.Block.Equal(block) {
+		chunk.SetBlock(tB.x, tB.y, tB.z, tB.Block)
+		if block := chunk.GetBlock(tB.x, tB.y, tB.z); !tB.Block.EqualBlock(block) {
 			t.Errorf("blocks do not match, expecting %s, got %s", tB.Block.String(), block.String())
 		}
 	}
 	for _, tB := range testBlocks {
 		if tB.recheck {
-			if block := chunk.GetBlock(tB.x, tB.y, tB.z); !tB.Block.Equal(block) {
+			if block := chunk.GetBlock(tB.x, tB.y, tB.z); !tB.Block.EqualBlock(block) {
 				t.Errorf("blocks do not match, expecting:-\n%s\ngot:-\n%s", tB.Block.String(), block.String())
 			}
 		}
@@ -300,30 +300,30 @@ func TestBlock(t *testing.T) {
 func TestHeightMap(t *testing.T) {
 	tests := []struct {
 		x, y, z int32
-		*Block
+		Block
 		height int32
 	}{
-		{0, 0, 0, &Block{}, 0},
-		{1, 0, 0, &Block{BlockID: 1}, 1},
-		{1, 1, 0, &Block{BlockID: 1}, 2},
-		{1, 0, 0, &Block{}, 2},
-		{1, 1, 0, &Block{}, 0},
-		{2, 10, 0, &Block{BlockID: 1}, 11},
-		{2, 12, 0, &Block{BlockID: 1}, 13},
-		{2, 12, 0, &Block{}, 11},
-		{2, 10, 0, &Block{}, 0},
-		{3, 15, 0, &Block{BlockID: 1}, 16},
-		{3, 16, 0, &Block{BlockID: 1}, 17},
-		{3, 16, 0, &Block{}, 16},
-		{3, 15, 0, &Block{}, 0},
-		{4, 31, 0, &Block{BlockID: 1}, 32},
-		{4, 32, 0, &Block{BlockID: 1}, 33},
-		{4, 32, 0, &Block{}, 32},
-		{4, 31, 0, &Block{}, 0},
-		{5, 16, 0, &Block{BlockID: 1}, 17},
-		{5, 32, 0, &Block{BlockID: 1}, 33},
-		{5, 32, 0, &Block{}, 17},
-		{5, 16, 0, &Block{}, 0},
+		{0, 0, 0, Block{}, 0},
+		{1, 0, 0, Block{BlockID: 1}, 1},
+		{1, 1, 0, Block{BlockID: 1}, 2},
+		{1, 0, 0, Block{}, 2},
+		{1, 1, 0, Block{}, 0},
+		{2, 10, 0, Block{BlockID: 1}, 11},
+		{2, 12, 0, Block{BlockID: 1}, 13},
+		{2, 12, 0, Block{}, 11},
+		{2, 10, 0, Block{}, 0},
+		{3, 15, 0, Block{BlockID: 1}, 16},
+		{3, 16, 0, Block{BlockID: 1}, 17},
+		{3, 16, 0, Block{}, 16},
+		{3, 15, 0, Block{}, 0},
+		{4, 31, 0, Block{BlockID: 1}, 32},
+		{4, 32, 0, Block{BlockID: 1}, 33},
+		{4, 32, 0, Block{}, 32},
+		{4, 31, 0, Block{}, 0},
+		{5, 16, 0, Block{BlockID: 1}, 17},
+		{5, 32, 0, Block{BlockID: 1}, 33},
+		{5, 32, 0, Block{}, 17},
+		{5, 16, 0, Block{}, 0},
 	}
 	chunk, _ := newChunk(0, 0, nbt.Tag{})
 	for n, test := range tests {

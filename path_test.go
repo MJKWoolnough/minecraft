@@ -324,7 +324,7 @@ func init() {
 					if k%2 == 0 {
 						tick = []Tick{{int32(i+j+k) % 4096, 1, -1}}
 					}
-					chunks[3].SetBlock(int32(i), int32(k), int32(j), &Block{
+					chunks[3].SetBlock(int32(i), int32(k), int32(j), Block{
 						uint16(i+j+k) % 4096,
 						uint8(i),
 						nbt.Compound{
@@ -334,9 +334,9 @@ func init() {
 					})
 				}
 				if k < 250 {
-					chunks[2].SetBlock(int32(i), int32(k), int32(j), &Block{1, 0, nil, nil})
+					chunks[2].SetBlock(int32(i), int32(k), int32(j), Block{1, 0, nil, nil})
 				} else {
-					chunks[2].SetBlock(int32(i), int32(k), int32(j), &Block{
+					chunks[2].SetBlock(int32(i), int32(k), int32(j), Block{
 						1,
 						0,
 						nbt.Compound{
@@ -346,7 +346,7 @@ func init() {
 					})
 				}
 			}
-			chunks[1].SetBlock(int32(i), int32(j)*16, int32(j), &Block{
+			chunks[1].SetBlock(int32(i), int32(j)*16, int32(j), Block{
 				uint16(i*j + i + j),
 				uint8(i),
 				nbt.Compound{
@@ -359,7 +359,7 @@ func init() {
 				[]Tick{{int32(i*j+i+j) % 4096, 1, -1}},
 			})
 		}
-		chunks[0].SetBlock(int32(i), int32(i), int32(i), &Block{uint16(i), uint8(i), nil, nil})
+		chunks[0].SetBlock(int32(i), int32(i), int32(i), Block{uint16(i), uint8(i), nil, nil})
 	}
 	chunksNBT = [4]nbt.Tag{
 		a.GetNBT(),
