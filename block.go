@@ -22,45 +22,53 @@ type Block struct {
 }
 
 // Equal is an implementation of the equaler.Equaler interface
-func (b Block) Equal(e equaler.Equaler) bool {
+func (b *Block) Equal(e equaler.Equaler) bool {
 	c, ok := e.(*Block)
 	if !ok {
 		if d, ok := e.(Block); ok {
 			c = &d
 		}
 	}
-	if c != nil {
-		if b.BlockID == c.BlockID && b.Data == c.Data && len(b.metadata) == len(c.metadata) && len(b.ticks) == len(c.ticks) {
-			for _, bT := range b.ticks {
-				found := false
-				for _, cT := range c.ticks {
-					if bT.I == cT.I && bT.T == cT.T && bT.P == cT.P {
-						found = true
-						break
-					}
-				}
-				if !found {
-					return false
-				}
-			}
-			for _, v := range b.metadata {
-				name := v.Name()
-				found := false
-				for _, w := range c.metadata {
-					if w.Name() == name {
-						if !v.Equal(w) {
-							return false
-						}
-						found = true
-						break
-					}
-				}
-				if !found {
-					return false
+	return b.EqualBlock(c)
+}
+
+// EqualBlock checks for equality between the two blocks
+func (b *Block) EqualBlock(c *Block) {
+	if b == c {
+		return true
+	} else if b == nil || c == nil {
+		return false
+	}
+	if b.BlockID == c.BlockID && b.Data == c.Data && len(b.metadata) == len(c.metadata) && len(b.ticks) == len(c.ticks) {
+		for _, bT := range b.ticks {
+			found := false
+			for _, cT := range c.ticks {
+				if bT.I == cT.I && bT.T == cT.T && bT.P == cT.P {
+					found = true
+					break
 				}
 			}
-			return true
+			if !found {
+				return false
+			}
 		}
+		for _, v := range b.metadata {
+			name := v.Name()
+			found := false
+			for _, w := range c.metadata {
+				if w.Name() == name {
+					if !v.Equal(w) {
+						return false
+					}
+					found = true
+					break
+				}
+			}
+			if !found {
+				return false
+			}
+		}
+		return true
 	}
 	return false
 }
