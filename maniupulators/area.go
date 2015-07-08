@@ -27,20 +27,20 @@ func (a Area) Depth() int32 {
 	return a.z2 - a.z1 + 1
 }
 
-func (a Area) Get(x, y, z int32) (*minecraft.Block, error) {
+func (a Area) Get(x, y, z int32) (minecraft.Block, error) {
 	if x < 0 || y < 0 || z < 0 {
-		return nil, ErrOOB
+		return minecraft.Block{}, ErrOOB
 	}
 	x += a.x1
 	y += a.y1
 	z += a.z1
 	if x > a.x2 || y > a.y2 || z > a.z2 {
-		return nil, ErrOOB
+		return minecraft.Block{}, ErrOOB
 	}
 	return a.level.GetBlock(x, y, z)
 }
 
-func (a Area) Set(x, y, z int32, b *minecraft.Block) error {
+func (a Area) Set(x, y, z int32, b minecraft.Block) error {
 	if x < 0 || y < 0 || z < 0 {
 		return ErrOOB
 	}
@@ -53,7 +53,7 @@ func (a Area) Set(x, y, z int32, b *minecraft.Block) error {
 	return a.level.SetBlock(x, y, z, b)
 }
 
-func (a Area) Fill(b *minecraft.Block) error {
+func (a Area) Fill(b minecraft.Block) error {
 	for x := a.x1; x <= a.x2; x++ {
 		for y := a.y1; y <= a.y2; y++ {
 			for z := a.z1; z <= a.z2; z++ {
@@ -66,7 +66,7 @@ func (a Area) Fill(b *minecraft.Block) error {
 	return nil
 }
 
-func (a Area) Replace(replace, with *minecraft.Block) error {
+func (a Area) Replace(replace, with minecraft.Block) error {
 	for x := a.x1; x <= a.x2; x++ {
 		for y := a.y1; y <= a.y2; y++ {
 			for z := a.z1; z <= a.z2; z++ {
