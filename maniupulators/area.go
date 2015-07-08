@@ -181,6 +181,229 @@ func (a Area) CopyInDirection(dir Direction, times uint) error {
 
 }
 
+func (a Area) Rotate90() error {
+	if a.Width() != a.Depth() {
+		return ErrNotSquare
+	}
+
+	width := a.x2 - a.x1
+
+	for x := int32(0); x <= width>>1; x++ {
+		leftPos := x
+		rightPos := width - x
+		for z := int32(0); z <= (width-1)>>1; z++ {
+			topPos := z
+			bottomPos := width - z
+			for y := a.y1; y <= a.y2; y++ {
+				topLeft, err := a.level.GetBlock(a.x1+leftPos, y, a.z1+topPos) /// top-left...
+				if err != nil {
+					return err
+				}
+				if leftPos != rightPos || topPos != bottomPos {
+					block, err := a.level.GetBlock(a.x1+topPos, y, a.z1+rightPos) // bottom-left -> ...
+					if err != nil {
+						return err
+					}
+					err = a.level.SetBlock(a.x1+leftPos, y, a.z1+topPos, Rotate90(block)) //... top-left
+					if err != nil {
+						return err
+					}
+					block, err = a.level.GetBlock(a.x1+rightPos, y, a.z1+bottomPos) // bottom-right -> ...
+					if err != nil {
+						return err
+					}
+					err = a.level.SetBlock(a.x1+topPos, y, a.z1+rightPos, Rotate90(block)) //... bottom-left
+					if err != nil {
+						return err
+					}
+					block, err = a.level.GetBlock(a.x1+bottomPos, y, a.z1+leftPos) // top-right -> ...
+					if err != nil {
+						return err
+					}
+					err = a.level.SetBlock(a.x1+rightPos, y, a.z1+bottomPos, Rotate90(block)) //... bottom-right
+					if err != nil {
+						return err
+					}
+				}
+				err = a.level.SetBlock(a.x1+bottomPos, y, a.z1+leftPos, Rotate90(topLeft)) // ... -> top-right
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	if (width & 1) == 0 {
+		for y := a.y1; y <= a.y2; y++ {
+			block, err := a.level.GetBlock(a.x1+(width>>1), y, a.z1+(width>>1))
+			if err != nil {
+				return err
+			}
+			err = a.level.SetBlock(a.x1+(width>>1), y, a.z1+(width>>1), Rotate90(block))
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (a Area) Rotate180() error {
+	for x := int32(0); x <= (a.x2-a.x1)>>1; x++ {
+		leftPos := a.x1 + x
+		rightPos := a.x2 - x
+		for z := int32(0); z <= a.z2-a.z1; z++ {
+			topPos := a.z1 + z
+			bottomPos := a.z2 - z
+			for y := a.y1; y <= a.y2; y++ {
+				left, err := a.level.GetBlock(leftPos, y, topPos)
+				if err != nil {
+					return err
+				}
+				if leftPos != rightPos || topPos != bottomPos {
+					right, err := a.level.GetBlock(rightPos, y, bottomPos)
+					if err != nil {
+						return err
+					}
+					err = a.level.SetBlock(leftPos, y, topPos, Rotate180(right))
+				}
+				err = a.level.SetBlock(rightPos, y, bottomPos, Rotate180(left))
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (a Area) Rotate270() error {
+	if a.Width() != a.Depth() {
+		return ErrNotSquare
+	}
+
+	width := a.x2 - a.x1
+
+	for x := int32(0); x <= width>>1; x++ {
+		leftPos := x
+		rightPos := width - x
+		for z := int32(0); z <= (width-1)>>1; z++ {
+			topPos := z
+			bottomPos := width - z
+			for y := a.y1; y <= a.y2; y++ {
+				topLeft, err := a.level.GetBlock(a.x1+leftPos, y, a.z1+topPos) /// top-left...
+				if err != nil {
+					return err
+				}
+				if leftPos != rightPos || topPos != bottomPos {
+					block, err := a.level.GetBlock(a.x1+bottomPos, y, a.z1+leftPos) // top-right -> ...
+					if err != nil {
+						return err
+					}
+					err = a.level.SetBlock(a.x1+leftPos, y, a.z1+topPos, Rotate270(block)) //... top-left
+					if err != nil {
+						return err
+					}
+					block, err = a.level.GetBlock(a.x1+rightPos, y, a.z1+bottomPos) // bottom-right -> ...
+					if err != nil {
+						return err
+					}
+					err = a.level.SetBlock(a.x1+bottomPos, y, a.z1+leftPos, Rotate270(block)) //... top-right
+					if err != nil {
+						return err
+					}
+					block, err = a.level.GetBlock(a.x1+topPos, y, a.z1+rightPos) // bottom-left -> ...
+					if err != nil {
+						return err
+					}
+					err = a.level.SetBlock(a.x1+rightPos, y, a.z1+bottomPos, Rotate270(block)) //... bottom-right
+					if err != nil {
+						return err
+					}
+				}
+				err = a.level.SetBlock(a.x1+topPos, y, a.z1+rightPos, Rotate270(topLeft)) // ... -> bottom-left
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	if (width & 1) == 0 {
+		for y := a.y1; y <= a.y2; y++ {
+			block, err := a.level.GetBlock(a.x1+(width>>1), y, a.z1+(width>>1))
+			if err != nil {
+				return err
+			}
+			err = a.level.SetBlock(a.x1+(width>>1), y, a.z1+(width>>1), Rotate270(block))
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (a Area) MirrorX() error {
+	for x := int32(0); x <= (a.x2-a.x1)>>1; x++ {
+		leftPos := a.x1 + x
+		rightPos := a.x2 - x
+		for y := a.y1; y <= a.y2; y++ {
+			for z := a.z1; z <= a.z2; z++ {
+				left, err := a.level.GetBlock(leftPos, y, z)
+				if err != nil {
+					return err
+				}
+				if leftPos != rightPos {
+					right, err := a.level.GetBlock(rightPos, y, z)
+					if err != nil {
+						return err
+					}
+					err = a.level.SetBlock(leftPos, y, z, MirrorX(right))
+					if err != nil {
+						return err
+					}
+				}
+				err = a.level.SetBlock(rightPos, y, z, MirrorX(left))
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func (a Area) MirrorZ() error {
+	for z := int32(0); z <= (a.z2-a.z1)>>1; z++ {
+		topPos := a.z1 + z
+		bottomPos := a.z2 - z
+		for x := a.x1; x <= a.x2; x++ {
+			for y := a.y1; y <= a.y2; y++ {
+				top, err := a.level.GetBlock(x, y, topPos)
+				if err != nil {
+					return err
+				}
+				if topPos != bottomPos {
+					bottom, err := a.level.GetBlock(x, y, bottomPos)
+					if err != nil {
+						return err
+					}
+					err = a.level.SetBlock(x, y, topPos, MirrorZ(bottom))
+					if err != nil {
+						return err
+					}
+				}
+				err = a.level.SetBlock(x, y, bottomPos, MirrorZ(top))
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
 func min(a, b int32) int32 {
 	if a < b {
 		return a
@@ -195,8 +418,17 @@ func max(a, b int32) int32 {
 	return b
 }
 
+func (a Area) Save() error {
+	return a.level.Save()
+}
+
+func (a Area) Close() {
+	a.level.Close()
+}
+
 //Errors
 var (
-	ErrOOB      = errors.New("out of bounds")
-	ErrMismatch = errors.New("areas not equal sizes")
+	ErrOOB       = errors.New("out of bounds")
+	ErrMismatch  = errors.New("areas not equal sizes")
+	ErrNotSquare = errors.New("non-square area")
 )
