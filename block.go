@@ -25,15 +25,13 @@ type Block struct {
 func (b *Block) Equal(e equaler.Equaler) bool {
 	c, ok := e.(*Block)
 	if !ok {
-		if d, ok := e.(Block); ok {
-			c = &d
-		}
+		return false
 	}
 	return b.EqualBlock(c)
 }
 
 // EqualBlock checks for equality between the two blocks
-func (b *Block) EqualBlock(c *Block) {
+func (b *Block) EqualBlock(c *Block) bool {
 	if b == c {
 		return true
 	} else if b == nil || c == nil {
