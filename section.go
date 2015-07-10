@@ -125,14 +125,14 @@ func loadSection(c nbt.Compound) (*section, error) {
 
 func (s *section) GetBlock(x, y, z int32) Block {
 	return Block{
-		BlockID: uint16(getNibble(s.add, x, y, z))<<8 | uint16(byte(s.blocks[yzx(x, y, z)])),
-		Data:    getNibble(s.data, x, y, z),
+		ID:   uint16(getNibble(s.add, x, y, z))<<8 | uint16(byte(s.blocks[yzx(x, y, z)])),
+		Data: getNibble(s.data, x, y, z),
 	}
 }
 
 func (s *section) SetBlock(x, y, z int32, b Block) {
-	s.blocks[yzx(x, y, z)] = int8(b.BlockID & 255)
-	setNibble(s.add, x, y, z, byte(b.BlockID>>8))
+	s.blocks[yzx(x, y, z)] = int8(b.ID & 255)
+	setNibble(s.add, x, y, z, byte(b.ID>>8))
 	setNibble(s.data, x, y, z, byte(b.Data))
 }
 

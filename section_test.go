@@ -51,12 +51,12 @@ func TestGetBlock(t *testing.T) {
 		xyz [3]int32
 		Block
 	}{
-		{[3]int32{0, 0, 0}, Block{BlockID: 1}},
-		{[3]int32{10, 0, 0}, Block{BlockID: 2}},
-		{[3]int32{2, 0, 1}, Block{BlockID: 1816}},
-		{[3]int32{3, 0, 1}, Block{BlockID: 3085}},
-		{[3]int32{3, 13, 9}, Block{BlockID: 45, Data: 9}},
-		{[3]int32{6, 15, 13}, Block{BlockID: 1474, Data: 8}},
+		{[3]int32{0, 0, 0}, Block{ID: 1}},
+		{[3]int32{10, 0, 0}, Block{ID: 2}},
+		{[3]int32{2, 0, 1}, Block{ID: 1816}},
+		{[3]int32{3, 0, 1}, Block{ID: 3085}},
+		{[3]int32{3, 13, 9}, Block{ID: 45, Data: 9}},
+		{[3]int32{6, 15, 13}, Block{ID: 1474, Data: 8}},
 		{[3]int32{9, 12, 11}, Block{}},
 	}
 	for n, test := range tests {
@@ -73,12 +73,12 @@ func TestSetBlock(t *testing.T) {
 		Block
 		recheck bool
 	}{
-		{[3]int32{4, 7, 9}, Block{BlockID: 12, Data: 4}, false},
-		{[3]int32{4, 7, 9}, Block{BlockID: 15}, false},
-		{[3]int32{1, 12, 10}, Block{BlockID: 1345, Data: 12}, true},
-		{[3]int32{2, 12, 10}, Block{BlockID: 765, Data: 5}, true},
-		{[3]int32{3, 12, 10}, Block{BlockID: 451, Data: 11}, false},
-		{[3]int32{4, 7, 9}, Block{BlockID: 761, Data: 5}, false},
+		{[3]int32{4, 7, 9}, Block{ID: 12, Data: 4}, false},
+		{[3]int32{4, 7, 9}, Block{ID: 15}, false},
+		{[3]int32{1, 12, 10}, Block{ID: 1345, Data: 12}, true},
+		{[3]int32{2, 12, 10}, Block{ID: 765, Data: 5}, true},
+		{[3]int32{3, 12, 10}, Block{ID: 451, Data: 11}, false},
+		{[3]int32{4, 7, 9}, Block{ID: 761, Data: 5}, false},
 		{[3]int32{4, 7, 9}, Block{}, false},
 	}
 	for n, test := range tests {
