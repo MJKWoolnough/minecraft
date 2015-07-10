@@ -32,7 +32,7 @@ func RegisterBlock(block minecraft.Block, m manipulator) {
 func Rotate90(b minecraft.Block) minecraft.Block {
 	mmu.RLock()
 	defer mmu.RUnlock()
-	m, ok := manipulators[b.BlockID]
+	m, ok := manipulators[b.ID]
 	if !ok {
 		return b
 	}
@@ -42,7 +42,7 @@ func Rotate90(b minecraft.Block) minecraft.Block {
 func Rotate180(b minecraft.Block) minecraft.Block {
 	mmu.RLock()
 	defer mmu.RUnlock()
-	m, ok := manipulators[b.BlockID]
+	m, ok := manipulators[b.ID]
 	if !ok {
 		return b
 	}
@@ -52,7 +52,7 @@ func Rotate180(b minecraft.Block) minecraft.Block {
 func Rotate270(b minecraft.Block) minecraft.Block {
 	mmu.RLock()
 	defer mmu.RUnlock()
-	m, ok := manipulators[b.BlockID]
+	m, ok := manipulators[b.ID]
 	if !ok {
 		return b
 	}
@@ -62,7 +62,7 @@ func Rotate270(b minecraft.Block) minecraft.Block {
 func MirrorX(b minecraft.Block) minecraft.Block {
 	mmu.RLock()
 	defer mmu.RUnlock()
-	m, ok := manipulators[b.BlockID]
+	m, ok := manipulators[b.ID]
 	if !ok {
 		return b
 	}
@@ -72,7 +72,7 @@ func MirrorX(b minecraft.Block) minecraft.Block {
 func MirrorZ(b minecraft.Block) minecraft.Block {
 	mmu.RLock()
 	defer mmu.RUnlock()
-	m, ok := manipulators[b.BlockID]
+	m, ok := manipulators[b.ID]
 	if !ok {
 		return b
 	}
