@@ -1,34 +1,13 @@
-package manipulators
+package vanilla16
 
 import (
 	"github.com/MJKWoolnough/minecraft"
+	"github.com/MJKWoolnough/minecraft/manipulators"
 	"github.com/MJKWoolnough/minecraft/nbt"
 )
 
-type Default struct{}
-
-func (Default) Rotate90(block minecraft.Block) minecraft.Block {
-	return block
-}
-
-func (Default) Rotate180(block minecraft.Block) minecraft.Block {
-	return block
-}
-
-func (Default) Rotate270(block minecraft.Block) minecraft.Block {
-	return block
-}
-
-func (Default) MirrorX(block minecraft.Block) minecraft.Block {
-	return block
-}
-
-func (Default) MirrorZ(block minecraft.Block) minecraft.Block {
-	return block
-}
-
 type Log struct {
-	Default
+	manipulators.Default
 }
 
 func (Log) Rotate90(block minecraft.Block) minecraft.Block {
@@ -43,98 +22,6 @@ func (Log) Rotate90(block minecraft.Block) minecraft.Block {
 
 func (l Log) Rotate270(block minecraft.Block) minecraft.Block {
 	return l.Rotate90(block)
-}
-
-type Bits struct {
-	Bitmask, North, East, South, West uint8
-}
-
-func NewBits(bm, north, east, south, west uint8) Bits {
-	return Bits{
-		bm, north, east, south, west,
-	}
-}
-
-func (b Bits) Rotate90(block minecraft.Block) minecraft.Block {
-	data := block.Data & b.Bitmask
-	block.Data &^= b.Bitmask
-	switch data {
-	case b.North:
-		block.Data |= b.East
-	case b.East:
-		block.Data |= b.South
-	case b.South:
-		block.Data |= b.West
-	case b.West:
-		block.Data |= b.North
-	default:
-		block.Data |= data
-	}
-	return block
-}
-
-func (b Bits) Rotate180(block minecraft.Block) minecraft.Block {
-	data := block.Data & b.Bitmask
-	block.Data &^= b.Bitmask
-	switch data {
-	case b.North:
-		block.Data |= b.South
-	case b.East:
-		block.Data |= b.West
-	case b.South:
-		block.Data |= b.North
-	case b.West:
-		block.Data |= b.East
-	default:
-		block.Data |= data
-	}
-	return block
-}
-
-func (b Bits) Rotate270(block minecraft.Block) minecraft.Block {
-	data := block.Data & b.Bitmask
-	block.Data &^= b.Bitmask
-	switch data {
-	case b.North:
-		block.Data |= b.West
-	case b.East:
-		block.Data |= b.North
-	case b.South:
-		block.Data |= b.East
-	case b.West:
-		block.Data |= b.South
-	default:
-		block.Data |= data
-	}
-	return block
-}
-
-func (b Bits) MirrorX(block minecraft.Block) minecraft.Block {
-	data := block.Data & b.Bitmask
-	block.Data &^= b.Bitmask
-	switch data {
-	case b.East:
-		block.Data |= b.West
-	case b.West:
-		block.Data |= b.East
-	default:
-		block.Data |= data
-	}
-	return block
-}
-
-func (b Bits) MirrorZ(block minecraft.Block) minecraft.Block {
-	data := block.Data & b.Bitmask
-	block.Data &^= b.Bitmask
-	switch data {
-	case b.North:
-		block.Data |= b.South
-	case b.South:
-		block.Data |= b.North
-	default:
-		block.Data |= data
-	}
-	return block
 }
 
 type Sign struct{}
@@ -164,30 +51,30 @@ func (Sign) MirrorZ(block minecraft.Block) minecraft.Block {
 	return block
 }
 
-type Door struct{}
+type Doors struct{}
 
-func (Door) Rotate90(block minecraft.Block) minecraft.Block {
+func (Doors) Rotate90(block minecraft.Block) minecraft.Block {
 	if block.Data&8 == 0 {
 		block.Data = (((block.Data & 3) + 1) & 3) | (block.Data & 4)
 	}
 	return block
 }
 
-func (Door) Rotate180(block minecraft.Block) minecraft.Block {
+func (Doors) Rotate180(block minecraft.Block) minecraft.Block {
 	if block.Data&8 == 0 {
 		block.Data = (((block.Data & 3) + 2) & 3) | (block.Data & 4)
 	}
 	return block
 }
 
-func (Door) Rotate270(block minecraft.Block) minecraft.Block {
+func (Doors) Rotate270(block minecraft.Block) minecraft.Block {
 	if block.Data&8 == 0 {
 		block.Data = (((block.Data & 3) + 3) & 3) | (block.Data & 4)
 	}
 	return block
 }
 
-func (Door) MirrorX(block minecraft.Block) minecraft.Block {
+func (Doors) MirrorX(block minecraft.Block) minecraft.Block {
 	if block.Data&8 == 0 {
 		if block.Data == 0 || block.Data == 2 {
 			block.Data = ((block.Data + 2) & 3) | (block.Data & 4)
@@ -198,7 +85,7 @@ func (Door) MirrorX(block minecraft.Block) minecraft.Block {
 	return block
 }
 
-func (Door) MirrorZ(block minecraft.Block) minecraft.Block {
+func (Doors) MirrorZ(block minecraft.Block) minecraft.Block {
 	if block.Data&8 == 0 {
 		if block.Data == 1 || block.Data == 3 {
 			block.Data = ((block.Data + 2) & 3) | (block.Data & 4)
@@ -223,9 +110,9 @@ const (
 	RailSouthWest  = 9
 )
 
-type Rail struct{}
+type Rails struct{}
 
-func (Rail) Rotate90(block minecraft.Block) minecraft.Block {
+func (Rails) Rotate90(block minecraft.Block) minecraft.Block {
 	switch block.Data {
 	case RailNorthSouth:
 		block.Data = RailEastWest
@@ -251,7 +138,7 @@ func (Rail) Rotate90(block minecraft.Block) minecraft.Block {
 	return block
 }
 
-func (Rail) Rotate180(block minecraft.Block) minecraft.Block {
+func (Rails) Rotate180(block minecraft.Block) minecraft.Block {
 	switch block.Data {
 	case RailEast:
 		block.Data = RailWest
@@ -273,7 +160,7 @@ func (Rail) Rotate180(block minecraft.Block) minecraft.Block {
 	return block
 }
 
-func (Rail) Rotate270(block minecraft.Block) minecraft.Block {
+func (Rails) Rotate270(block minecraft.Block) minecraft.Block {
 	switch block.Data {
 	case RailNorthSouth:
 		block.Data = RailEastWest
@@ -299,7 +186,7 @@ func (Rail) Rotate270(block minecraft.Block) minecraft.Block {
 	return block
 }
 
-func (Rail) MirrorX(block minecraft.Block) minecraft.Block {
+func (Rails) MirrorX(block minecraft.Block) minecraft.Block {
 	switch block.Data {
 	case RailEast:
 		block.Data = RailWest
@@ -317,7 +204,7 @@ func (Rail) MirrorX(block minecraft.Block) minecraft.Block {
 	return block
 }
 
-func (Rail) MirrorZ(block minecraft.Block) minecraft.Block {
+func (Rails) MirrorZ(block minecraft.Block) minecraft.Block {
 	switch block.Data {
 	case RailNorth:
 		block.Data = RailSouth
@@ -336,13 +223,13 @@ func (Rail) MirrorZ(block minecraft.Block) minecraft.Block {
 }
 
 type PowerableRail struct {
-	Rail
+	Rails
 }
 
 func (p PowerableRail) Rotate90(block minecraft.Block) minecraft.Block {
 	powered := block.Data & 8
 	block.Data &= 7
-	p.Rail.Rotate90(block)
+	p.Rails.Rotate90(block)
 	block.Data |= powered
 	return block
 }
@@ -350,7 +237,7 @@ func (p PowerableRail) Rotate90(block minecraft.Block) minecraft.Block {
 func (p PowerableRail) Rotate180(block minecraft.Block) minecraft.Block {
 	powered := block.Data & 8
 	block.Data &= 7
-	p.Rail.Rotate180(block)
+	p.Rails.Rotate180(block)
 	block.Data |= powered
 	return block
 }
@@ -358,7 +245,7 @@ func (p PowerableRail) Rotate180(block minecraft.Block) minecraft.Block {
 func (p PowerableRail) Rotate270(block minecraft.Block) minecraft.Block {
 	powered := block.Data & 8
 	block.Data &= 7
-	p.Rail.Rotate270(block)
+	p.Rails.Rotate270(block)
 	block.Data |= powered
 	return block
 }
@@ -366,7 +253,7 @@ func (p PowerableRail) Rotate270(block minecraft.Block) minecraft.Block {
 func (p PowerableRail) MirrorX(block minecraft.Block) minecraft.Block {
 	powered := block.Data & 8
 	block.Data &= 7
-	p.Rail.MirrorX(block)
+	p.Rails.MirrorX(block)
 	block.Data |= powered
 	return block
 }
@@ -374,7 +261,7 @@ func (p PowerableRail) MirrorX(block minecraft.Block) minecraft.Block {
 func (p PowerableRail) MirrorZ(block minecraft.Block) minecraft.Block {
 	powered := block.Data & 8
 	block.Data &= 7
-	p.Rail.MirrorZ(block)
+	p.Rails.MirrorZ(block)
 	block.Data |= powered
 	return block
 }
@@ -391,9 +278,9 @@ const (
 	LeverCeilingEastWest   = 0
 )
 
-type Lever struct{}
+type Levers struct{}
 
-func (Lever) Rotate90(block minecraft.Block) minecraft.Block {
+func (Levers) Rotate90(block minecraft.Block) minecraft.Block {
 	powered := block.Data & 8
 	switch block.Data & 7 {
 	case LeverNorth:
@@ -417,7 +304,7 @@ func (Lever) Rotate90(block minecraft.Block) minecraft.Block {
 	return block
 }
 
-func (Lever) Rotate180(block minecraft.Block) minecraft.Block {
+func (Levers) Rotate180(block minecraft.Block) minecraft.Block {
 	powered := block.Data & 8
 	switch block.Data & 7 {
 	case LeverNorth:
@@ -433,7 +320,7 @@ func (Lever) Rotate180(block minecraft.Block) minecraft.Block {
 	return block
 }
 
-func (Lever) Rotate270(block minecraft.Block) minecraft.Block {
+func (Levers) Rotate270(block minecraft.Block) minecraft.Block {
 	powered := block.Data & 8
 	switch block.Data & 7 {
 	case LeverNorth:
@@ -457,7 +344,7 @@ func (Lever) Rotate270(block minecraft.Block) minecraft.Block {
 	return block
 }
 
-func (Lever) MirrorX(block minecraft.Block) minecraft.Block {
+func (Levers) MirrorX(block minecraft.Block) minecraft.Block {
 	powered := block.Data & 8
 	switch block.Data & 7 {
 	case LeverEast:
@@ -469,7 +356,7 @@ func (Lever) MirrorX(block minecraft.Block) minecraft.Block {
 	return block
 }
 
-func (Lever) MirrorZ(block minecraft.Block) minecraft.Block {
+func (Levers) MirrorZ(block minecraft.Block) minecraft.Block {
 	powered := block.Data & 8
 	switch block.Data & 7 {
 	case LeverNorth:
@@ -699,15 +586,15 @@ func (Vines) MirrorZ(block minecraft.Block) minecraft.Block {
 
 const SkullRotationString = "Rot"
 
-type Skull struct {
-	b Bits
+type Skulls struct {
+	b manipulators.Bits
 }
 
-func NewSkull() Skull {
-	return Skull{NewBits(3, 2, 4, 3, 5)}
+func NewSkulls() Skulls {
+	return Skulls{manipulators.Bits{3, 2, 4, 3, 5}}
 }
 
-func (s Skull) Rotate90(block minecraft.Block) minecraft.Block {
+func (s Skulls) Rotate90(block minecraft.Block) minecraft.Block {
 	if block.Data != 1 {
 		return s.b.Rotate90(block)
 	}
@@ -718,7 +605,7 @@ func (s Skull) Rotate90(block minecraft.Block) minecraft.Block {
 	return block
 }
 
-func (s Skull) Rotate180(block minecraft.Block) minecraft.Block {
+func (s Skulls) Rotate180(block minecraft.Block) minecraft.Block {
 	if block.Data != 1 {
 		return s.b.Rotate90(block)
 	}
@@ -729,7 +616,7 @@ func (s Skull) Rotate180(block minecraft.Block) minecraft.Block {
 	return block
 }
 
-func (s Skull) Rotate270(block minecraft.Block) minecraft.Block {
+func (s Skulls) Rotate270(block minecraft.Block) minecraft.Block {
 	if block.Data != 1 {
 		return s.b.Rotate90(block)
 	}
@@ -740,7 +627,7 @@ func (s Skull) Rotate270(block minecraft.Block) minecraft.Block {
 	return block
 }
 
-func (s Skull) MirrorX(block minecraft.Block) minecraft.Block {
+func (s Skulls) MirrorX(block minecraft.Block) minecraft.Block {
 	if block.Data != 1 {
 		return s.b.Rotate90(block)
 	}
@@ -751,7 +638,7 @@ func (s Skull) MirrorX(block minecraft.Block) minecraft.Block {
 	return block
 }
 
-func (s Skull) MirrorZ(block minecraft.Block) minecraft.Block {
+func (s Skulls) MirrorZ(block minecraft.Block) minecraft.Block {
 	if block.Data != 1 {
 		return s.b.Rotate90(block)
 	}
@@ -763,5 +650,82 @@ func (s Skull) MirrorZ(block minecraft.Block) minecraft.Block {
 }
 
 func init() {
+	manipulators.RegisterBlock(Wood, Log{})
 
+	uewsn := manipulators.NewBits(7, 4, 1, 3, 2)
+	manipulators.RegisterBlock(Torch, &uewsn)
+	manipulators.RegisterBlock(RedstoneTorch, &uewsn)
+	manipulators.RegisterBlock(RedstoneTorchActive, &uewsn)
+	manipulators.RegisterBlock(StoneButton, &uewsn)
+	manipulators.RegisterBlock(WoodenButton, &uewsn)
+
+	nesw := manipulators.NewBits(3, 0, 1, 2, 3)
+	manipulators.RegisterBlock(Bed, &nesw)
+	manipulators.RegisterBlock(RedstoneRepeater, &nesw)
+	manipulators.RegisterBlock(RedstoneRepeaterActive, &nesw)
+	manipulators.RegisterBlock(RedstoneComparator, &nesw)
+	manipulators.RegisterBlock(RedstoneComparatorActive, &nesw)
+	manipulators.RegisterBlock(Cocoa, &nesw)
+	manipulators.RegisterBlock(Anvil, &nesw)
+
+	uunswe := manipulators.NewBits(7, 2, 5, 3, 4)
+	manipulators.RegisterBlock(Piston, &uunswe)
+	manipulators.RegisterBlock(PistonExtension, &uunswe)
+	manipulators.RegisterBlock(PistonMoving, &uunswe)
+	manipulators.RegisterBlock(StickyPiston, &uunswe)
+	manipulators.RegisterBlock(Ladder, &uunswe)
+	manipulators.RegisterBlock(SignWall, &uunswe)
+	manipulators.RegisterBlock(Furnace, &uunswe)
+	manipulators.RegisterBlock(FurnaceActive, &uunswe)
+	manipulators.RegisterBlock(Chest, &uunswe)
+	manipulators.RegisterBlock(Dispenser, &uunswe)
+	manipulators.RegisterBlock(Dropper, &uunswe)
+	manipulators.RegisterBlock(Hopper, &uunswe)
+	manipulators.RegisterBlock(EnderChest, &uunswe)
+	manipulators.RegisterBlock(TrappedChest, &uunswe)
+	manipulators.RegisterBlock(LockedChest, &uunswe)
+
+	ewsn := manipulators.NewBits(3, 3, 0, 2, 1)
+	manipulators.RegisterBlock(OakStairs, &ewsn)
+	manipulators.RegisterBlock(CobblestoneStairs, &ewsn)
+	manipulators.RegisterBlock(BrickStairs, &ewsn)
+	manipulators.RegisterBlock(StoneBrickStairs, &ewsn)
+	manipulators.RegisterBlock(NetherBrickStairs, &ewsn)
+	manipulators.RegisterBlock(SandStoneStairs, &ewsn)
+	manipulators.RegisterBlock(SpruceStairs, &ewsn)
+	manipulators.RegisterBlock(BirchStairs, &ewsn)
+	manipulators.RegisterBlock(JungleStairs, &ewsn)
+	manipulators.RegisterBlock(NetherQuartzStairs, &ewsn)
+
+	manipulators.RegisterBlock(SignPost, Sign{})
+
+	var doors Doors
+	manipulators.RegisterBlock(Door, &doors)
+	manipulators.RegisterBlock(IronDoor, &doors)
+
+	manipulators.RegisterBlock(Rail, Rails{})
+
+	var rail PowerableRail
+	manipulators.RegisterBlock(Rail, &rail)
+	manipulators.RegisterBlock(DetectorRail, &rail)
+	manipulators.RegisterBlock(RailActivator, &rail)
+
+	manipulators.RegisterBlock(Lever, Levers{})
+
+	swne := manipulators.NewBits(3, 2, 3, 0, 1)
+	manipulators.RegisterBlock(Pumpkin, &swne)
+	manipulators.RegisterBlock(JackOLantern, &swne)
+	manipulators.RegisterBlock(FenceGate, &swne)
+	manipulators.RegisterBlock(EndPortalFrame, &swne)
+	manipulators.RegisterBlock(TripwireHook, &swne)
+
+	manipulators.RegisterBlock(Trapdoor, manipulators.NewBits(3, 1, 2, 0, 3))
+
+	var mushroom Mushroom
+	manipulators.RegisterBlock(BrownMushroom, &mushroom)
+	manipulators.RegisterBlock(RedMushroom, &mushroom)
+
+	manipulators.RegisterBlock(Vine, Vines{})
+
+	manipulators.RegisterBlock(Skull, Skulls{})
 }
