@@ -24,6 +24,10 @@ func (Default) MirrorZ(block minecraft.Block) minecraft.Block {
 	return block
 }
 
+type Bits struct {
+	Bitmask, North, East, South, West uint8
+}
+
 func NewBits(bm, north, east, south, west uint8) Bits {
 	return Bits{
 		bm, north, east, south, west,
