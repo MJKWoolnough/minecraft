@@ -26,7 +26,7 @@ func Register(blockID uint16, m manipulator) {
 }
 
 func RegisterBlock(block minecraft.Block, m manipulator) {
-	Register(block.BlockID, m)
+	Register(block.ID, m)
 }
 
 func Rotate90(b minecraft.Block) minecraft.Block {
