@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/MJKWoolnough/boolmap"
+	"github.com/MJKWoolnough/minecraft"
 	"github.com/MJKWoolnough/minecraft/nbt"
 )
 
@@ -117,6 +118,9 @@ func NewLevel(location Path) (*Level, error) {
 
 // GetBlock gets the block at coordinates x, y, z.
 func (l *Level) GetBlock(x, y, z int32) (Block, error) {
+	if y < 0 {
+		return minecraft.Block{}, nil
+	}
 	c, err := l.getChunk(x, z, false)
 	if err != nil {
 		return Block{}, err
@@ -128,6 +132,9 @@ func (l *Level) GetBlock(x, y, z int32) (Block, error) {
 
 // SetBlock sets the block at coordinates x, y, z. Also processes any lighting updates if applicable.
 func (l *Level) SetBlock(x, y, z int32, block Block) error {
+	if y < 0 {
+		y = 0
+	}
 	var (
 		c   *chunk
 		err error
