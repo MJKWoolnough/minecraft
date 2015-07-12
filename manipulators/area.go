@@ -255,6 +255,9 @@ func (a Area) Rotate180() error {
 		for z := int32(0); z <= a.z2-a.z1; z++ {
 			topPos := a.z1 + z
 			bottomPos := a.z2 - z
+			if leftPos == rightPos && topPos > bottomPos {
+				break
+			}
 			for y := a.y1; y <= a.y2; y++ {
 				left, err := a.level.GetBlock(leftPos, y, topPos)
 				if err != nil {
