@@ -36,6 +36,7 @@ func TestAreaDimensions(t *testing.T) {
 func TestAreaGetSet(t *testing.T) {
 	t.Parallel()
 	l, _ := minecraft.NewLevel(minecraft.NewMemPath())
+	defer l.Close()
 	a1 := NewArea(3, 4, 5, 6, 7, 8, l)
 	a2 := NewArea(-3, 12, -5, -6, 17, -8, l)
 	tests := []struct {
@@ -71,6 +72,7 @@ func TestAreaGetSet(t *testing.T) {
 func TestAreaFill(t *testing.T) {
 	t.Parallel()
 	l, _ := minecraft.NewLevel(minecraft.NewMemPath())
+	defer l.Close()
 	b := minecraft.Block{ID: 1}
 	a := NewArea(1, 1, 1, 4, 4, 4, l)
 	a.Fill(b)
@@ -82,6 +84,39 @@ func TestAreaFill(t *testing.T) {
 					bl = minecraft.Block{}
 				}
 				got, _ := l.GetBlock(x, y, z)
+				if !got.EqualBlock(bl) {
+					t.Errorf("at coords, %d, %d, %d, expecting %v, got %v", x, y, z, bl, got)
+				}
+			}
+		}
+	}
+}
+
+func TestAreaReplace(t *testing.T) {
+	t.Parallel()
+	l, _ := minecraft.NewLevel(minecraft.NewMemPath())
+	defer l.Close()
+	b := minecraft.Block{ID: 1}
+	c := minecraft.Block{ID: 2}
+	a := NewArea(0, 0, 0, 5, 5, 5, l)
+	for x := int32(0); x < 6; x++ {
+		for y := int32(0); y < 6; y++ {
+			for z := int32(0); z < 6; z++ {
+				if x == y || x == z || y == z {
+					a.Set(x, y, z, b)
+				}
+			}
+		}
+	}
+	a.Replace(b, c)
+	for x := int32(0); x < 6; x++ {
+		for y := int32(0); y < 6; y++ {
+			for z := int32(0); z < 6; z++ {
+				var bl minecraft.Block
+				if x == y || x == z || y == z {
+					bl = c
+				}
+				got, _ := a.Get(x, y, z)
 				if !got.EqualBlock(bl) {
 					t.Errorf("at coords, %d, %d, %d, expecting %v, got %v", x, y, z, bl, got)
 				}
