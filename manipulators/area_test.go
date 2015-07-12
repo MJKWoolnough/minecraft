@@ -124,3 +124,61 @@ func TestAreaReplace(t *testing.T) {
 		}
 	}
 }
+
+func (a Area) EqualTo(b Area) bool {
+	if a.Width() != b.Width() || a.Height() != b.Height() || a.Depth() != b.Depth() {
+		return false
+	}
+	for x := int32(0); x < a.Width(); x++ {
+		for y := int32(0); y < a.Height(); y++ {
+			for z := int32(0); z < a.Depth(); z++ {
+				b1, _ := a.Get(x, y, z)
+				b2, _ := b.Get(x, y, z)
+				if !b1.EqualBlock(b2) {
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
+
+func TestAreaCopyTo(t *testing.T) {
+	t.Parallel()
+	l, _ := minecraft.NewLevel(minecraft.NewMemPath())
+	defer l.Close()
+	b := minecraft.Block{ID: 1}
+	a := NewArea(0, 0, 0, 5, 5, 5, l)
+	for x := int32(0); x < a.Width(); x++ {
+		for y := int32(0); y < a.Height(); y++ {
+			for z := int32(0); z < a.Depth(); z++ {
+				if (x+y+z)%7 == 0 {
+					a.Set(x, y, z, b)
+				}
+			}
+		}
+	}
+	a2 := NewArea(10, 0, 0, 15, 5, 5, l)
+	a.CopyTo(a2)
+	if !a.EqualTo(a2) {
+		t.Errorf("area2 not equal to area 1")
+		return
+	}
+	a3 := NewArea(11, 1, 1, 16, 6, 6, l)
+	a2.CopyTo(a3)
+	if !a.EqualTo(a3) {
+		t.Errorf("area3 not equal to area 1")
+		return
+	} else if a.EqualTo(a2) {
+		t.Errorf("area2 equal to area 1, shouldn't be")
+		return
+	}
+	a3.CopyTo(a2)
+	if !a.EqualTo(a2) {
+		t.Errorf("area2 not equal to area 1")
+		return
+	} else if a.EqualTo(a3) {
+		t.Errorf("area3 equal to area 1, shouldn't be")
+		return
+	}
+}
