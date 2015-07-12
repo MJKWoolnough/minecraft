@@ -213,7 +213,6 @@ func TestAreaRotate90(t *testing.T) {
 	)
 	if !a.EqualTo(b) {
 		t.Errorf("1: single 90 rotation failed")
-
 		return
 	}
 	a.Rotate90()
@@ -224,7 +223,6 @@ func TestAreaRotate90(t *testing.T) {
 	)
 	if !a.EqualTo(b) {
 		t.Errorf("1: double 90 rotation failed")
-
 		return
 	}
 	a.Rotate90()
@@ -265,7 +263,6 @@ func TestAreaRotate90(t *testing.T) {
 	)
 	if !a.EqualTo(b) {
 		t.Errorf("2: single 90 rotation failed")
-
 		return
 	}
 	a.Rotate90()
@@ -277,7 +274,6 @@ func TestAreaRotate90(t *testing.T) {
 	)
 	if !a.EqualTo(b) {
 		t.Errorf("2: double 90 rotation failed")
-
 		return
 	}
 	a.Rotate90()
@@ -300,6 +296,69 @@ func TestAreaRotate90(t *testing.T) {
 	)
 	if !a.EqualTo(b) {
 		t.Errorf("2: quadruple 90 rotation failed")
+		return
+	}
+}
+
+func TestAreaRotate180(t *testing.T) {
+	t.Parallel()
+	l, _ := minecraft.NewLevel(minecraft.NewMemPath())
+	defer l.Close()
+	a := NewArea(0, 0, 0, 2, 0, 2, l)
+	b := NewArea(3, 0, 0, 5, 0, 2, l)
+	numToArea(a,
+		0, 1, 2,
+		3, 4, 5,
+		6, 7, 8,
+	)
+	a.Rotate180()
+	numToArea(b,
+		8, 7, 6,
+		5, 4, 3,
+		2, 1, 0,
+	)
+	if !a.EqualTo(b) {
+		t.Errorf("1: single 180 rotation failed")
+		return
+	}
+	a.Rotate180()
+	numToArea(b,
+		0, 1, 2,
+		3, 4, 5,
+		6, 7, 8,
+	)
+	if !a.EqualTo(b) {
+		t.Errorf("1: double 180 rotation failed")
+		return
+	}
+	a = NewArea(0, 0, 0, 3, 0, 3, l)
+	b = NewArea(4, 0, 0, 7, 0, 3, l)
+	numToArea(a,
+		0, 1, 2, 3,
+		4, 5, 6, 7,
+		8, 9, 10, 11,
+		12, 13, 14, 15,
+	)
+	a.Rotate180()
+	numToArea(b,
+		15, 14, 13, 12,
+		11, 10, 9, 8,
+		7, 6, 5, 4,
+		3, 2, 1, 0,
+	)
+	if !a.EqualTo(b) {
+		t.Errorf("2: single 180 rotation failed")
+		return
+	}
+	a.Rotate180()
+	numToArea(b,
+		0, 1, 2, 3,
+		4, 5, 6, 7,
+		8, 9, 10, 11,
+		12, 13, 14, 15,
+	)
+	if !a.EqualTo(b) {
+		t.Errorf("2: double 180 rotation failed")
 		return
 	}
 }
