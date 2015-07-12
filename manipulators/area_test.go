@@ -532,3 +532,67 @@ func TestAreaMirrorX(t *testing.T) {
 		return
 	}
 }
+
+func TestAreaMirrorZ(t *testing.T) {
+	t.Parallel()
+	l, _ := minecraft.NewLevel(minecraft.NewMemPath())
+	defer l.Close()
+	a := NewArea(0, 0, 0, 2, 0, 2, l)
+	b := NewArea(3, 0, 0, 5, 0, 2, l)
+	numToArea(a,
+		0, 1, 2,
+		3, 4, 5,
+		6, 7, 8,
+	)
+	a.MirrorZ()
+	numToArea(b,
+		6, 7, 8,
+		3, 4, 5,
+		0, 1, 2,
+	)
+	if !a.EqualTo(b) {
+		t.Errorf("1: single Z Mirror failed")
+		return
+	}
+	a.MirrorZ()
+	numToArea(b,
+		0, 1, 2,
+		3, 4, 5,
+		6, 7, 8,
+	)
+	if !a.EqualTo(b) {
+		t.Errorf("1: double Z Mirror failed")
+		return
+	}
+
+	a = NewArea(0, 0, 0, 3, 0, 3, l)
+	b = NewArea(4, 0, 0, 7, 0, 3, l)
+	numToArea(a,
+		0, 1, 2, 3,
+		4, 5, 6, 7,
+		8, 9, 10, 11,
+		12, 13, 14, 15,
+	)
+	a.MirrorZ()
+	numToArea(b,
+		12, 13, 14, 15,
+		8, 9, 10, 11,
+		4, 5, 6, 7,
+		0, 1, 2, 3,
+	)
+	if !a.EqualTo(b) {
+		t.Errorf("2: single Z Mirror failed")
+		return
+	}
+	a.MirrorZ()
+	numToArea(b,
+		0, 1, 2, 3,
+		4, 5, 6, 7,
+		8, 9, 10, 11,
+		12, 13, 14, 15,
+	)
+	if !a.EqualTo(b) {
+		t.Errorf("2: double Z Mirror failed")
+		return
+	}
+}
