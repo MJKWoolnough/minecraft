@@ -15,6 +15,14 @@ func NewArea(x1, y1, z1, x2, y2, z2 int32, level *minecraft.Level) Area {
 	return Area{min(x1, x2), min(y1, y2), min(z1, z2), max(x1, x2), max(y1, y2), max(z1, z2), level}
 }
 
+func (a Area) Coords() (int32, int32, int32, int32, int32, int32) {
+	return a.x1, a.y1, a.z1, a.x2, a.y2, a.z2
+}
+
+func (a Area) Level() *minecraft.Level {
+	return a.level
+}
+
 func (a Area) Width() int32 {
 	return a.x2 - a.x1 + 1 //no zero width, everything contains at least one block
 }
