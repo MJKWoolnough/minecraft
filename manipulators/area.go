@@ -186,7 +186,6 @@ func (a Area) CopyInDirection(dir Direction, times uint) error {
 		}
 	}
 	return nil
-
 }
 
 func (a Area) Rotate90() error {
