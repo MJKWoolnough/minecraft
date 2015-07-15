@@ -25,7 +25,7 @@ func (o *options) Rotate90() {
 	o.Rotation = manipulators.Rotate90
 }
 
-func (o *options) Rotat180() {
+func (o *options) Rotate180() {
 	o.Rotation = manipulators.Rotate180
 }
 
@@ -48,11 +48,11 @@ func Rotate90() Modifier {
 }
 
 func Rotate180() Modifier {
-	return options.Rotat180
+	return options.Rotate180
 }
 
 func Rotate270() Modifier {
-	return options.Rotat270
+	return options.Rotate270
 }
 
 func MirrorX() Modifier {
