@@ -2,7 +2,6 @@ package nbt
 
 import (
 	"io"
-	"unsafe"
 
 	"github.com/MJKWoolnough/byteio"
 )
@@ -147,7 +146,7 @@ func (d Decoder) decodeByteArray() (ByteArray, error) {
 		return nil, err
 	}
 	data := make(ByteArray, l)
-	_, err = io.ReadFull(d.r, *(*[]byte)(unsafe.Pointer(&data)))
+	err = data.readFrom(d.r)
 	if err != nil {
 		return nil, err
 	}

@@ -4,7 +4,6 @@ package nbt
 
 import (
 	"fmt"
-	"unsafe"
 
 	"github.com/MJKWoolnough/equaler"
 )
@@ -335,9 +334,9 @@ func (ByteArray) Type() TagID {
 }
 
 // Bytes converts the ByteArray (actually int8) to an actual slice of bytes.
-// NB: Uses unsafe, so the underlying array is the same.
+// NB: May uss unsafe, so the underlying array may be the same.
 func (b ByteArray) Bytes() []byte {
-	return *(*[]byte)(unsafe.Pointer(&b))
+	return byteArrayToByteSlice(b)
 }
 
 // String is an implementation of the Data interface
