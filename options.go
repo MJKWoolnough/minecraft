@@ -30,7 +30,7 @@ func (l *Level) Generator(generator string) {
 	l.setOption("generatorName", nbt.String(generator))
 }
 
-// GeneratorOptions sets the generator options for a flat or cusom generator. The syntax is not checked.
+// GeneratorOptions sets the generator options for a flat or custom generator. The syntax is not checked.
 func (l *Level) GeneratorOptions(options string) {
 	l.setOption("generatorOptions", nbt.String(options))
 }
