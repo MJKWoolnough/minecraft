@@ -194,7 +194,7 @@ func (l *Level) LogAdminCommands(d bool) {
 	l.setGameRule("logAdminCommands", d)
 }
 
-// MobGriefing enables/disables the abilty of mobs to destroy blocks
+// MobGriefing enables/disables the ability of mobs to destroy blocks
 func (l *Level) MobGriefing(d bool) {
 	l.setGameRule("mobGriefing", d)
 }
