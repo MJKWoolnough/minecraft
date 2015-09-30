@@ -768,7 +768,7 @@ mineshafts, etc.)
 ```go
 func MobGriefing(d bool) Option
 ```
-MobGriefing enables/disables the abilty of mobs to destroy blocks
+MobGriefing enables/disables the ability of mobs to destroy blocks
 
 #### func  MobLoot
 
