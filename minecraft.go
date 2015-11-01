@@ -1,4 +1,4 @@
-// Package minecraft will be a full featured minecraft level editor/viewer.
+// Package minecraft is a level viewer/editor for the popular creative game minecraft
 package minecraft
 
 // TransparentBlockList is a slice of the block ids that are transparent.
