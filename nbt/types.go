@@ -88,7 +88,7 @@ func (t Tag) Copy() Tag {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (t Tag) Equal(e equaler.Equaler) bool {
+func (t Tag) Equal(e interface{}) bool {
 	if m, ok := e.(Tag); ok {
 		if t.data.Type() == m.data.Type() && t.name == m.name {
 			return t.data.Equal(m.data)
@@ -129,7 +129,7 @@ func (end) Copy() Data {
 	return &end{}
 }
 
-func (end) Equal(e equaler.Equaler) bool {
+func (end) Equal(e interface{}) bool {
 	_, ok := e.(end)
 	return ok
 }
@@ -154,7 +154,7 @@ func (b Byte) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (b Byte) Equal(e equaler.Equaler) bool {
+func (b Byte) Equal(e interface{}) bool {
 	if m, ok := e.(Byte); ok {
 		return b == m
 	}
@@ -180,7 +180,7 @@ func (s Short) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (s Short) Equal(e equaler.Equaler) bool {
+func (s Short) Equal(e interface{}) bool {
 	if m, ok := e.(Short); ok {
 		return s == m
 	}
@@ -206,7 +206,7 @@ func (i Int) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (i Int) Equal(e equaler.Equaler) bool {
+func (i Int) Equal(e interface{}) bool {
 	if m, ok := e.(Int); ok {
 		return i == m
 	}
@@ -232,7 +232,7 @@ func (l Long) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (l Long) Equal(e equaler.Equaler) bool {
+func (l Long) Equal(e interface{}) bool {
 	if m, ok := e.(Long); ok {
 		return l == m
 	}
@@ -258,7 +258,7 @@ func (f Float) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (f Float) Equal(e equaler.Equaler) bool {
+func (f Float) Equal(e interface{}) bool {
 	if m, ok := e.(Float); ok {
 		return f == m
 	}
@@ -284,7 +284,7 @@ func (d Double) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (d Double) Equal(e equaler.Equaler) bool {
+func (d Double) Equal(e interface{}) bool {
 	if m, ok := e.(Double); ok {
 		return d == m
 	}
@@ -312,7 +312,7 @@ func (b ByteArray) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (b ByteArray) Equal(e equaler.Equaler) bool {
+func (b ByteArray) Equal(e interface{}) bool {
 	if m, ok := e.(ByteArray); ok {
 		for i := 0; i < len(b); i++ {
 			if b[i] != m[i] {
@@ -349,7 +349,7 @@ func (s String) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (s String) Equal(e equaler.Equaler) bool {
+func (s String) Equal(e interface{}) bool {
 	if m, ok := e.(String); ok {
 		return s == m
 	}
@@ -415,7 +415,7 @@ func (l *List) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (l *List) Equal(e equaler.Equaler) bool {
+func (l *List) Equal(e interface{}) bool {
 	if m, ok := e.(*List); ok {
 		if l.tagType == m.tagType && len(l.data) == len(m.data) {
 			for i, o := range l.data {
@@ -518,7 +518,7 @@ func (c Compound) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (c Compound) Equal(e equaler.Equaler) bool {
+func (c Compound) Equal(e interface{}) bool {
 	if m, ok := e.(Compound); ok {
 		if len(c) == len(m) {
 			for _, o := range c {
@@ -595,7 +595,7 @@ func (i IntArray) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (i IntArray) Equal(e equaler.Equaler) bool {
+func (i IntArray) Equal(e interface{}) bool {
 	if m, ok := e.(IntArray); ok {
 		if len(i) == len(m) {
 			for j, o := range i {
@@ -628,7 +628,7 @@ func (b Bool) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (b Bool) Equal(e equaler.Equaler) bool {
+func (b Bool) Equal(e interface{}) bool {
 	if m, ok := e.(Bool); ok {
 		return b == m
 	}
@@ -657,7 +657,7 @@ func (u Uint8) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (u Uint8) Equal(e equaler.Equaler) bool {
+func (u Uint8) Equal(e interface{}) bool {
 	if m, ok := e.(Uint8); ok {
 		return u == m
 	}
@@ -683,7 +683,7 @@ func (u Uint16) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (u Uint16) Equal(e equaler.Equaler) bool {
+func (u Uint16) Equal(e interface{}) bool {
 	if m, ok := e.(Uint16); ok {
 		return u == m
 	}
@@ -709,7 +709,7 @@ func (u Uint32) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (u Uint32) Equal(e equaler.Equaler) bool {
+func (u Uint32) Equal(e interface{}) bool {
 	if m, ok := e.(Uint32); ok {
 		return u == m
 	}
@@ -735,7 +735,7 @@ func (u Uint64) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (u Uint64) Equal(e equaler.Equaler) bool {
+func (u Uint64) Equal(e interface{}) bool {
 	if m, ok := e.(Uint64); ok {
 		return u == m
 	}
@@ -761,7 +761,7 @@ func (c Complex64) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (c Complex64) Equal(e equaler.Equaler) bool {
+func (c Complex64) Equal(e interface{}) bool {
 	if m, ok := e.(Complex64); ok {
 		return c == m
 	}
@@ -787,7 +787,7 @@ func (c Complex128) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (c Complex128) Equal(e equaler.Equaler) bool {
+func (c Complex128) Equal(e interface{}) bool {
 	if m, ok := e.(Complex128); ok {
 		return c == m
 	}
