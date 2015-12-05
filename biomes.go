@@ -1,7 +1,5 @@
 package minecraft
 
-import "github.com/MJKWoolnough/equaler"
-
 // Biome constants
 const (
 	Ocean                Biome = 0
@@ -72,7 +70,7 @@ const (
 type Biome uint8
 
 // Equal is an implementation of the equaler.Equaler interface
-func (b Biome) Equal(e equaler.Equaler) bool {
+func (b Biome) Equal(e interface{}) bool {
 	if c, ok := e.(*Biome); ok {
 		return b == *c
 	} else if c, ok := e.(Biome); ok {

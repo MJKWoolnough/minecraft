@@ -3,7 +3,6 @@ package minecraft
 import (
 	"fmt"
 
-	"github.com/MJKWoolnough/equaler"
 	"github.com/MJKWoolnough/minecraft/nbt"
 )
 
@@ -22,7 +21,7 @@ type Block struct {
 }
 
 // Equal is an implementation of the equaler.Equaler interface
-func (b Block) Equal(e equaler.Equaler) bool {
+func (b Block) Equal(e interface{}) bool {
 	c, ok := e.(Block)
 	if !ok {
 		d, ok := e.(*Block)
