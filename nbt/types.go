@@ -2,11 +2,7 @@
 // http://web.archive.org/web/20110723210920/http://www.minecraft.net/docs/NBT.txt
 package nbt
 
-import (
-	"fmt"
-
-	"github.com/MJKWoolnough/equaler"
-)
+import "fmt"
 
 // Tag Types
 const (
@@ -58,7 +54,7 @@ func (t TagID) String() string {
 
 // Data is an interface representing the many different types that a tag can be
 type Data interface {
-	equaler.Equaler
+	Equal(interface{}) bool
 	Copy() Data
 	String() string
 	Type() TagID
