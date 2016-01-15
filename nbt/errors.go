@@ -2,7 +2,7 @@ package nbt
 
 import (
 	"errors"
-	"fmt"
+	"strconv"
 )
 
 // ReadError is an error returned when a read error occurs
@@ -32,7 +32,7 @@ type UnknownTag struct {
 }
 
 func (u UnknownTag) Error() string {
-	return fmt.Sprintf("discovered unknown TagId with id %d", u.TagID)
+	return "discovered unknown TagId with id " + strconv.FormatUint(uint64(u.TagID), 10)
 }
 
 // WrongTag is an error returned when a tag of the incorrect type was intended
@@ -42,7 +42,7 @@ type WrongTag struct {
 }
 
 func (w WrongTag) Error() string {
-	return fmt.Sprintf("expecting tag id %s, got %s", w.Expecting, w.Got)
+	return "expecting tag id " + w.Expecting.String() + ", got " + w.Got.String()
 }
 
 // BadRange is an error that occurs when trying to set an item on a list which

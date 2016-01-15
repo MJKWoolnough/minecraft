@@ -2,7 +2,7 @@
 // http://web.archive.org/web/20110723210920/http://www.minecraft.net/docs/NBT.txt
 package nbt
 
-import "fmt"
+import "strconv"
 
 // Tag Types
 const (
@@ -116,7 +116,7 @@ func (t Tag) TagID() TagID {
 
 // String returns a textual representation of the tag
 func (t Tag) String() string {
-	return fmt.Sprintf("%s(%q): %s", t.data.Type(), t.name, t.data)
+	return t.data.Type().String() + "(" + strconv.Quote(t.name) + "): " + t.data.String()
 }
 
 type end struct{}
@@ -158,7 +158,7 @@ func (b Byte) Equal(e interface{}) bool {
 }
 
 func (b Byte) String() string {
-	return fmt.Sprintf("%d", b)
+	return strconv.FormatInt(int64(b), 10)
 }
 
 // Type returns the TagID of the data
@@ -184,7 +184,7 @@ func (s Short) Equal(e interface{}) bool {
 }
 
 func (s Short) String() string {
-	return fmt.Sprintf("%d", s)
+	return strconv.FormatInt(int64(s), 10)
 }
 
 // Type returns the TagID of the data
@@ -210,7 +210,7 @@ func (i Int) Equal(e interface{}) bool {
 }
 
 func (i Int) String() string {
-	return fmt.Sprintf("%d", i)
+	return strconv.FormatInt(int64(i), 10)
 }
 
 // Type returns the TagID of the data
@@ -236,7 +236,7 @@ func (l Long) Equal(e interface{}) bool {
 }
 
 func (l Long) String() string {
-	return fmt.Sprintf("%d", l)
+	return strconv.FormatInt(int64(l), 10)
 }
 
 // Type returns the TagID of the data
@@ -262,7 +262,7 @@ func (f Float) Equal(e interface{}) bool {
 }
 
 func (f Float) String() string {
-	return fmt.Sprintf("%g", f)
+	return strconv.FormatFloat(float64(f), 'g', -1, 32)
 }
 
 // Type returns the TagID of the data
@@ -288,7 +288,7 @@ func (d Double) Equal(e interface{}) bool {
 }
 
 func (d Double) String() string {
-	return fmt.Sprintf("%g", d)
+	return strconv.FormatFloat(float64(d), 'g', -1, 64)
 }
 
 // Type returns the TagID of the data
@@ -321,7 +321,14 @@ func (b ByteArray) Equal(e interface{}) bool {
 }
 
 func (b ByteArray) String() string {
-	return fmt.Sprintf("[%d bytes] %v", len(b), []int8(b))
+	var data []byte
+	for n, d := range b {
+		if n > 0 {
+			data = append(data, ',', ' ')
+		}
+		data = append(data, strconv.FormatInt(int64(d), 10)...)
+	}
+	return "[" + strconv.FormatInt(int64(len(b)), 10) + " bytes] [" + string(data) + "]"
 }
 
 // Type returns the TagID of the data
@@ -426,9 +433,9 @@ func (l *List) Equal(e interface{}) bool {
 }
 
 func (l *List) String() string {
-	s := fmt.Sprintf("%d entries of type %s {", len(l.data), l.tagType)
+	s := strconv.FormatInt(int64(len(l.data)), 10) + " entries of type " + l.tagType.String() + " {"
 	for _, d := range l.data {
-		s += fmt.Sprintf("\n	%s: %s", l.tagType, indent(d.String()))
+		s += "\n	" + l.tagType.String() + ": " + indent(d.String())
 	}
 	return s + "\n}"
 }
@@ -529,7 +536,7 @@ func (c Compound) Equal(e interface{}) bool {
 }
 
 func (c Compound) String() string {
-	s := fmt.Sprintf("%d entries {", len(c))
+	s := strconv.FormatInt(int64(len(c)), 10) + " entries {"
 	for _, d := range c {
 		s += "\n	" + indent(d.String())
 	}
@@ -606,7 +613,14 @@ func (i IntArray) Equal(e interface{}) bool {
 }
 
 func (i IntArray) String() string {
-	return fmt.Sprintf("[%d ints] %v", len(i), []int32(i))
+	var data []byte
+	for n, d := range i {
+		if n > 0 {
+			data = append(data, ',', ' ')
+		}
+		data = append(data, strconv.FormatInt(int64(d), 10)...)
+	}
+	return "[" + strconv.FormatInt(int64(len(i)), 10) + " bytes] [" + string(data) + "]"
 }
 
 // Type returns the TagID of the data
@@ -661,7 +675,7 @@ func (u Uint8) Equal(e interface{}) bool {
 }
 
 func (u Uint8) String() string {
-	return fmt.Sprintf("%d", u)
+	return strconv.FormatUint(uint64(u), 10)
 }
 
 // Type returns the TagID of the data
@@ -687,7 +701,7 @@ func (u Uint16) Equal(e interface{}) bool {
 }
 
 func (u Uint16) String() string {
-	return fmt.Sprintf("%d", u)
+	return strconv.FormatUint(uint64(u), 10)
 }
 
 // Type returns the TagID of the data
@@ -713,7 +727,7 @@ func (u Uint32) Equal(e interface{}) bool {
 }
 
 func (u Uint32) String() string {
-	return fmt.Sprintf("%d", u)
+	return strconv.FormatUint(uint64(u), 10)
 }
 
 // Type returns the TagID of the data
@@ -739,7 +753,7 @@ func (u Uint64) Equal(e interface{}) bool {
 }
 
 func (u Uint64) String() string {
-	return fmt.Sprintf("%d", u)
+	return strconv.FormatUint(uint64(u), 10)
 }
 
 // Type returns the TagID of the data
@@ -765,7 +779,17 @@ func (c Complex64) Equal(e interface{}) bool {
 }
 
 func (c Complex64) String() string {
-	return fmt.Sprintf("%g", c)
+	var str string
+	if real(c) != 0 {
+		str = strconv.FormatFloat(float64(real(c)), 'g', -1, 32)
+	}
+	if imag(c) != 0 {
+		if len(str) != 0 {
+			str += "+"
+		}
+		str += strconv.FormatFloat(float64(imag(c)), 'g', -1, 32) + "i"
+	}
+	return str
 }
 
 // Type returns the TagID of the data
@@ -791,7 +815,17 @@ func (c Complex128) Equal(e interface{}) bool {
 }
 
 func (c Complex128) String() string {
-	return fmt.Sprintf("%g", c)
+	var str string
+	if real(c) != 0 {
+		str = strconv.FormatFloat(float64(real(c)), 'g', -1, 64)
+	}
+	if imag(c) != 0 {
+		if len(str) != 0 {
+			str += "+"
+		}
+		str += strconv.FormatFloat(float64(imag(c)), 'g', -1, 64) + "i"
+	}
+	return str
 }
 
 // Type returns the TagID of the data
