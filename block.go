@@ -1,7 +1,7 @@
 package minecraft
 
 import (
-	"fmt"
+	"strconv"
 
 	"github.com/MJKWoolnough/minecraft/nbt"
 )
@@ -152,12 +152,12 @@ func (b *Block) SetTicks(t []Tick) {
 }
 
 func (b Block) String() string {
-	toRet := fmt.Sprintf("Block ID: %d\nData: %d\n", b.ID, b.Data)
+	toRet := "Block ID: " + strconv.FormatUint(uint64(b.ID), 10) + "\nData: " + strconv.FormatUint(uint64(b.Data), 10) + "\n"
 	if b.metadata != nil && len(b.metadata) != 0 {
 		toRet += "Metadata: " + b.metadata.String()
 	}
 	for n, tick := range b.ticks {
-		toRet += fmt.Sprintf("	Tick: %d, i: %d, t: %d, p: %d\n", n+1, tick.I, tick.T, tick.P)
+		toRet += "	Tick: " + strconv.FormatInt(int64(n+1), 10) + ", i: " + strconv.FormatInt(int64(tick.I), 10) + ", t: " + strconv.FormatInt(int64(tick.T), 10) + ", p: " + strconv.FormatInt(int64(tick.I), 10)
 	}
 	return toRet
 }

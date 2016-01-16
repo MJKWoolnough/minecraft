@@ -2,7 +2,7 @@ package minecraft
 
 import (
 	"errors"
-	"fmt"
+	"strconv"
 
 	"github.com/MJKWoolnough/minecraft/nbt"
 )
@@ -21,7 +21,7 @@ type MissingTagError struct {
 }
 
 func (m MissingTagError) Error() string {
-	return fmt.Sprintf("minecraft: missing %q tag", m.TagName)
+	return "minecraft: missing " + strconv.Quote(m.TagName) + " tag"
 }
 
 // WrongTypeError is an error returned when a nbt tag has an unexpected type
@@ -31,7 +31,7 @@ type WrongTypeError struct {
 }
 
 func (w WrongTypeError) Error() string {
-	return fmt.Sprintf("minecraft: tag %q is of incorrect type, expecting %q, got %q", w.TagName, w.Expecting, w.Got)
+	return "minecraft: tag " + strconv.Quote(w.TagName) + " is of incorrect type, expecting " + strconv.Quote(w.Expecting.String()) + ", got " + strconv.Quote(w.Got.String())
 }
 
 // UnexpectedValue is an error returned from chunk loading during sanity
@@ -41,7 +41,7 @@ type UnexpectedValue struct {
 }
 
 func (u UnexpectedValue) Error() string {
-	return fmt.Sprintf("minecraft: tag %q was expecting %s, but got %q", u.TagName, u.Expecting, u.Got)
+	return "minecraft: tag " + strconv.Quote(u.TagName) + " was expecting " + strconv.Quote(u.Expecting) + ", but got " + strconv.Quote(u.Got)
 }
 
 // UnknownCompression is an error returned by path types when it encounters a
@@ -52,7 +52,7 @@ type UnknownCompression struct {
 }
 
 func (u UnknownCompression) Error() string {
-	return fmt.Sprintf("unknown compression code: %d", u.Code)
+	return "unknown compression code: " + strconv.FormatUint(uint64(u.Code), 10)
 }
 
 // ConflictError is an error return by SetChunk when trying to save a single
@@ -62,7 +62,7 @@ type ConflictError struct {
 }
 
 func (c ConflictError) Error() string {
-	return fmt.Sprintf("already setting chunk %d,%d, recall SetChunk to set again", c.X, c.Z)
+	return "already setting chunk " + strconv.FormatInt(int64(c.X), 10) + "," + strconv.FormatInt(int64(c.Z), 10) + ", recall SetChunk to set again"
 }
 
 // FilePathSetError is an error returned from SetChunk when some error is
@@ -73,7 +73,7 @@ type FilePathSetError struct {
 }
 
 func (f FilePathSetError) Error() string {
-	return fmt.Sprintf("chunk %d, %d had the following error: %s", f.X, f.Z, f.Err.Error())
+	return "chunk " + strconv.FormatInt(int64(f.X), 10) + "," + strconv.FormatInt(int64(f.Z), 10) + " had the following error: " + f.Err.Error()
 }
 
 // MultiError is an error type that contains multiple errors
@@ -85,5 +85,5 @@ func (m MultiError) Error() string {
 	if len(m.Errors) == 1 {
 		return m.Errors[0].Error()
 	}
-	return fmt.Sprintf("received %d errors", len(m.Errors))
+	return "received " + strconv.FormatInt(int64(len(m.Errors)), 10) + " errors"
 }

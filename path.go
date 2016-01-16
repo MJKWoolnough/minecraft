@@ -3,7 +3,6 @@ package minecraft
 import (
 	"compress/gzip"
 	"compress/zlib"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -69,12 +68,16 @@ func NewFilePathDimension(dirname string, dimension int) (*FilePath, error) {
 	return fp, err
 }
 
+func (p *FilePath) getRegionPath(x, z int32) string {
+	return path.Join(p.dirname, p.dimension, "region", "r."+strconv.FormatInt(int64(x>>5), 10)+"."+strconv.FormatInt(int64(z>>5), 10)+".mca")
+}
+
 // GetChunk returns the chunk at chunk coords x, z.
 func (p *FilePath) GetChunk(x, z int32) (nbt.Tag, error) {
 	if !p.HasLock() {
 		return nbt.Tag{}, ErrNoLock
 	}
-	f, err := os.Open(path.Join(p.dirname, p.dimension, "region", fmt.Sprintf("r.%d.%d.mca", x>>5, z>>5)))
+	f, err := os.Open(p.getRegionPath(x>>5, z>>5))
 	if err != nil {
 		if os.IsNotExist(err) {
 			err = nil
@@ -203,7 +206,7 @@ func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
 	if err := os.MkdirAll(path.Join(p.dirname, p.dimension, "region"), 0755); err != nil {
 		return err
 	}
-	f, err := os.OpenFile(path.Join(p.dirname, p.dimension, "region", fmt.Sprintf("r.%d.%d.mca", x, z)), os.O_RDWR|os.O_CREATE, 0666)
+	f, err := os.OpenFile(p.getRegionPath(x, z), os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		return err
 	}
@@ -313,7 +316,7 @@ func (p *FilePath) RemoveChunk(x, z int32) error {
 	regionX := x >> 5
 	chunkZ := z & 31
 	regionZ := z >> 5
-	f, err := os.OpenFile(path.Join(p.dirname, p.dimension, "region", fmt.Sprintf("r.%d.%d.mca", regionX, regionZ)), os.O_WRONLY, 0666)
+	f, err := os.OpenFile(p.getRegionPath(regionX, regionZ), os.O_WRONLY, 0666)
 	if os.IsNotExist(err) {
 		return nil
 	} else if err != nil {
@@ -367,13 +370,12 @@ func (p *FilePath) WriteLevelDat(data nbt.Tag) error {
 func (p *FilePath) GetRegions() [][2]int32 {
 	files, _ := ioutil.ReadDir(path.Join(p.dirname, p.dimension, "region"))
 	var toRet [][2]int32
-	var x, z int32
 	for _, file := range files {
 		if !file.IsDir() {
 			if nums := filename.FindStringSubmatch(file.Name()); nums != nil {
-				fmt.Sscan(nums[1], &x)
-				fmt.Sscan(nums[2], &z)
-				toRet = append(toRet, [2]int32{x, z})
+				x, _ := strconv.ParseInt(nums[1], 10, 32)
+				z, _ := strconv.ParseInt(nums[2], 10, 32)
+				toRet = append(toRet, [2]int32{int32(x), int32(z)})
 			}
 		}
 	}
@@ -385,7 +387,7 @@ func (p *FilePath) GetChunks(x, z int32) ([][2]int32, error) {
 	if !p.HasLock() {
 		return nil, ErrNoLock
 	}
-	f, err := os.Open(path.Join(p.dirname, p.dimension, "region", fmt.Sprintf("r.%d.%d.mca", x, z)))
+	f, err := os.Open(p.getRegionPath(x, z))
 	if err != nil {
 		return nil, err
 	}
@@ -448,7 +450,7 @@ func (p *FilePath) Defrag(x, z int32) error {
 	if !p.HasLock() {
 		return ErrNoLock
 	}
-	f, err := os.OpenFile(path.Join(p.dirname, p.dimension, "region", fmt.Sprintf("r.%d.%d.mca", x, z)), os.O_RDWR|os.O_CREATE, 0666)
+	f, err := os.OpenFile(p.getRegionPath(x, z), os.O_RDWR|os.O_CREATE, 0666)
 	if err != nil {
 		return err
 	}

@@ -1,7 +1,7 @@
 package minecraft
 
 import (
-	"fmt"
+	"strconv"
 
 	"github.com/MJKWoolnough/minecraft/nbt"
 )
@@ -115,10 +115,10 @@ func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
 	}
 
 	if tX := int32(c.data.Get("xPos").Data().(nbt.Int)); tX != x {
-		return nil, UnexpectedValue{"[Chunk Base]->Level->xPos", fmt.Sprintf("%d", x), fmt.Sprintf("%d", tX)}
+		return nil, UnexpectedValue{"[Chunk Base]->Level->xPos", strconv.FormatInt(int64(x), 10), strconv.FormatInt(int64(tX), 10)}
 	}
 	if tZ := int32(c.data.Get("zPos").Data().(nbt.Int)); tZ != z {
-		return nil, UnexpectedValue{"[Chunk Base]->Level->zPos", fmt.Sprintf("%d", z), fmt.Sprintf("%d", tZ)}
+		return nil, UnexpectedValue{"[Chunk Base]->Level->zPos", strconv.FormatInt(int64(z), 10), strconv.FormatInt(int64(tZ), 10)}
 	}
 
 	for _, co := range chunkOther {
