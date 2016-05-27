@@ -7,6 +7,7 @@ import (
 	"github.com/MJKWoolnough/minecraft"
 )
 
+// Image represents a Minecraft Map
 type Image struct {
 	level         *minecraft.Level
 	bounds        image.Rectangle
@@ -16,10 +17,12 @@ type Image struct {
 	colour        func(minecraft.Block) color.Color
 }
 
-func (Image) ColourModel() color.Model {
+// ColorModel returns the palette for the map
+func (Image) ColorModel() color.Model {
 	return palette
 }
 
+// Bounds returns the dimensions of the map
 func (i Image) Bounds() image.Rectangle {
 	return image.Rectangle{
 		Min: image.Point{},
@@ -27,6 +30,7 @@ func (i Image) Bounds() image.Rectangle {
 	}
 }
 
+// At returns the colour at the specified coords
 func (i Image) At(x, z int) color.Color {
 	var y int32
 	if i.y < 0 {
@@ -45,12 +49,12 @@ func (i Image) At(x, z int) color.Color {
 	return i.colour(b)
 }
 
+// BlockColor is the standard block-to-colour func
 func BlockColor(b minecraft.Block) color.Color {
-	id := uint32(b.ID)<<16 | uint32(b.Data)
-	if c, ok := colours[id]; ok {
+	if c, ok := colours[uint32(b.ID)<<16|uint32(b.Data)]; ok {
 		return palette[c]
 	}
-	if c, ok := colours[id>>16]; ok {
+	if c, ok := colours[b.ID]; ok {
 		return palette[c]
 	}
 	return color.Transparent
@@ -58,24 +62,30 @@ func BlockColor(b minecraft.Block) color.Color {
 
 type option func(*Image)
 
+// FixedY is an options to fix the Y-coord of the blocks to be read. By default
+// the highest, non-transparent block is usedd.
 func FixedY(y int32) option {
 	return func(i *Image) {
 		i.y = y
 	}
 }
 
+// Scale sets the scale the map is to be rendered at.
 func Scale(s uint8) option {
 	return func(i *Image) {
 		i.scale = s
 	}
 }
 
+// ColorFunc is an option for NewMap that specifies what colour blocks are
+// painted as.
 func ColorFunc(c func(minecraft.Block) color.Color) option {
 	return func(i *Image) {
 		i.colour = c
 	}
 }
 
+// NewMap creates an image from a Minecraft level.
 func NewMap(l *minecraft.Level, bounds image.Rectangle, options ...option) Image {
 	i := Image{
 		level:  l,
