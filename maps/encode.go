@@ -34,7 +34,7 @@ func (e *Encoder) Encode(w io.Writer, im image.Image) error {
 	width := im.Bounds().Dx()
 	height := im.Bounds().Dy()
 	if width > 0xffff || height > 0xffff || width < 0 || height < 0 {
-		return InvalidDimensions
+		return ErrInvalidDimensions
 	}
 
 	colours := make(nbt.ByteArray, 0, width*height)
@@ -58,5 +58,6 @@ func (e *Encoder) Encode(w io.Writer, im image.Image) error {
 }
 
 // Errors
-
-var InvalidDimensions = errors.New("cannot encode an image with the given dimensions")
+var (
+	ErrInvalidDimensions = errors.New("cannot encode an image with the given dimensions")
+)
