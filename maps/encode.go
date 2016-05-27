@@ -8,6 +8,10 @@ import (
 	"github.com/MJKWoolnough/minecraft/nbt"
 )
 
+// Encode writes an image an as uncompressed Minecraft map.
+//
+// As Minecraft expects the map to be gzip compressed, the Writer sohuld be the
+// wrapped in gzip.NewWriter
 func Encode(w io.Writer, i image.Image) error {
 	e := Encoder{
 		Dimension: -128,
@@ -16,11 +20,16 @@ func Encode(w io.Writer, i image.Image) error {
 	return e.Encode(w, i)
 }
 
+// Encoder lets you specify options for the Minecraft map
 type Encoder struct {
 	Scale, Dimension int8
 	CenterX, CenterZ int32
 }
 
+// Encode writes an image an as uncompressed Minecraft map.
+//
+// As Minecraft expects the map to be gzip compressed, the Writer sohuld be the
+// wrapped in gzip.NewWriter
 func (e *Encoder) Encode(w io.Writer, im image.Image) error {
 	width := im.Bounds().Dx()
 	height := im.Bounds().Dy()

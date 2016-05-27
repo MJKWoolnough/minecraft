@@ -44,6 +44,10 @@ func getDimensions(d nbt.Compound) image.Rectangle {
 	}
 }
 
+// Decode takes a reader for an uncompressed Minecraft map.
+//
+// Minecraft maps are gzip compressed, so the reader given to this func should
+// be wrapped in gzip.NewReader.
 func Decode(r io.Reader) (image.Image, error) {
 	d, err := readData(r)
 	if err != nil {
@@ -72,6 +76,10 @@ type config struct {
 	} `nbt:"data"`
 }
 
+// Config reader the configuration for an uncompressed Minecraft map.
+//
+// Minecraft maps are gzip compressed, so the reader given to this func should
+// be wrapped in gzip.NewReader.
 func Config(r io.Reader) (image.Config, error) {
 	var c config
 	_, err := nbt.RDecode(r, &c)
