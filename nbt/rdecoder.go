@@ -16,11 +16,15 @@ type rDecoder struct {
 }
 
 // RDecode will decode an NBT stream into the given structure.
+//
+// Returns the name of the tag decoded and any error that occurred
 func RDecode(r io.Reader, v interface{}) (string, error) {
 	return NewDecoder(r).RDecode(v)
 }
 
 // RDecode will decode an NBT stream into the given structure.
+//
+// Returns the name of the tag decoded and any error that occurred
 func (d Decoder) RDecode(v interface{}) (string, error) {
 	rv := reflect.ValueOf(v)
 	if rv.Kind() != reflect.Ptr || rv.IsNil() || rv.Elem().Kind() != reflect.Struct {
