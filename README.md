@@ -177,7 +177,7 @@ Biome constants
 #### func (Biome) Equal
 
 ```go
-func (b Biome) Equal(e equaler.Equaler) bool
+func (b Biome) Equal(e interface{}) bool
 ```
 Equal is an implementation of the equaler.Equaler interface
 
@@ -209,7 +209,7 @@ AddTicks adds one or more scheduled ticks to the block
 #### func (Block) Equal
 
 ```go
-func (b Block) Equal(e equaler.Equaler) bool
+func (b Block) Equal(e interface{}) bool
 ```
 Equal is an implementation of the equaler.Equaler interface
 
