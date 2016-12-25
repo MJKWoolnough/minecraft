@@ -54,7 +54,7 @@ func BlockColor(b minecraft.Block) color.Color {
 	if c, ok := colours[uint32(b.ID)<<16|uint32(b.Data)]; ok {
 		return palette[c]
 	}
-	if c, ok := colours[b.ID]; ok {
+	if c, ok := colours[uint32(b.ID)]; ok {
 		return palette[c]
 	}
 	return color.Transparent
