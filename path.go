@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/MJKWoolnough/byteio"
-	"github.com/MJKWoolnough/bytewrite"
 	"github.com/MJKWoolnough/memio"
 	"github.com/MJKWoolnough/minecraft/nbt"
 )
@@ -53,6 +52,20 @@ func NewFilePath(dirname string) (*FilePath, error) {
 	}
 	p := &FilePath{dirname: dirname}
 	return p, p.Lock()
+}
+
+type stickyEndianSeeker struct {
+	byteio.StickyWriter
+	io.Seeker
+}
+
+func (s *stickyEndianSeeker) Seek(offset int64, whence int) (int64, error) {
+	if s.StickyWriter.Err != nil {
+		return 0, s.StickyWriter.Err
+	}
+	var n int64
+	n, s.StickyWriter.Err = s.Seeker.Seek(offset, whence)
+	return n, s.StickyWriter.Err
 }
 
 // NewFilePathDimension create a new FilePath, but with the option to set the
@@ -133,7 +146,7 @@ func (p *FilePath) GetChunk(x, z int32) (nbt.Tag, error) {
 
 type rc struct {
 	pos int32
-	buf []byte
+	buf memio.Buffer
 }
 
 // SetChunk saves multiple chunks at once, possibly returning a MultiError if
@@ -163,7 +176,7 @@ func (p *FilePath) SetChunk(data ...nbt.Tag) error {
 		poses = append(poses, pos)
 		r := uint64(z>>5)<<32 | uint64(uint32(x>>5))
 		reg := rc{pos: (z&31)<<5 | (x & 31)}
-		zl := zlib.NewWriter(memio.Create(&reg.buf))
+		zl := zlib.NewWriter(&reg.buf)
 		err = nbt.Encode(zl, d)
 		zl.Close()
 		if err != nil {
@@ -215,38 +228,35 @@ func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
 		bytes     [4096]byte
 		positions [1024]uint32
 	)
-	pBytes := bytes[:]
+	pBytes := memio.Buffer(bytes[:])
 	if _, err = io.ReadFull(f, pBytes); err != nil && err != io.EOF {
 		return err
 	}
+	posr := byteio.BigEndianReader{Reader: &pBytes}
 	for i := 0; i < 1024; i++ {
-		positions[i] = bytewrite.BigEndian.Uint32(pBytes[:4])
-		pBytes = pBytes[4:]
+		positions[i], _, _ = posr.ReadUint32()
 	}
 	var todoChunks []rc
+	bew := stickyEndianSeeker{byteio.StickyWriter{Writer: byteio.BigEndianWriter{Writer: f}}, f}
 	for _, chunk := range chunks {
 		newSize := uint32(len(chunk.buf)+5) >> 12
 		if uint32(len(chunk.buf))&4095 > 0 {
 			newSize++
 		}
 		if positions[chunk.pos]&255 == newSize {
-			if _, err = f.Seek(4*int64(chunk.pos)+4096, os.SEEK_SET); err != nil { // Write the time, then the data
-				return err
-			} else if _, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(time.Now().Unix()))); err != nil {
-				return err
-			} else if _, err = f.Seek(int64(positions[chunk.pos])>>8<<12, os.SEEK_SET); err != nil {
-				return err
-			} else if _, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(len(chunk.buf)) + 1)); err != nil {
-				return err
-			} else if _, err = f.Write([]byte{Zlib}); err != nil {
-				return err
-			} else if _, err = f.Write(chunk.buf); err != nil {
-				return err
-			}
+			bew.Seek(4*int64(chunk.pos)+4096, os.SEEK_SET) // Write the time, then the data
+			bew.WriteUint32(uint32(time.Now().Unix()))
+			bew.Seek(int64(positions[chunk.pos])>>8<<12, os.SEEK_SET)
+			bew.WriteUint32(uint32(len(chunk.buf)) + 1)
+			bew.WriteUint8(Zlib)
+			bew.Write(chunk.buf)
 		} else {
 			todoChunks = append(todoChunks, chunk)
 			positions[chunk.pos] = 0
 		}
+	}
+	if bew.Err != nil {
+		return bew.Err
 	}
 	for _, chunk := range todoChunks {
 		sort.Sort(sia(positions[:]))
@@ -279,32 +289,20 @@ func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
 		}
 		positions[0] = newPosition<<8 | newSize&255
 		// Write the new position
-		if _, err = f.Seek(4*int64(chunk.pos), os.SEEK_SET); err != nil {
-			return err
-		} else if _, err = f.Write(bytewrite.BigEndian.PutUint32(positions[0])); err != nil {
-			return err
-		} else if _, err = f.Seek(4*(int64(chunk.pos)+1024), os.SEEK_SET); err != nil { // Write the time, then the data
-			return err
-		} else if _, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(time.Now().Unix()))); err != nil {
-			return err
-		} else if _, err = f.Seek(int64(newPosition)<<12, os.SEEK_SET); err != nil {
-			return err
-		} else if _, err = f.Write(bytewrite.BigEndian.PutUint32(uint32(len(chunk.buf)) + 1)); err != nil {
-			return err
-		} else if _, err = f.Write([]byte{Zlib}); err != nil {
-			return err
-		} else if _, err = f.Write(chunk.buf); err != nil {
-			return err
-		} else if writeLastByte { // Make filesize mod 4096 (for minecraft compatibility)
-			if _, err = f.Seek(int64(newPosition+newSize)<<12-1, os.SEEK_SET); err != nil {
-				return err
-			} else if _, err = f.Write([]byte{0}); err != nil {
-				return err
-			}
-
+		bew.Seek(4*int64(chunk.pos), os.SEEK_SET)
+		bew.WriteUint32(positions[0])
+		bew.Seek(4*(int64(chunk.pos)+1024), os.SEEK_SET) // Write the time, then the data
+		bew.WriteUint32(uint32(time.Now().Unix()))
+		bew.Seek(int64(newPosition)<<12, os.SEEK_SET)
+		bew.WriteUint32(uint32(len(chunk.buf)) + 1)
+		bew.WriteUint8(Zlib)
+		bew.Write(chunk.buf)
+		if writeLastByte { // Make filesize mod 4096 (for minecraft compatibility)
+			bew.Seek(int64(newPosition+newSize)<<12-1, os.SEEK_SET)
+			bew.WriteUint8(0)
 		}
 	}
-	return nil
+	return bew.Err
 }
 
 // RemoveChunk deletes the chunk at chunk coords x, z.
@@ -393,7 +391,7 @@ func (p *FilePath) GetChunks(x, z int32) ([][2]int32, error) {
 	}
 	defer f.Close()
 
-	pBytes := make([]byte, 4096)
+	pBytes := make(memio.Buffer, 4096)
 	if _, err = io.ReadFull(f, pBytes); err != nil {
 		return nil, err
 	}
@@ -402,11 +400,11 @@ func (p *FilePath) GetChunks(x, z int32) ([][2]int32, error) {
 	baseZ := z << 5
 
 	var toRet [][2]int32
+	posr := byteio.BigEndianReader{Reader: &pBytes}
 	for i := 0; i < 1024; i++ {
-		if bytewrite.BigEndian.Uint32(pBytes[:4]) > 0 {
+		if n, _, _ := posr.ReadUint32(); n > 0 {
 			toRet = append(toRet, [2]int32{baseX + int32(i&31), baseZ + int32(i>>5)})
 		}
-		pBytes = pBytes[4:]
 	}
 	return toRet, nil
 }
@@ -418,12 +416,13 @@ func (p *FilePath) HasLock() bool {
 		return false
 	}
 	defer r.Close()
-	buf := make([]byte, 9)
+	buf := make(memio.Buffer, 9)
 	n, err := io.ReadFull(r, buf)
 	if n != 8 || err != io.ErrUnexpectedEOF {
 		return false
 	}
-	return int64(bytewrite.BigEndian.Uint64(buf)) == p.lock
+	b, _, _ := byteio.BigEndianReader{Reader: &buf}.ReadInt64()
+	return b == p.lock
 }
 
 // Lock will retake the lock file if it has been lost. May cause corruption.
@@ -437,7 +436,7 @@ func (p *FilePath) Lock() error {
 	if err != nil {
 		return err
 	}
-	_, err = f.Write(bytewrite.BigEndian.PutUint64(uint64(p.lock)))
+	_, err = byteio.BigEndianWriter{Writer: f}.WriteUint64(uint64(p.lock))
 	f.Close()
 	if err != nil {
 		return err
@@ -456,7 +455,7 @@ func (p *FilePath) Defrag(x, z int32) error {
 	}
 	defer f.Close()
 
-	locationSizes := make([]byte, 4096)
+	locationSizes := make(memio.Buffer, 4096)
 	if _, err = io.ReadFull(f, locationSizes); err != nil {
 		return err
 	}
@@ -466,10 +465,11 @@ func (p *FilePath) Defrag(x, z int32) error {
 		locations  [4096]byte
 		currSector uint32 = 2
 	)
-
+	locationr := byteio.BigEndianReader{Reader: &locationSizes}
+	l := memio.Buffer(locations[:0])
+	locationw := byteio.BigEndianWriter{Writer: &l}
 	for i := 0; i < 1024; i++ {
-		locationSize := bytewrite.BigEndian.Uint32(locationSizes[:4])
-		locationSizes = locationSizes[4:]
+		locationSize, _, _ := locationr.ReadUint32()
 		if locationSize>>8 == 0 {
 			continue
 		} else if _, err = f.Seek(int64(locationSize>>8<<12), os.SEEK_SET); err != nil {
@@ -482,7 +482,7 @@ func (p *FilePath) Defrag(x, z int32) error {
 			return err
 		}
 
-		copy(locations[i<<2:i<<2+4], bytewrite.BigEndian.PutUint32(currSector<<8|locationSize&255))
+		locationw.WriteUint32(currSector<<8 | locationSize&255)
 
 		currSector += locationSize & 255
 	}
@@ -515,22 +515,23 @@ func (p *FilePath) Defrag(x, z int32) error {
 
 // MemPath is an in memory minecraft level format that implements the Path interface.
 type MemPath struct {
-	level  []byte
-	chunks map[uint64][]byte
+	level  memio.Buffer
+	chunks map[uint64]memio.Buffer
 }
 
 // NewMemPath creates a new MemPath implementation.
 func NewMemPath() *MemPath {
-	return &MemPath{chunks: make(map[uint64][]byte)}
+	return &MemPath{chunks: make(map[uint64]memio.Buffer)}
 }
 
 // GetChunk returns the chunk at chunk coords x, z.
 func (m *MemPath) GetChunk(x, z int32) (nbt.Tag, error) {
 	pos := uint64(z)<<32 | uint64(uint32(x))
-	if m.chunks[pos] == nil {
+	c := m.chunks[pos]
+	if c == nil {
 		return nbt.Tag{}, nil
 	}
-	return m.read(m.chunks[pos])
+	return m.read(c)
 }
 
 // SetChunk saves multiple chunks at once.
@@ -540,7 +541,7 @@ func (m *MemPath) SetChunk(data ...nbt.Tag) error {
 		if err != nil {
 			return err
 		}
-		var buf []byte
+		var buf memio.Buffer
 		if err = m.write(d, &buf); err != nil {
 			return err
 		}
@@ -570,8 +571,8 @@ func (m *MemPath) WriteLevelDat(data nbt.Tag) error {
 	return m.write(data, &m.level)
 }
 
-func (m *MemPath) read(buf []byte) (nbt.Tag, error) {
-	z, err := zlib.NewReader(memio.Open(buf))
+func (m *MemPath) read(buf memio.Buffer) (nbt.Tag, error) {
+	z, err := zlib.NewReader(&buf)
 	if err != nil {
 		return nbt.Tag{}, err
 	}
@@ -579,8 +580,8 @@ func (m *MemPath) read(buf []byte) (nbt.Tag, error) {
 	return data, err
 }
 
-func (m *MemPath) write(data nbt.Tag, buf *[]byte) error {
-	z := zlib.NewWriter(memio.Create(buf))
+func (m *MemPath) write(data nbt.Tag, buf *memio.Buffer) error {
+	z := zlib.NewWriter(buf)
 	defer z.Close()
 	err := nbt.Encode(z, data)
 	return err
