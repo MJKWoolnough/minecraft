@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
-	"os"
 	"reflect"
 
 	"github.com/MJKWoolnough/byteio"
@@ -238,7 +237,7 @@ func makeSeeker(r byteio.EndianReader) io.Seeker {
 }
 
 func (s seeker) Seek(offset int64, whence int) (int64, error) {
-	if whence != os.SEEK_CUR || offset < 0 {
+	if whence != io.SeekCurrent || offset < 0 {
 		return 0, ErrUnsupportedWhence
 	}
 	return io.CopyN(ioutil.Discard, s, offset)
@@ -381,7 +380,7 @@ func (rd rDecoder) skipByteArray() error {
 	if err != nil {
 		return err
 	}
-	_, err = rd.Seek(int64(l), os.SEEK_CUR)
+	_, err = rd.Seek(int64(l), io.SeekCurrent)
 	return err
 }
 
@@ -390,7 +389,7 @@ func (rd rDecoder) skipString() error {
 	if err != nil {
 		return err
 	}
-	_, err = rd.Seek(int64(l), os.SEEK_CUR)
+	_, err = rd.Seek(int64(l), io.SeekCurrent)
 	return err
 }
 
@@ -457,7 +456,7 @@ func (rd rDecoder) skipList() error {
 	default:
 		return UnknownTag{tagID}
 	}
-	_, err = rd.Seek(toSkip*int64(l), os.SEEK_CUR)
+	_, err = rd.Seek(toSkip*int64(l), io.SeekCurrent)
 	return err
 }
 
@@ -485,7 +484,7 @@ func (rd rDecoder) skipIntArray() error {
 	if err != nil {
 		return err
 	}
-	_, err = rd.Seek(int64(l)*4, os.SEEK_CUR)
+	_, err = rd.Seek(int64(l)*4, io.SeekCurrent)
 	return err
 }
 
