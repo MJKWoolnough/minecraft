@@ -99,7 +99,7 @@ func (p *FilePath) GetChunk(x, z int32) (nbt.Tag, error) {
 	}
 	defer f.Close()
 	pos := int64((z&31)<<5 | (x & 31))
-	if _, err = f.Seek(4*pos, os.SEEK_SET); err != nil {
+	if _, err = f.Seek(4*pos, io.SeekStart); err != nil {
 		return nbt.Tag{}, err
 	}
 
@@ -108,7 +108,7 @@ func (p *FilePath) GetChunk(x, z int32) (nbt.Tag, error) {
 	locationSize, _, err := be.ReadUint32()
 	if locationSize>>8 == 0 {
 		return nbt.Tag{}, nil
-	} else if _, err = f.Seek(int64(locationSize>>8<<12), os.SEEK_SET); err != nil {
+	} else if _, err = f.Seek(int64(locationSize>>8<<12), io.SeekStart); err != nil {
 		return nbt.Tag{}, err
 	}
 
@@ -244,9 +244,9 @@ func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
 			newSize++
 		}
 		if positions[chunk.pos]&255 == newSize {
-			bew.Seek(4*int64(chunk.pos)+4096, os.SEEK_SET) // Write the time, then the data
+			bew.Seek(4*int64(chunk.pos)+4096, io.SeekStart) // Write the time, then the data
 			bew.WriteUint32(uint32(time.Now().Unix()))
-			bew.Seek(int64(positions[chunk.pos])>>8<<12, os.SEEK_SET)
+			bew.Seek(int64(positions[chunk.pos])>>8<<12, io.SeekStart)
 			bew.WriteUint32(uint32(len(chunk.buf)) + 1)
 			bew.WriteUint8(Zlib)
 			bew.Write(chunk.buf)
@@ -289,16 +289,16 @@ func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
 		}
 		positions[0] = newPosition<<8 | newSize&255
 		// Write the new position
-		bew.Seek(4*int64(chunk.pos), os.SEEK_SET)
+		bew.Seek(4*int64(chunk.pos), io.SeekStart)
 		bew.WriteUint32(positions[0])
-		bew.Seek(4*(int64(chunk.pos)+1024), os.SEEK_SET) // Write the time, then the data
+		bew.Seek(4*(int64(chunk.pos)+1024), io.SeekStart) // Write the time, then the data
 		bew.WriteUint32(uint32(time.Now().Unix()))
-		bew.Seek(int64(newPosition)<<12, os.SEEK_SET)
+		bew.Seek(int64(newPosition)<<12, io.SeekStart)
 		bew.WriteUint32(uint32(len(chunk.buf)) + 1)
 		bew.WriteUint8(Zlib)
 		bew.Write(chunk.buf)
 		if writeLastByte { // Make filesize mod 4096 (for minecraft compatibility)
-			bew.Seek(int64(newPosition+newSize)<<12-1, os.SEEK_SET)
+			bew.Seek(int64(newPosition+newSize)<<12-1, io.SeekStart)
 			bew.WriteUint8(0)
 		}
 	}
@@ -321,7 +321,7 @@ func (p *FilePath) RemoveChunk(x, z int32) error {
 		return err
 	}
 	defer f.Close()
-	if _, err = f.Seek(int64(chunkZ<<5|chunkX)*4, os.SEEK_SET); err != nil {
+	if _, err = f.Seek(int64(chunkZ<<5|chunkX)*4, io.SeekStart); err != nil {
 		return err
 	}
 	_, err = f.Write([]byte{0, 0, 0, 0})
@@ -472,7 +472,7 @@ func (p *FilePath) Defrag(x, z int32) error {
 		locationSize, _, _ := locationr.ReadUint32()
 		if locationSize>>8 == 0 {
 			continue
-		} else if _, err = f.Seek(int64(locationSize>>8<<12), os.SEEK_SET); err != nil {
+		} else if _, err = f.Seek(int64(locationSize>>8<<12), io.SeekStart); err != nil {
 			return err
 		}
 
@@ -487,7 +487,7 @@ func (p *FilePath) Defrag(x, z int32) error {
 		currSector += locationSize & 255
 	}
 
-	_, err = f.Seek(0, os.SEEK_SET)
+	_, err = f.Seek(0, io.SeekStart)
 	if err != nil {
 		return err
 	}
@@ -497,7 +497,7 @@ func (p *FilePath) Defrag(x, z int32) error {
 		return err
 	}
 
-	_, err = f.Seek(8192, os.SEEK_SET)
+	_, err = f.Seek(8192, io.SeekStart)
 	if err != nil {
 		return err // Try and recover first?
 	}
