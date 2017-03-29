@@ -13,7 +13,7 @@ type Decoder struct {
 
 // NewDecoder returns a Decoder using Big Endian
 func NewDecoder(r io.Reader) Decoder {
-	return NewDecoderEndian(byteio.BigEndianReader{r})
+	return NewDecoderEndian(&byteio.BigEndianReader{Reader: r})
 }
 
 // NewDecoderEndian allows you to specify your own Endian Reader

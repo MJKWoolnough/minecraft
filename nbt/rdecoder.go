@@ -224,11 +224,11 @@ type seeker struct {
 }
 
 func makeSeeker(r byteio.EndianReader) io.Seeker {
-	if ber, ok := r.(byteio.BigEndianReader); ok {
+	if ber, ok := r.(*byteio.BigEndianReader); ok {
 		if s, ok := ber.Reader.(io.Seeker); ok {
 			return s
 		}
-	} else if ler, ok := r.(byteio.LittleEndianReader); ok {
+	} else if ler, ok := r.(*byteio.LittleEndianReader); ok {
 		if s, ok := ler.Reader.(io.Seeker); ok {
 			return s
 		}

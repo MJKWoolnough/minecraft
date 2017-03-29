@@ -237,7 +237,7 @@ func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
 		positions[i], _, _ = posr.ReadUint32()
 	}
 	var todoChunks []rc
-	bew := stickyEndianSeeker{byteio.StickyWriter{Writer: byteio.BigEndianWriter{Writer: f}}, f}
+	bew := stickyEndianSeeker{byteio.StickyWriter{Writer: &byteio.BigEndianWriter{Writer: f}}, f}
 	for _, chunk := range chunks {
 		newSize := uint32(len(chunk.buf)+5) >> 12
 		if uint32(len(chunk.buf))&4095 > 0 {
@@ -421,7 +421,8 @@ func (p *FilePath) HasLock() bool {
 	if n != 8 || err != io.ErrUnexpectedEOF {
 		return false
 	}
-	b, _, _ := byteio.BigEndianReader{Reader: &buf}.ReadInt64()
+	bew := byteio.BigEndianReader{Reader: &buf}
+	b, _, _ := bew.ReadInt64()
 	return b == p.lock
 }
 
@@ -436,7 +437,8 @@ func (p *FilePath) Lock() error {
 	if err != nil {
 		return err
 	}
-	_, err = byteio.BigEndianWriter{Writer: f}.WriteUint64(uint64(p.lock))
+	bew := byteio.BigEndianWriter{Writer: f}
+	_, err = bew.WriteUint64(uint64(p.lock))
 	f.Close()
 	if err != nil {
 		return err
