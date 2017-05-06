@@ -47,7 +47,7 @@ type largeTest2 struct {
 	FloatTest        Float        `nbt:"floatTest"`
 	IntTest          *Int         `nbt:"intTest"`
 	Nested           *Compound    `nbt:"nested compound test"`
-	ListTestLong     *List        `nbt:"listTest (long)"`
+	ListTestLong     List         `nbt:"listTest (long)"`
 	ListTestCompound [2]*Compound `nbt:"listTest (compound)"`
 	ByteTest         Byte         `nbt:"byteTest"`
 	ByteArrayTest    **ByteArray  `nbt:"byteArrayTest (the first 1000 values of (n*n*255+n*7)%100, starting with n=0 (0, 62, 34, 16, 8, ...))"`

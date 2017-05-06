@@ -61,7 +61,7 @@ func (rd rDecoder) decodeData(tagID TagID, rv reflect.Value) error {
 		if err != nil {
 			return err
 		}
-		rv.Set(reflect.ValueOf(*data))
+		rv.Set(reflect.ValueOf(data))
 	case nbtCompoundType:
 		data, err := rd.Decoder.decodeCompound()
 		if err != nil {
@@ -280,7 +280,7 @@ var (
 
 func init() {
 	nbtCompoundType = reflect.TypeOf(Compound{})
-	nbtListType = reflect.TypeOf(List{})
+	nbtListType = reflect.TypeOf(ListData{})
 }
 
 func (rd rDecoder) decodeCompound(rv reflect.Value) error {

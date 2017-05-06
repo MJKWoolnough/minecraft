@@ -20,7 +20,7 @@ func (b ByteArray) readFrom(r io.Reader) error {
 func (re rEncoder) encodeData(tagType TagID, rv reflect.Value) error {
 	switch t := rv.Interface().(type) {
 	case List:
-		return re.Encoder.encodeList(&t)
+		return re.Encoder.encodeList(t)
 	case Compound:
 		return re.Encoder.encodeCompound(t)
 	default:

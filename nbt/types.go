@@ -368,17 +368,28 @@ func (String) Type() TagID {
 	return TagString
 }
 
+type List interface {
+	Data
+	Set(int, Data) error
+	Get(int) Data
+	Append(...Data) error
+	Insert(int, ...Data) error
+	Remove(int)
+	Len() int
+	TagType() TagID
+}
+
 // List is an implementation of the Data interface
-type List struct {
+type ListData struct {
 	tagType TagID
 	data    []Data
 }
 
 // NewList returns a new List Data type, or nil if the given data is not of all
 // the same Data type
-func NewList(data []Data) *List {
+func NewList(data []Data) List {
 	if len(data) == 0 {
-		return &List{TagByte, data}
+		return &ListData{TagByte, data}
 	}
 	tagType := data[0].Type()
 	for i := 1; i < len(data); i++ {
@@ -386,28 +397,28 @@ func NewList(data []Data) *List {
 			return nil
 		}
 	}
-	return &List{
+	return &ListData{
 		tagType,
 		data,
 	}
 }
 
 // NewEmptyList returns a new empty List Data type, set to the type given
-func NewEmptyList(tagType TagID) *List {
-	return &List{
+func NewEmptyList(tagType TagID) List {
+	return &ListData{
 		tagType,
 		make([]Data, 0),
 	}
 }
 
 // TagType returns the TagID of the type of tag this list contains
-func (l *List) TagType() TagID {
+func (l *ListData) TagType() TagID {
 	return l.tagType
 }
 
 // Copy simply returns a deep-copy the the data
-func (l *List) Copy() Data {
-	c := new(List)
+func (l *ListData) Copy() Data {
+	c := new(ListData)
 	c.tagType = l.tagType
 	c.data = make([]Data, len(l.data))
 	for i, d := range l.data {
@@ -418,8 +429,8 @@ func (l *List) Copy() Data {
 
 // Equal satisfies the equaler.Equaler interface, allowing for types to be
 // checked for equality
-func (l *List) Equal(e interface{}) bool {
-	if m, ok := e.(*List); ok {
+func (l *ListData) Equal(e interface{}) bool {
+	if m, ok := e.(*ListData); ok {
 		if l.tagType == m.tagType && len(l.data) == len(m.data) {
 			for i, o := range l.data {
 				if !o.Equal(m.data[i]) {
@@ -432,7 +443,7 @@ func (l *List) Equal(e interface{}) bool {
 	return false
 }
 
-func (l *List) String() string {
+func (l *ListData) String() string {
 	s := strconv.FormatInt(int64(len(l.data)), 10) + " entries of type " + l.tagType.String() + " {"
 	for _, d := range l.data {
 		s += "\n	" + l.tagType.String() + ": " + indent(d.String())
@@ -441,8 +452,8 @@ func (l *List) String() string {
 }
 
 // Set sets the data at the given position. It does not append
-func (l *List) Set(i int32, data Data) error {
-	if i < 0 || i >= int32(len(l.data)) {
+func (l *ListData) Set(i int, data Data) error {
+	if i < 0 || i >= len(l.data) {
 		return ErrBadRange
 	}
 	if err := l.valid(data); err != nil {
@@ -453,7 +464,7 @@ func (l *List) Set(i int32, data Data) error {
 }
 
 // Get returns the data at the given positon
-func (l *List) Get(i int) Data {
+func (l *ListData) Get(i int) Data {
 	if i >= 0 && i < len(l.data) {
 		return l.data[i]
 	}
@@ -461,7 +472,7 @@ func (l *List) Get(i int) Data {
 }
 
 // Append adds data to the list
-func (l *List) Append(data ...Data) error {
+func (l *ListData) Append(data ...Data) error {
 	if err := l.valid(data...); err != nil {
 		return err
 	}
@@ -471,7 +482,7 @@ func (l *List) Append(data ...Data) error {
 
 // Insert will add the given data at the specified position, moving other
 // elements up.
-func (l *List) Insert(i int, data ...Data) error {
+func (l *ListData) Insert(i int, data ...Data) error {
 	if err := l.valid(data...); err != nil {
 		return err
 	}
@@ -480,7 +491,7 @@ func (l *List) Insert(i int, data ...Data) error {
 }
 
 // Remove deletes the specified position and shifts remaing data down
-func (l *List) Remove(i int) {
+func (l *ListData) Remove(i int) {
 	if i >= 0 && i < len(l.data) {
 		copy(l.data[i:], l.data[i+1:])
 		l.data[len(l.data)-1] = nil
@@ -489,11 +500,11 @@ func (l *List) Remove(i int) {
 }
 
 // Len returns the length of the list
-func (l *List) Len() int {
+func (l *ListData) Len() int {
 	return len(l.data)
 }
 
-func (l *List) valid(data ...Data) error {
+func (l *ListData) valid(data ...Data) error {
 	for _, d := range data {
 		if t := d.Type(); t != l.tagType {
 			return &WrongTag{l.tagType, t}
@@ -503,7 +514,7 @@ func (l *List) valid(data ...Data) error {
 }
 
 // Type returns the TagID of the data
-func (List) Type() TagID {
+func (ListData) Type() TagID {
 	return TagList
 }
 

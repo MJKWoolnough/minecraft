@@ -63,7 +63,7 @@ func (e Encoder) encodeData(d Data) error {
 		err = e.encodeByteArray(d)
 	case String:
 		err = e.encodeString(d)
-	case *List:
+	case *ListData:
 		err = e.encodeList(d)
 	case Compound:
 		err = e.encodeCompound(d)
@@ -84,7 +84,11 @@ func (e Encoder) encodeData(d Data) error {
 	case Complex128:
 		err = e.encodeComplex128(d)
 	default:
-		err = UnknownTag{d.Type()}
+		if l, ok := d.(List); ok {
+			e.encodeList(l)
+		} else {
+			err = UnknownTag{d.Type()}
+		}
 	}
 	if err != nil {
 		return err
@@ -149,19 +153,21 @@ func (e Encoder) encodeString(s String) error {
 }
 
 // EncodeList will write a List Data
-func (e Encoder) encodeList(l *List) error {
-	_, err := e.w.WriteUint8(uint8(l.tagType))
+func (e Encoder) encodeList(l List) error {
+	tagType := l.TagType()
+	_, err := e.w.WriteUint8(uint8(tagType))
 	if err != nil {
 		return err
 	}
-	_, err = e.w.WriteUint32(uint32(len(l.data)))
+	_, err = e.w.WriteUint32(uint32(l.Len()))
 	if err != nil {
 		return err
 	}
 	if l.TagType() != TagEnd {
-		for _, data := range l.data {
-			if tagID := data.Type(); tagID != l.tagType {
-				return WrongTag{l.tagType, tagID}
+		for i := 0; i < l.Len(); i++ {
+			data := l.Get(i)
+			if tagID := data.Type(); tagID != tagType {
+				return WrongTag{tagType, tagID}
 			}
 			err = e.encodeData(data)
 			if err != nil {

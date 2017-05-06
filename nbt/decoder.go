@@ -168,7 +168,7 @@ func (d Decoder) decodeString() (String, error) {
 }
 
 // DecodeList will read a List Data
-func (d Decoder) decodeList() (*List, error) {
+func (d Decoder) decodeList() (List, error) {
 	t, _, err := d.r.ReadUint8()
 	if err != nil {
 		return nil, err
@@ -185,7 +185,7 @@ func (d Decoder) decodeList() (*List, error) {
 			return nil, err
 		}
 	}
-	return &List{
+	return &ListData{
 		tagID,
 		data,
 	}, nil
