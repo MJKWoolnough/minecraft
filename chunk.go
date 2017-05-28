@@ -127,7 +127,7 @@ func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
 		} else if tagID := tag.TagID(); tagID != co.tagType {
 			return nil, WrongTypeError{co.name, co.tagType, tagID}
 		} else if tagID == nbt.TagList {
-			list := tag.Data().(*nbt.List)
+			list := tag.Data().(nbt.List)
 			if list.TagType() != co.listType {
 				if co.emptyByte && list.Len() == 0 {
 					if tt := list.TagType(); tt == nbt.TagByte || tt == nbt.TagEnd {
@@ -151,7 +151,7 @@ func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
 	c.heightMap = c.data.Get("HeightMap").Data().(nbt.IntArray)
 	c.tileEntities = make(map[uint16]nbt.Compound)
 	if tileEntities := c.data.Get("TileEntities"); tileEntities.TagID() != 0 {
-		if lTileEntities, ok := tileEntities.Data().(*nbt.List); ok {
+		if lTileEntities, ok := tileEntities.Data().(nbt.List); ok {
 			for i := 0; i < lTileEntities.Len(); i++ {
 				tag := lTileEntities.Get(i).(nbt.Compound)
 				if tag == nil {
@@ -168,7 +168,7 @@ func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
 	c.data.Remove("TileEntities")
 	c.tileTicks = make(map[uint16][]nbt.Compound)
 	if tileTicks := c.data.Get("TileTicks"); tileTicks.TagID() != 0 {
-		if lTileTicks, ok := tileTicks.Data().(*nbt.List); ok {
+		if lTileTicks, ok := tileTicks.Data().(nbt.List); ok {
 			for i := 0; i < lTileTicks.Len(); i++ {
 				tag := lTileTicks.Get(i).(nbt.Compound)
 				if tag == nil {
@@ -199,7 +199,7 @@ func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
 		}
 	}
 	c.data.Remove("TileTicks")
-	sections := c.data.Get("Sections").Data().(*nbt.List)
+	sections := c.data.Get("Sections").Data().(nbt.List)
 	for i := 0; i < sections.Len(); i++ {
 		section := sections.Get(i).(nbt.Compound)
 		if yc := section.Get("Y"); yc.TagID() == 0 {
