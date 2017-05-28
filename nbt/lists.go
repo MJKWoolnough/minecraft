@@ -7,7 +7,14 @@ import "strconv"
 type ListByte []Byte
 
 func (l ListByte) Equal(e interface{}) bool {
-	if m, ok := e.(ListByte); ok {
+	m, ok := e.(ListByte)
+	if !ok {
+		var n *ListByte
+		if n, ok = e.(*ListByte); ok {
+			m = *n
+		}
+	}
+	if ok {
 		if len(l) == len(m) {
 			for n, t := range m {
 				if !t.Equal(l[n]) {
@@ -16,6 +23,13 @@ func (l ListByte) Equal(e interface{}) bool {
 			}
 			return true
 		}
+	} else if d, ok := e.(List); ok && d.TagType() == TagByte && d.Len() == len(l) {
+		for i := 0; i < d.Len(); i++ {
+			if !d.Get(i).Equal(l[i]) {
+				return false
+			}
+		}
+		return true
 	}
 	return false
 }
@@ -93,23 +107,41 @@ func (l *ListByte) Insert(i int, d ...Data) error {
 	return nil
 }
 
-func (l *ListByte) Remove(i int) error {
+func (l *ListByte) Remove(i int) {
 	if i >= len(*l) {
-		return nil
+		return
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return nil
+	return
 }
 
 func (l ListByte) Len() int {
 	return len(l)
 }
 
+func (l ListData) ListByte() ListByte {
+	if l.tagType != TagByte {
+		return nil
+	}
+	s := make(ListByte, len(l.data))
+	for n, v := range l.data {
+		s[n] = v.(Byte)
+	}
+	return s
+}
+
 type ListShort []Short
 
 func (l ListShort) Equal(e interface{}) bool {
-	if m, ok := e.(ListShort); ok {
+	m, ok := e.(ListShort)
+	if !ok {
+		var n *ListShort
+		if n, ok = e.(*ListShort); ok {
+			m = *n
+		}
+	}
+	if ok {
 		if len(l) == len(m) {
 			for n, t := range m {
 				if !t.Equal(l[n]) {
@@ -118,6 +150,13 @@ func (l ListShort) Equal(e interface{}) bool {
 			}
 			return true
 		}
+	} else if d, ok := e.(List); ok && d.TagType() == TagShort && d.Len() == len(l) {
+		for i := 0; i < d.Len(); i++ {
+			if !d.Get(i).Equal(l[i]) {
+				return false
+			}
+		}
+		return true
 	}
 	return false
 }
@@ -195,23 +234,41 @@ func (l *ListShort) Insert(i int, d ...Data) error {
 	return nil
 }
 
-func (l *ListShort) Remove(i int) error {
+func (l *ListShort) Remove(i int) {
 	if i >= len(*l) {
-		return nil
+		return
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return nil
+	return
 }
 
 func (l ListShort) Len() int {
 	return len(l)
 }
 
+func (l ListData) ListShort() ListShort {
+	if l.tagType != TagShort {
+		return nil
+	}
+	s := make(ListShort, len(l.data))
+	for n, v := range l.data {
+		s[n] = v.(Short)
+	}
+	return s
+}
+
 type ListInt []Int
 
 func (l ListInt) Equal(e interface{}) bool {
-	if m, ok := e.(ListInt); ok {
+	m, ok := e.(ListInt)
+	if !ok {
+		var n *ListInt
+		if n, ok = e.(*ListInt); ok {
+			m = *n
+		}
+	}
+	if ok {
 		if len(l) == len(m) {
 			for n, t := range m {
 				if !t.Equal(l[n]) {
@@ -220,6 +277,13 @@ func (l ListInt) Equal(e interface{}) bool {
 			}
 			return true
 		}
+	} else if d, ok := e.(List); ok && d.TagType() == TagInt && d.Len() == len(l) {
+		for i := 0; i < d.Len(); i++ {
+			if !d.Get(i).Equal(l[i]) {
+				return false
+			}
+		}
+		return true
 	}
 	return false
 }
@@ -297,23 +361,41 @@ func (l *ListInt) Insert(i int, d ...Data) error {
 	return nil
 }
 
-func (l *ListInt) Remove(i int) error {
+func (l *ListInt) Remove(i int) {
 	if i >= len(*l) {
-		return nil
+		return
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return nil
+	return
 }
 
 func (l ListInt) Len() int {
 	return len(l)
 }
 
+func (l ListData) ListInt() ListInt {
+	if l.tagType != TagInt {
+		return nil
+	}
+	s := make(ListInt, len(l.data))
+	for n, v := range l.data {
+		s[n] = v.(Int)
+	}
+	return s
+}
+
 type ListLong []Long
 
 func (l ListLong) Equal(e interface{}) bool {
-	if m, ok := e.(ListLong); ok {
+	m, ok := e.(ListLong)
+	if !ok {
+		var n *ListLong
+		if n, ok = e.(*ListLong); ok {
+			m = *n
+		}
+	}
+	if ok {
 		if len(l) == len(m) {
 			for n, t := range m {
 				if !t.Equal(l[n]) {
@@ -322,6 +404,13 @@ func (l ListLong) Equal(e interface{}) bool {
 			}
 			return true
 		}
+	} else if d, ok := e.(List); ok && d.TagType() == TagLong && d.Len() == len(l) {
+		for i := 0; i < d.Len(); i++ {
+			if !d.Get(i).Equal(l[i]) {
+				return false
+			}
+		}
+		return true
 	}
 	return false
 }
@@ -399,23 +488,41 @@ func (l *ListLong) Insert(i int, d ...Data) error {
 	return nil
 }
 
-func (l *ListLong) Remove(i int) error {
+func (l *ListLong) Remove(i int) {
 	if i >= len(*l) {
-		return nil
+		return
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return nil
+	return
 }
 
 func (l ListLong) Len() int {
 	return len(l)
 }
 
+func (l ListData) ListLong() ListLong {
+	if l.tagType != TagLong {
+		return nil
+	}
+	s := make(ListLong, len(l.data))
+	for n, v := range l.data {
+		s[n] = v.(Long)
+	}
+	return s
+}
+
 type ListFloat []Float
 
 func (l ListFloat) Equal(e interface{}) bool {
-	if m, ok := e.(ListFloat); ok {
+	m, ok := e.(ListFloat)
+	if !ok {
+		var n *ListFloat
+		if n, ok = e.(*ListFloat); ok {
+			m = *n
+		}
+	}
+	if ok {
 		if len(l) == len(m) {
 			for n, t := range m {
 				if !t.Equal(l[n]) {
@@ -424,6 +531,13 @@ func (l ListFloat) Equal(e interface{}) bool {
 			}
 			return true
 		}
+	} else if d, ok := e.(List); ok && d.TagType() == TagFloat && d.Len() == len(l) {
+		for i := 0; i < d.Len(); i++ {
+			if !d.Get(i).Equal(l[i]) {
+				return false
+			}
+		}
+		return true
 	}
 	return false
 }
@@ -501,23 +615,41 @@ func (l *ListFloat) Insert(i int, d ...Data) error {
 	return nil
 }
 
-func (l *ListFloat) Remove(i int) error {
+func (l *ListFloat) Remove(i int) {
 	if i >= len(*l) {
-		return nil
+		return
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return nil
+	return
 }
 
 func (l ListFloat) Len() int {
 	return len(l)
 }
 
+func (l ListData) ListFloat() ListFloat {
+	if l.tagType != TagFloat {
+		return nil
+	}
+	s := make(ListFloat, len(l.data))
+	for n, v := range l.data {
+		s[n] = v.(Float)
+	}
+	return s
+}
+
 type ListDouble []Double
 
 func (l ListDouble) Equal(e interface{}) bool {
-	if m, ok := e.(ListDouble); ok {
+	m, ok := e.(ListDouble)
+	if !ok {
+		var n *ListDouble
+		if n, ok = e.(*ListDouble); ok {
+			m = *n
+		}
+	}
+	if ok {
 		if len(l) == len(m) {
 			for n, t := range m {
 				if !t.Equal(l[n]) {
@@ -526,6 +658,13 @@ func (l ListDouble) Equal(e interface{}) bool {
 			}
 			return true
 		}
+	} else if d, ok := e.(List); ok && d.TagType() == TagDouble && d.Len() == len(l) {
+		for i := 0; i < d.Len(); i++ {
+			if !d.Get(i).Equal(l[i]) {
+				return false
+			}
+		}
+		return true
 	}
 	return false
 }
@@ -603,23 +742,41 @@ func (l *ListDouble) Insert(i int, d ...Data) error {
 	return nil
 }
 
-func (l *ListDouble) Remove(i int) error {
+func (l *ListDouble) Remove(i int) {
 	if i >= len(*l) {
-		return nil
+		return
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return nil
+	return
 }
 
 func (l ListDouble) Len() int {
 	return len(l)
 }
 
+func (l ListData) ListDouble() ListDouble {
+	if l.tagType != TagDouble {
+		return nil
+	}
+	s := make(ListDouble, len(l.data))
+	for n, v := range l.data {
+		s[n] = v.(Double)
+	}
+	return s
+}
+
 type ListIntArray []IntArray
 
 func (l ListIntArray) Equal(e interface{}) bool {
-	if m, ok := e.(ListIntArray); ok {
+	m, ok := e.(ListIntArray)
+	if !ok {
+		var n *ListIntArray
+		if n, ok = e.(*ListIntArray); ok {
+			m = *n
+		}
+	}
+	if ok {
 		if len(l) == len(m) {
 			for n, t := range m {
 				if !t.Equal(l[n]) {
@@ -628,6 +785,13 @@ func (l ListIntArray) Equal(e interface{}) bool {
 			}
 			return true
 		}
+	} else if d, ok := e.(List); ok && d.TagType() == TagIntArray && d.Len() == len(l) {
+		for i := 0; i < d.Len(); i++ {
+			if !d.Get(i).Equal(l[i]) {
+				return false
+			}
+		}
+		return true
 	}
 	return false
 }
@@ -705,23 +869,41 @@ func (l *ListIntArray) Insert(i int, d ...Data) error {
 	return nil
 }
 
-func (l *ListIntArray) Remove(i int) error {
+func (l *ListIntArray) Remove(i int) {
 	if i >= len(*l) {
-		return nil
+		return
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return nil
+	return
 }
 
 func (l ListIntArray) Len() int {
 	return len(l)
 }
 
+func (l ListData) ListIntArray() ListIntArray {
+	if l.tagType != TagIntArray {
+		return nil
+	}
+	s := make(ListIntArray, len(l.data))
+	for n, v := range l.data {
+		s[n] = v.(IntArray)
+	}
+	return s
+}
+
 type ListBool []Bool
 
 func (l ListBool) Equal(e interface{}) bool {
-	if m, ok := e.(ListBool); ok {
+	m, ok := e.(ListBool)
+	if !ok {
+		var n *ListBool
+		if n, ok = e.(*ListBool); ok {
+			m = *n
+		}
+	}
+	if ok {
 		if len(l) == len(m) {
 			for n, t := range m {
 				if !t.Equal(l[n]) {
@@ -730,6 +912,13 @@ func (l ListBool) Equal(e interface{}) bool {
 			}
 			return true
 		}
+	} else if d, ok := e.(List); ok && d.TagType() == TagBool && d.Len() == len(l) {
+		for i := 0; i < d.Len(); i++ {
+			if !d.Get(i).Equal(l[i]) {
+				return false
+			}
+		}
+		return true
 	}
 	return false
 }
@@ -807,23 +996,41 @@ func (l *ListBool) Insert(i int, d ...Data) error {
 	return nil
 }
 
-func (l *ListBool) Remove(i int) error {
+func (l *ListBool) Remove(i int) {
 	if i >= len(*l) {
-		return nil
+		return
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return nil
+	return
 }
 
 func (l ListBool) Len() int {
 	return len(l)
 }
 
+func (l ListData) ListBool() ListBool {
+	if l.tagType != TagBool {
+		return nil
+	}
+	s := make(ListBool, len(l.data))
+	for n, v := range l.data {
+		s[n] = v.(Bool)
+	}
+	return s
+}
+
 type ListUint8 []Uint8
 
 func (l ListUint8) Equal(e interface{}) bool {
-	if m, ok := e.(ListUint8); ok {
+	m, ok := e.(ListUint8)
+	if !ok {
+		var n *ListUint8
+		if n, ok = e.(*ListUint8); ok {
+			m = *n
+		}
+	}
+	if ok {
 		if len(l) == len(m) {
 			for n, t := range m {
 				if !t.Equal(l[n]) {
@@ -832,6 +1039,13 @@ func (l ListUint8) Equal(e interface{}) bool {
 			}
 			return true
 		}
+	} else if d, ok := e.(List); ok && d.TagType() == TagUint8 && d.Len() == len(l) {
+		for i := 0; i < d.Len(); i++ {
+			if !d.Get(i).Equal(l[i]) {
+				return false
+			}
+		}
+		return true
 	}
 	return false
 }
@@ -909,23 +1123,41 @@ func (l *ListUint8) Insert(i int, d ...Data) error {
 	return nil
 }
 
-func (l *ListUint8) Remove(i int) error {
+func (l *ListUint8) Remove(i int) {
 	if i >= len(*l) {
-		return nil
+		return
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return nil
+	return
 }
 
 func (l ListUint8) Len() int {
 	return len(l)
 }
 
+func (l ListData) ListUint8() ListUint8 {
+	if l.tagType != TagUint8 {
+		return nil
+	}
+	s := make(ListUint8, len(l.data))
+	for n, v := range l.data {
+		s[n] = v.(Uint8)
+	}
+	return s
+}
+
 type ListUint16 []Uint16
 
 func (l ListUint16) Equal(e interface{}) bool {
-	if m, ok := e.(ListUint16); ok {
+	m, ok := e.(ListUint16)
+	if !ok {
+		var n *ListUint16
+		if n, ok = e.(*ListUint16); ok {
+			m = *n
+		}
+	}
+	if ok {
 		if len(l) == len(m) {
 			for n, t := range m {
 				if !t.Equal(l[n]) {
@@ -934,6 +1166,13 @@ func (l ListUint16) Equal(e interface{}) bool {
 			}
 			return true
 		}
+	} else if d, ok := e.(List); ok && d.TagType() == TagUint16 && d.Len() == len(l) {
+		for i := 0; i < d.Len(); i++ {
+			if !d.Get(i).Equal(l[i]) {
+				return false
+			}
+		}
+		return true
 	}
 	return false
 }
@@ -1011,23 +1250,41 @@ func (l *ListUint16) Insert(i int, d ...Data) error {
 	return nil
 }
 
-func (l *ListUint16) Remove(i int) error {
+func (l *ListUint16) Remove(i int) {
 	if i >= len(*l) {
-		return nil
+		return
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return nil
+	return
 }
 
 func (l ListUint16) Len() int {
 	return len(l)
 }
 
+func (l ListData) ListUint16() ListUint16 {
+	if l.tagType != TagUint16 {
+		return nil
+	}
+	s := make(ListUint16, len(l.data))
+	for n, v := range l.data {
+		s[n] = v.(Uint16)
+	}
+	return s
+}
+
 type ListUint32 []Uint32
 
 func (l ListUint32) Equal(e interface{}) bool {
-	if m, ok := e.(ListUint32); ok {
+	m, ok := e.(ListUint32)
+	if !ok {
+		var n *ListUint32
+		if n, ok = e.(*ListUint32); ok {
+			m = *n
+		}
+	}
+	if ok {
 		if len(l) == len(m) {
 			for n, t := range m {
 				if !t.Equal(l[n]) {
@@ -1036,6 +1293,13 @@ func (l ListUint32) Equal(e interface{}) bool {
 			}
 			return true
 		}
+	} else if d, ok := e.(List); ok && d.TagType() == TagUint32 && d.Len() == len(l) {
+		for i := 0; i < d.Len(); i++ {
+			if !d.Get(i).Equal(l[i]) {
+				return false
+			}
+		}
+		return true
 	}
 	return false
 }
@@ -1113,23 +1377,41 @@ func (l *ListUint32) Insert(i int, d ...Data) error {
 	return nil
 }
 
-func (l *ListUint32) Remove(i int) error {
+func (l *ListUint32) Remove(i int) {
 	if i >= len(*l) {
-		return nil
+		return
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return nil
+	return
 }
 
 func (l ListUint32) Len() int {
 	return len(l)
 }
 
+func (l ListData) ListUint32() ListUint32 {
+	if l.tagType != TagUint32 {
+		return nil
+	}
+	s := make(ListUint32, len(l.data))
+	for n, v := range l.data {
+		s[n] = v.(Uint32)
+	}
+	return s
+}
+
 type ListUint64 []Uint64
 
 func (l ListUint64) Equal(e interface{}) bool {
-	if m, ok := e.(ListUint64); ok {
+	m, ok := e.(ListUint64)
+	if !ok {
+		var n *ListUint64
+		if n, ok = e.(*ListUint64); ok {
+			m = *n
+		}
+	}
+	if ok {
 		if len(l) == len(m) {
 			for n, t := range m {
 				if !t.Equal(l[n]) {
@@ -1138,6 +1420,13 @@ func (l ListUint64) Equal(e interface{}) bool {
 			}
 			return true
 		}
+	} else if d, ok := e.(List); ok && d.TagType() == TagUint64 && d.Len() == len(l) {
+		for i := 0; i < d.Len(); i++ {
+			if !d.Get(i).Equal(l[i]) {
+				return false
+			}
+		}
+		return true
 	}
 	return false
 }
@@ -1215,23 +1504,41 @@ func (l *ListUint64) Insert(i int, d ...Data) error {
 	return nil
 }
 
-func (l *ListUint64) Remove(i int) error {
+func (l *ListUint64) Remove(i int) {
 	if i >= len(*l) {
-		return nil
+		return
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return nil
+	return
 }
 
 func (l ListUint64) Len() int {
 	return len(l)
 }
 
+func (l ListData) ListUint64() ListUint64 {
+	if l.tagType != TagUint64 {
+		return nil
+	}
+	s := make(ListUint64, len(l.data))
+	for n, v := range l.data {
+		s[n] = v.(Uint64)
+	}
+	return s
+}
+
 type ListComplex64 []Complex64
 
 func (l ListComplex64) Equal(e interface{}) bool {
-	if m, ok := e.(ListComplex64); ok {
+	m, ok := e.(ListComplex64)
+	if !ok {
+		var n *ListComplex64
+		if n, ok = e.(*ListComplex64); ok {
+			m = *n
+		}
+	}
+	if ok {
 		if len(l) == len(m) {
 			for n, t := range m {
 				if !t.Equal(l[n]) {
@@ -1240,6 +1547,13 @@ func (l ListComplex64) Equal(e interface{}) bool {
 			}
 			return true
 		}
+	} else if d, ok := e.(List); ok && d.TagType() == TagComplex64 && d.Len() == len(l) {
+		for i := 0; i < d.Len(); i++ {
+			if !d.Get(i).Equal(l[i]) {
+				return false
+			}
+		}
+		return true
 	}
 	return false
 }
@@ -1317,23 +1631,41 @@ func (l *ListComplex64) Insert(i int, d ...Data) error {
 	return nil
 }
 
-func (l *ListComplex64) Remove(i int) error {
+func (l *ListComplex64) Remove(i int) {
 	if i >= len(*l) {
-		return nil
+		return
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return nil
+	return
 }
 
 func (l ListComplex64) Len() int {
 	return len(l)
 }
 
+func (l ListData) ListComplex64() ListComplex64 {
+	if l.tagType != TagComplex64 {
+		return nil
+	}
+	s := make(ListComplex64, len(l.data))
+	for n, v := range l.data {
+		s[n] = v.(Complex64)
+	}
+	return s
+}
+
 type ListComplex128 []Complex128
 
 func (l ListComplex128) Equal(e interface{}) bool {
-	if m, ok := e.(ListComplex128); ok {
+	m, ok := e.(ListComplex128)
+	if !ok {
+		var n *ListComplex128
+		if n, ok = e.(*ListComplex128); ok {
+			m = *n
+		}
+	}
+	if ok {
 		if len(l) == len(m) {
 			for n, t := range m {
 				if !t.Equal(l[n]) {
@@ -1342,6 +1674,13 @@ func (l ListComplex128) Equal(e interface{}) bool {
 			}
 			return true
 		}
+	} else if d, ok := e.(List); ok && d.TagType() == TagComplex128 && d.Len() == len(l) {
+		for i := 0; i < d.Len(); i++ {
+			if !d.Get(i).Equal(l[i]) {
+				return false
+			}
+		}
+		return true
 	}
 	return false
 }
@@ -1419,15 +1758,26 @@ func (l *ListComplex128) Insert(i int, d ...Data) error {
 	return nil
 }
 
-func (l *ListComplex128) Remove(i int) error {
+func (l *ListComplex128) Remove(i int) {
 	if i >= len(*l) {
-		return nil
+		return
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return nil
+	return
 }
 
 func (l ListComplex128) Len() int {
 	return len(l)
+}
+
+func (l ListData) ListComplex128() ListComplex128 {
+	if l.tagType != TagComplex128 {
+		return nil
+	}
+	s := make(ListComplex128, len(l.data))
+	for n, v := range l.data {
+		s[n] = v.(Complex128)
+	}
+	return s
 }
