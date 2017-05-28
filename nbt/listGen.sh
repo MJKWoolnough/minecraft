@@ -17,7 +17,14 @@ types=( Byte Short Int Long Float Double IntArray Bool Uint8 Uint16 Uint32 Uint6
 		echo;
 
 		echo "func (l List$type) Equal(e interface{}) bool {";
-		echo "	if m, ok := e.(List$type); ok {";
+		echo "	m, ok := e.(List$type)";
+		echo "	if !ok {";
+		echo "		var n *List$type";
+		echo "		if n, ok = e.(*List$type); ok {";
+		echo "			m = *n";
+		echo "		}";
+		echo "	}";
+		echo "	if ok {";
 		echo "		if len(l) == len(m) {";
 		echo "			for n, t := range m {";
 		echo "				if !t.Equal(l[n]) {"
@@ -26,6 +33,13 @@ types=( Byte Short Int Long Float Double IntArray Bool Uint8 Uint16 Uint32 Uint6
 		echo "			}";
 		echo "			return true";
 		echo "		}";
+		echo "	} else if d, ok := e.(List); ok && d.TagType() == Tag$type && d.Len() == len(l) {";
+		echo "		for i := 0; i < d.Len(); i++ {";
+		echo "			if !d.Get(i).Equal(l[i]) {";
+		echo "				return false";
+		echo "			}";
+		echo "		}";
+		echo "		return true";
 		echo "	}";
 		echo "	return false";
 		echo "}";
