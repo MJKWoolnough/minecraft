@@ -174,21 +174,20 @@ func (d Decoder) decodeList() (List, error) {
 		return nil, err
 	}
 	tagID := TagID(t)
-	l, _, err := d.r.ReadUint32()
+	length, _, err := d.r.ReadUint32()
 	if err != nil {
 		return nil, err
 	}
-	data := make([]Data, l)
-	for i := uint32(0); i < l; i++ {
-		data[i], err = d.decodeData(tagID)
+	l := newListWithLength(tagID, length)
+	var data Data
+	for i := uint32(0); i < length; i++ {
+		data, err = d.decodeData(tagID)
 		if err != nil {
 			return nil, err
 		}
+		l.Append(data)
 	}
-	return &ListData{
-		tagID,
-		data,
-	}, nil
+	return l, nil
 }
 
 // DecodeCompound will read a Compound Data
