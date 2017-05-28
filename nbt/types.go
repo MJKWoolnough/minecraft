@@ -397,18 +397,68 @@ func NewList(data []Data) List {
 			return nil
 		}
 	}
-	return &ListData{
-		tagType,
-		data,
+	l := newListWithLength(tagType, uint32(len(data)))
+	l.Append(data...)
+	return l
+}
+
+func newListWithLength(tagType TagID, length uint32) List {
+	var l List
+	switch tagType {
+	case TagByte:
+		m := make(ListByte, 0, length)
+		l = &m
+	case TagShort:
+		m := make(ListShort, 0, length)
+		l = &m
+	case TagInt:
+		m := make(ListInt, 0, length)
+		l = &m
+	case TagLong:
+		m := make(ListLong, 0, length)
+		l = &m
+	case TagFloat:
+		m := make(ListFloat, 0, length)
+		l = &m
+	case TagDouble:
+		m := make(ListDouble, 0, length)
+		l = &m
+	case TagIntArray:
+		m := make(ListIntArray, 0, length)
+		l = &m
+	case TagBool:
+		m := make(ListBool, 0, length)
+		l = &m
+	case TagUint8:
+		m := make(ListUint8, 0, length)
+		l = &m
+	case TagUint16:
+		m := make(ListUint16, 0, length)
+		l = &m
+	case TagUint32:
+		m := make(ListUint32, 0, length)
+		l = &m
+	case TagUint64:
+		m := make(ListUint64, 0, length)
+		l = &m
+	case TagComplex64:
+		m := make(ListComplex64, 0, length)
+		l = &m
+	case TagComplex128:
+		m := make(ListComplex128, 0, length)
+		l = &m
+	default:
+		l = &ListData{
+			tagType,
+			make([]Data, 0, length),
+		}
 	}
+	return l
 }
 
 // NewEmptyList returns a new empty List Data type, set to the type given
 func NewEmptyList(tagType TagID) List {
-	return &ListData{
-		tagType,
-		make([]Data, 0),
-	}
+	return newListWithLength(tagType, 0)
 }
 
 // TagType returns the TagID of the type of tag this list contains
