@@ -123,22 +123,35 @@ types=( Byte Short Int Long Float Double IntArray Bool Uint8 Uint16 Uint32 Uint6
 
 		echo;
 
-		echo "func (l *List$type) Remove(i int) error {";
+		echo "func (l *List$type) Remove(i int) {";
 		echo "	if i >= len(*l) {";
-		echo "		return nil";
+		echo "		return";
 		echo "	}";
 		echo "	copy((*l)[i:], (*l)[i+1:])";
 		if [ "$type" = "List" -o "$type" = "Compound" ]; then
 			echo "	(*l)[i] = nil";
 		fi;
 		echo "	*l = (*l)[:len(*l)-1]";
-		echo "	return nil";
+		echo "	return";
 		echo "}";
 
 		echo;
 
 		echo "func (l List$type) Len() int {";
 		echo "	return len(l)";
+		echo "}";
+
+		echo;
+
+		echo "func (l ListData) List$type() List$type {";
+		echo "	if l.tagType != Tag$type {";
+		echo "		return nil";
+		echo "	}";
+		echo "	s := make(List$type, len(l.data))";
+		echo "	for n, v := range l.data {";
+		echo "		s[n] = v.($type)";
+		echo "	}";
+		echo "	return s";
 		echo "}";
 	done;
 
