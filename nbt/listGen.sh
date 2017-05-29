@@ -1,6 +1,6 @@
 #!/bin/bash
 
-types=( Byte Short Int Long Float Double IntArray Bool Uint8 Uint16 Uint32 Uint64 Complex64 Complex128 );
+types=( Byte Short Int Long Float Double Compound IntArray Bool Uint8 Uint16 Uint32 Uint64 Complex64 Complex128 );
 
 {
 	echo "// file automatically generated with listGen.sh";

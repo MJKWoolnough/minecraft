@@ -766,6 +766,134 @@ func (l ListData) ListDouble() ListDouble {
 	return s
 }
 
+type ListCompound []Compound
+
+func (l ListCompound) Equal(e interface{}) bool {
+	m, ok := e.(ListCompound)
+	if !ok {
+		var n *ListCompound
+		if n, ok = e.(*ListCompound); ok {
+			m = *n
+		}
+	}
+	if ok {
+		if len(l) == len(m) {
+			for n, t := range m {
+				if !t.Equal(l[n]) {
+					return false
+				}
+			}
+			return true
+		}
+	} else if d, ok := e.(List); ok && d.TagType() == TagCompound && d.Len() == len(l) {
+		for i := 0; i < d.Len(); i++ {
+			if !d.Get(i).Equal(l[i]) {
+				return false
+			}
+		}
+		return true
+	}
+	return false
+}
+
+func (l ListCompound) Copy() Data {
+	m := make(ListCompound, len(l))
+	for n, e := range l {
+		m[n] = e.Copy().(Compound)
+	}
+	return m
+}
+
+func (l ListCompound) String() string {
+	s := strconv.Itoa(len(l)) + " entries of type Compound {"
+	for _, d := range l {
+		s += "\n        Compound: " + indent(d.String())
+	}
+	return s + "\n}"
+}
+
+func (ListCompound) Type() TagID {
+	return TagList
+}
+
+func (ListCompound) TagType() TagID {
+	return TagCompound
+}
+
+func (l ListCompound) Set(i int, d Data) error {
+	if m, ok := d.(Compound); ok {
+		if i <= 0 || i >= int(len(l)) {
+			return ErrBadRange
+		}
+		l[i] = m
+	} else {
+		return &WrongTag{TagCompound, d.Type()}
+	}
+	return nil
+}
+
+func (l ListCompound) Get(i int) Data {
+	return l[i]
+}
+
+func (l ListCompound) GetCompound(i int) Compound {
+	return l[i]
+}
+
+func (l *ListCompound) Append(d ...Data) error {
+	toAppend := make(ListCompound, len(d))
+	for n, e := range d {
+		if f, ok := e.(Compound); ok {
+			toAppend[n] = f
+		} else {
+			return &WrongTag{TagCompound, e.Type()}
+		}
+	}
+	*l = append(*l, toAppend...)
+	return nil
+}
+
+func (l *ListCompound) Insert(i int, d ...Data) error {
+	if i >= len(*l) {
+		return l.Append(d...)
+	}
+	toInsert := make(ListCompound, len(d), len(d)+len(*l)-int(i))
+	for n, e := range d {
+		if f, ok := e.(Compound); ok {
+			toInsert[n] = f
+		} else {
+			return &WrongTag{TagCompound, e.Type()}
+		}
+	}
+	*l = append((*l)[:i], append(toInsert, (*l)[i:]...)...)
+	return nil
+}
+
+func (l *ListCompound) Remove(i int) {
+	if i >= len(*l) {
+		return
+	}
+	copy((*l)[i:], (*l)[i+1:])
+	(*l)[i] = nil
+	*l = (*l)[:len(*l)-1]
+	return
+}
+
+func (l ListCompound) Len() int {
+	return len(l)
+}
+
+func (l ListData) ListCompound() ListCompound {
+	if l.tagType != TagCompound {
+		return nil
+	}
+	s := make(ListCompound, len(l.data))
+	for n, v := range l.data {
+		s[n] = v.(Compound)
+	}
+	return s
+}
+
 type ListIntArray []IntArray
 
 func (l ListIntArray) Equal(e interface{}) bool {
