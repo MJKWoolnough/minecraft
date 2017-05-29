@@ -389,7 +389,7 @@ type ListData struct {
 // the same Data type
 func NewList(data []Data) List {
 	if len(data) == 0 {
-		return &ListData{TagByte, data}
+		return &ListByte{}
 	}
 	tagType := data[0].Type()
 	for i := 1; i < len(data); i++ {
