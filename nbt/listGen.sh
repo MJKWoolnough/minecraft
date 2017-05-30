@@ -106,12 +106,6 @@ types=( Byte Short Int Long Float Double Compound IntArray Bool Uint8 Uint16 Uin
 
 		echo;
 
-		echo "func (l List$type) Get$type(i int) $type {";
-		echo "	return l[i]";
-		echo "}";
-
-		echo;
-
 		echo "// Append adds data to the list";
 		echo "func (l *List$type) Append(d ...Data) error {";
 		echo "	toAppend := make(List$type, len(d))";
