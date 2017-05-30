@@ -45,6 +45,6 @@ func (w WrongTag) Error() string {
 	return "expecting tag id " + w.Expecting.String() + ", got " + w.Got.String()
 }
 
-// BadRange is an error that occurs when trying to set an item on a list which
+// ErrBadRange is an error that occurs when trying to set an item on a list which
 // is outside of the current limits of the list.
 var ErrBadRange = errors.New("given index was out-of-range")
