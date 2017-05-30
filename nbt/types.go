@@ -406,6 +406,8 @@ func NewList(data []Data) List {
 func newListWithLength(tagType TagID, length uint32) List {
 	var l List
 	switch tagType {
+	case TagEnd:
+		l = new(ListEnd)
 	case TagByte:
 		m := make(ListByte, 0, length)
 		l = &m
