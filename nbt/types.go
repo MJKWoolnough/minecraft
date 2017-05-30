@@ -368,6 +368,7 @@ func (String) Type() TagID {
 	return TagString
 }
 
+// List interface descibes the methods for the lists of different data types
 type List interface {
 	Data
 	Set(int, Data) error
@@ -379,7 +380,7 @@ type List interface {
 	TagType() TagID
 }
 
-// List is an implementation of the Data interface
+// ListData is an implementation of the Data interface
 type ListData struct {
 	tagType TagID
 	data    []Data
