@@ -14,7 +14,7 @@ func (l ListEnd) Equal(e interface{}) bool {
 
 // Copy simply returns a deep-copy the the data
 func (l ListEnd) Copy() Data {
-	return l
+	return &l
 }
 
 func (l ListEnd) String() string {

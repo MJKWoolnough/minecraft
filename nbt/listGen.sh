@@ -55,7 +55,7 @@ types=( Byte Short Int Long Float Double Compound IntArray Bool Uint8 Uint16 Uin
 		echo "	for n, e := range l {";
 		echo "		m[n] = e.Copy().($type)";
 		echo "	}";
-		echo "	return m";
+		echo "	return &m";
 		echo "}";
 
 		echo;
