@@ -24,7 +24,7 @@ func TestNew(t *testing.T) {
 			nbt.NewTag("HeightMap", make(nbt.IntArray, 256)),
 			nbt.NewTag("InhabitedTime", nbt.Long(0)),
 			nbt.NewTag("LastUpdate", nbt.Long(0)),
-			nbt.NewTag("Sections", nbt.NewList([]nbt.Data{
+			nbt.NewTag("Sections", &nbt.ListCompound{
 				nbt.Compound{
 					nbt.NewTag("Blocks", blocks),
 					nbt.NewTag("Add", add),
@@ -57,8 +57,8 @@ func TestNew(t *testing.T) {
 					nbt.NewTag("SkyLight", make(nbt.ByteArray, 2048)),
 					nbt.NewTag("Y", nbt.Byte(10)),
 				},
-			})),
-			nbt.NewTag("TileEntities", nbt.NewList([]nbt.Data{
+			}),
+			nbt.NewTag("TileEntities", &nbt.ListCompound{
 				nbt.Compound{
 					nbt.NewTag("id", nbt.String("test1")),
 					nbt.NewTag("x", nbt.Int(-191)),
@@ -73,24 +73,24 @@ func TestNew(t *testing.T) {
 					nbt.NewTag("z", nbt.Int(372)),
 					nbt.NewTag("testTag", nbt.Long(8)),
 				},
-			})),
-			nbt.NewTag("Entities", nbt.NewList([]nbt.Data{
+			}),
+			nbt.NewTag("Entities", &nbt.ListCompound{
 				nbt.Compound{
 					nbt.NewTag("id", nbt.String("testEntity1")),
-					nbt.NewTag("Pos", nbt.NewList([]nbt.Data{
+					nbt.NewTag("Pos", &nbt.ListDouble{
 						nbt.Double(-190),
 						nbt.Double(13),
 						nbt.Double(375),
-					})),
-					nbt.NewTag("Motion", nbt.NewList([]nbt.Data{
+					}),
+					nbt.NewTag("Motion", &nbt.ListDouble{
 						nbt.Double(1),
 						nbt.Double(13),
 						nbt.Double(11),
-					})),
-					nbt.NewTag("Rotation", nbt.NewList([]nbt.Data{
+					}),
+					nbt.NewTag("Rotation", &nbt.ListFloat{
 						nbt.Float(13),
 						nbt.Float(11),
-					})),
+					}),
 					nbt.NewTag("FallDistance", nbt.Float(0)),
 					nbt.NewTag("Fire", nbt.Short(-1)),
 					nbt.NewTag("Air", nbt.Short(300)),
@@ -104,20 +104,20 @@ func TestNew(t *testing.T) {
 				},
 				nbt.Compound{
 					nbt.NewTag("id", nbt.String("testEntity2")),
-					nbt.NewTag("Pos", nbt.NewList([]nbt.Data{
+					nbt.NewTag("Pos", &nbt.ListDouble{
 						nbt.Double(-186),
 						nbt.Double(2),
 						nbt.Double(378),
-					})),
-					nbt.NewTag("Motion", nbt.NewList([]nbt.Data{
+					}),
+					nbt.NewTag("Motion", &nbt.ListDouble{
 						nbt.Double(17.5),
 						nbt.Double(1000),
 						nbt.Double(54),
-					})),
-					nbt.NewTag("Rotation", nbt.NewList([]nbt.Data{
+					}),
+					nbt.NewTag("Rotation", &nbt.ListFloat{
 						nbt.Float(11),
 						nbt.Float(13),
-					})),
+					}),
 					nbt.NewTag("FallDistance", nbt.Float(30)),
 					nbt.NewTag("Fire", nbt.Short(4)),
 					nbt.NewTag("Air", nbt.Short(30)),
@@ -129,8 +129,8 @@ func TestNew(t *testing.T) {
 					nbt.NewTag("UUIDLease", nbt.Long(6435)),
 					nbt.NewTag("Riding", nbt.Compound{}),
 				},
-			})),
-			nbt.NewTag("TileTicks", nbt.NewList([]nbt.Data{
+			}),
+			nbt.NewTag("TileTicks", &nbt.ListCompound{
 				nbt.Compound{
 					nbt.NewTag("i", nbt.Int(0)),
 					nbt.NewTag("t", nbt.Int(0)),
@@ -147,7 +147,7 @@ func TestNew(t *testing.T) {
 					nbt.NewTag("y", nbt.Int(11)),
 					nbt.NewTag("z", nbt.Int(381)),
 				},
-			})),
+			}),
 			nbt.NewTag("TerrainPopulated", nbt.Byte(1)),
 			nbt.NewTag("xPos", nbt.Int(-12)),
 			nbt.NewTag("zPos", nbt.Int(23)),

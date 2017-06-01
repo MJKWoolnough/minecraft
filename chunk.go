@@ -52,13 +52,14 @@ func (c *chunk) GetNBT() nbt.Tag {
 	sectionList := nbt.NewEmptyList(nbt.TagCompound)
 	sectionList.Append(sections...)
 	data.Set(nbt.NewTag("Sections", sectionList))
-	var tileEntities, tileTicks []nbt.Data
+	tileEntities := make(nbt.ListCompound, 0, len(c.tileEntities))
 	for _, cmp := range c.tileEntities {
 		if cmp != nil {
 			tileEntities = append(tileEntities, cmp)
 		}
 	}
-	data.Set(nbt.NewTag("TileEntities", nbt.NewList(tileEntities)))
+	data.Set(nbt.NewTag("TileEntities", &tileEntities))
+	tileTicks := make(nbt.ListCompound, 0, len(c.tileTicks))
 	for _, cmpa := range c.tileTicks {
 		for _, cmp := range cmpa {
 			tileTicks = append(tileTicks, cmp)
@@ -67,7 +68,7 @@ func (c *chunk) GetNBT() nbt.Tag {
 	if len(tileTicks) == 0 {
 		data.Remove("TileTicks")
 	} else {
-		data.Set(nbt.NewTag("TileTicks", nbt.NewList(tileTicks)))
+		data.Set(nbt.NewTag("TileTicks", &tileTicks))
 	}
 	return nbt.NewTag("", nbt.Compound{nbt.NewTag("Level", data)})
 }
@@ -151,8 +152,8 @@ func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
 	c.heightMap = c.data.Get("HeightMap").Data().(nbt.IntArray)
 	c.tileEntities = make(map[uint16]nbt.Compound)
 	if tileEntities := c.data.Get("TileEntities"); tileEntities.TagID() != 0 {
-		if lTileEntities, ok := tileEntities.Data().(nbt.List); ok {
-			for i := 0; i < lTileEntities.Len(); i++ {
+		if lTileEntities, ok := tileEntities.Data().(*nbt.ListCompound); ok {
+			for _, tag := range *lTileEntities {
 				tag := lTileEntities.Get(i).(nbt.Compound)
 				if tag == nil {
 					return nil, MissingTagError{"TileEntities->Child"}
@@ -168,9 +169,8 @@ func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
 	c.data.Remove("TileEntities")
 	c.tileTicks = make(map[uint16][]nbt.Compound)
 	if tileTicks := c.data.Get("TileTicks"); tileTicks.TagID() != 0 {
-		if lTileTicks, ok := tileTicks.Data().(nbt.List); ok {
-			for i := 0; i < lTileTicks.Len(); i++ {
-				tag := lTileTicks.Get(i).(nbt.Compound)
+		if lTileTicks, ok := tileTicks.Data().(*nbt.ListCompound); ok {
+			for _, tag := range *lTileTicks {
 				if tag == nil {
 					return nil, MissingTagError{"TileTicks->Child"}
 				}
@@ -199,9 +199,7 @@ func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
 		}
 	}
 	c.data.Remove("TileTicks")
-	sections := c.data.Get("Sections").Data().(nbt.List)
-	for i := 0; i < sections.Len(); i++ {
-		section := sections.Get(i).(nbt.Compound)
+	for _, section := range *(c.data.Get("Sections").Data().(*nbt.ListCompound)) {
 		if yc := section.Get("Y"); yc.TagID() == 0 {
 			return nil, MissingTagError{"Sections->Child->Y"}
 		} else if yc.TagID() != nbt.TagByte {
