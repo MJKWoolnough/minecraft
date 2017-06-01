@@ -426,6 +426,9 @@ func newListWithLength(tagType TagID, length uint32) List {
 	case TagDouble:
 		m := make(ListDouble, 0, length)
 		l = &m
+	case TagCompound:
+		m := make(ListCompound, 0, length)
+		l = &m
 	case TagIntArray:
 		m := make(ListIntArray, 0, length)
 		l = &m
