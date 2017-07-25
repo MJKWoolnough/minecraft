@@ -55,17 +55,17 @@ func NewFilePath(dirname string) (*FilePath, error) {
 }
 
 type stickyEndianSeeker struct {
-	byteio.StickyWriter
+	byteio.StickyBigEndianWriter
 	io.Seeker
 }
 
 func (s *stickyEndianSeeker) Seek(offset int64, whence int) (int64, error) {
-	if s.StickyWriter.Err != nil {
-		return 0, s.StickyWriter.Err
+	if s.StickyBigEndianWriter.Err != nil {
+		return 0, s.StickyBigEndianWriter.Err
 	}
 	var n int64
-	n, s.StickyWriter.Err = s.Seeker.Seek(offset, whence)
-	return n, s.StickyWriter.Err
+	n, s.StickyBigEndianWriter.Err = s.Seeker.Seek(offset, whence)
+	return n, s.StickyBigEndianWriter.Err
 }
 
 // NewFilePathDimension create a new FilePath, but with the option to set the
@@ -237,7 +237,7 @@ func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
 		positions[i], _, _ = posr.ReadUint32()
 	}
 	var todoChunks []rc
-	bew := stickyEndianSeeker{byteio.StickyWriter{Writer: &byteio.BigEndianWriter{Writer: f}}, f}
+	bew := stickyEndianSeeker{byteio.StickyBigEndianWriter{Writer: f}, f}
 	for _, chunk := range chunks {
 		newSize := uint32(len(chunk.buf)+5) >> 12
 		if uint32(len(chunk.buf))&4095 > 0 {
