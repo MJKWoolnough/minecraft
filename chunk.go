@@ -154,7 +154,6 @@ func newChunk(x, z int32, data nbt.Tag) (*chunk, error) {
 	if tileEntities := c.data.Get("TileEntities"); tileEntities.TagID() != 0 {
 		if lTileEntities, ok := tileEntities.Data().(*nbt.ListCompound); ok {
 			for _, tag := range *lTileEntities {
-				tag := lTileEntities.Get(i).(nbt.Compound)
 				if tag == nil {
 					return nil, MissingTagError{"TileEntities->Child"}
 				}
