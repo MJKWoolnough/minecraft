@@ -106,7 +106,9 @@ func (p *FilePath) GetChunk(x, z int32) (nbt.Tag, error) {
 	be := byteio.BigEndianReader{Reader: f}
 
 	locationSize, _, err := be.ReadUint32()
-	if locationSize>>8 == 0 {
+	if err != nil {
+		return nbt.Tag{}, err
+	} else if locationSize>>8 == 0 {
 		return nbt.Tag{}, nil
 	} else if _, err = f.Seek(int64(locationSize>>8<<12), io.SeekStart); err != nil {
 		return nbt.Tag{}, err
