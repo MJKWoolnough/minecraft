@@ -2,7 +2,8 @@
 --
     import "github.com/MJKWoolnough/minecraft"
 
-Package minecraft is a level viewer/editor for the popular creative game minecraft
+Package minecraft is a level viewer/editor for the popular creative game
+### minecraft
 
 ## Usage
 
