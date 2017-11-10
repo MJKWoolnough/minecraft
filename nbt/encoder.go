@@ -90,10 +90,7 @@ func (e Encoder) encodeData(d Data) error {
 			err = UnknownTag{d.Type()}
 		}
 	}
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // EncodeByte will write a single Byte Data
