@@ -442,10 +442,7 @@ func (p *FilePath) Lock() error {
 	bew := byteio.BigEndianWriter{Writer: f}
 	_, err = bew.WriteUint64(uint64(p.lock))
 	f.Close()
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // Defrag rewrites a region file to reduce wasted space.
@@ -584,7 +581,7 @@ func (m *MemPath) read(buf memio.Buffer) (nbt.Tag, error) {
 	return data, err
 }
 
-func (m *MemPath) write(data nbt.Tag, buf *memio.Buffer) error {
+func (m *MemPath) write(data nbt.Tag, buf io.Writer) error {
 	z := zlib.NewWriter(buf)
 	defer z.Close()
 	err := nbt.Encode(z, data)
