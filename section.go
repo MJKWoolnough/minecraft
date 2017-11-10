@@ -133,7 +133,7 @@ func (s *section) GetBlock(x, y, z int32) Block {
 func (s *section) SetBlock(x, y, z int32, b Block) {
 	s.blocks[yzx(x, y, z)] = int8(b.ID & 255)
 	setNibble(s.add, x, y, z, byte(b.ID>>8))
-	setNibble(s.data, x, y, z, byte(b.Data))
+	setNibble(s.data, x, y, z, b.Data)
 }
 
 func (s *section) GetOpacity(x, y, z int32) uint8 {
