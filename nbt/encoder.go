@@ -196,6 +196,9 @@ func (e Encoder) encodeCompound(c Compound) error {
 // EncodeIntArray will write a IntArray Data
 func (e Encoder) encodeIntArray(ints IntArray) error {
 	_, err := e.w.WriteUint32(uint32(len(ints)))
+	if err != nil {
+		return err
+	}
 	for _, i := range ints {
 		_, err = e.w.WriteInt32(i)
 		if err != nil {
