@@ -884,13 +884,13 @@ func (c Complex128) Equal(e interface{}) bool {
 func (c Complex128) String() string {
 	var str string
 	if real(c) != 0 {
-		str = strconv.FormatFloat(float64(real(c)), 'g', -1, 64)
+		str = strconv.FormatFloat(real(c), 'g', -1, 64)
 	}
 	if imag(c) != 0 {
 		if len(str) != 0 {
 			str += "+"
 		}
-		str += strconv.FormatFloat(float64(imag(c)), 'g', -1, 64) + "i"
+		str += strconv.FormatFloat(imag(c), 'g', -1, 64) + "i"
 	}
 	return str
 }
