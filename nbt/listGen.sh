@@ -87,7 +87,7 @@ types=( Byte Short Int Long Float Double Compound IntArray Bool Uint8 Uint16 Uin
 		echo "// Set sets the data at the given position. It does not append";
 		echo "func (l List$type) Set(i int, d Data) error {";
 		echo "	if m, ok := d.($type); ok {";
-		echo "		if i <= 0 || i >= int(len(l)) {";
+		echo "		if i <= 0 || i >= len(l) {";
 		echo "			return ErrBadRange";
 		echo "		}";
 		echo "		l[i] = m";
@@ -128,7 +128,7 @@ types=( Byte Short Int Long Float Double Compound IntArray Bool Uint8 Uint16 Uin
 		echo "	if i >= len(*l) {";
 		echo "		return l.Append(d...)";
 		echo "	}";
-		echo "	toInsert := make(List$type, len(d), len(d)+len(*l)-int(i))";
+		echo "	toInsert := make(List$type, len(d), len(d)+len(*l)-i)";
 		echo "	for n, e := range d {";
 		echo "		if f, ok := e.($type); ok {";
 		echo "			toInsert[n] = f";	
@@ -152,7 +152,6 @@ types=( Byte Short Int Long Float Double Compound IntArray Bool Uint8 Uint16 Uin
 			echo "	(*l)[i] = nil";
 		fi;
 		echo "	*l = (*l)[:len(*l)-1]";
-		echo "	return";
 		echo "}";
 
 		echo;
