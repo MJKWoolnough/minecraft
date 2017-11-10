@@ -67,7 +67,7 @@ func (ListByte) TagType() TagID {
 // Set sets the data at the given position. It does not append
 func (l ListByte) Set(i int, d Data) error {
 	if m, ok := d.(Byte); ok {
-		if i <= 0 || i >= int(len(l)) {
+		if i <= 0 || i >= len(l) {
 			return ErrBadRange
 		}
 		l[i] = m
@@ -102,7 +102,7 @@ func (l *ListByte) Insert(i int, d ...Data) error {
 	if i >= len(*l) {
 		return l.Append(d...)
 	}
-	toInsert := make(ListByte, len(d), len(d)+len(*l)-int(i))
+	toInsert := make(ListByte, len(d), len(d)+len(*l)-i)
 	for n, e := range d {
 		if f, ok := e.(Byte); ok {
 			toInsert[n] = f
@@ -121,7 +121,6 @@ func (l *ListByte) Remove(i int) {
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return
 }
 
 // Len returns the length of the list
@@ -204,7 +203,7 @@ func (ListShort) TagType() TagID {
 // Set sets the data at the given position. It does not append
 func (l ListShort) Set(i int, d Data) error {
 	if m, ok := d.(Short); ok {
-		if i <= 0 || i >= int(len(l)) {
+		if i <= 0 || i >= len(l) {
 			return ErrBadRange
 		}
 		l[i] = m
@@ -239,7 +238,7 @@ func (l *ListShort) Insert(i int, d ...Data) error {
 	if i >= len(*l) {
 		return l.Append(d...)
 	}
-	toInsert := make(ListShort, len(d), len(d)+len(*l)-int(i))
+	toInsert := make(ListShort, len(d), len(d)+len(*l)-i)
 	for n, e := range d {
 		if f, ok := e.(Short); ok {
 			toInsert[n] = f
@@ -258,7 +257,6 @@ func (l *ListShort) Remove(i int) {
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return
 }
 
 // Len returns the length of the list
@@ -341,7 +339,7 @@ func (ListInt) TagType() TagID {
 // Set sets the data at the given position. It does not append
 func (l ListInt) Set(i int, d Data) error {
 	if m, ok := d.(Int); ok {
-		if i <= 0 || i >= int(len(l)) {
+		if i <= 0 || i >= len(l) {
 			return ErrBadRange
 		}
 		l[i] = m
@@ -376,7 +374,7 @@ func (l *ListInt) Insert(i int, d ...Data) error {
 	if i >= len(*l) {
 		return l.Append(d...)
 	}
-	toInsert := make(ListInt, len(d), len(d)+len(*l)-int(i))
+	toInsert := make(ListInt, len(d), len(d)+len(*l)-i)
 	for n, e := range d {
 		if f, ok := e.(Int); ok {
 			toInsert[n] = f
@@ -395,7 +393,6 @@ func (l *ListInt) Remove(i int) {
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return
 }
 
 // Len returns the length of the list
@@ -478,7 +475,7 @@ func (ListLong) TagType() TagID {
 // Set sets the data at the given position. It does not append
 func (l ListLong) Set(i int, d Data) error {
 	if m, ok := d.(Long); ok {
-		if i <= 0 || i >= int(len(l)) {
+		if i <= 0 || i >= len(l) {
 			return ErrBadRange
 		}
 		l[i] = m
@@ -513,7 +510,7 @@ func (l *ListLong) Insert(i int, d ...Data) error {
 	if i >= len(*l) {
 		return l.Append(d...)
 	}
-	toInsert := make(ListLong, len(d), len(d)+len(*l)-int(i))
+	toInsert := make(ListLong, len(d), len(d)+len(*l)-i)
 	for n, e := range d {
 		if f, ok := e.(Long); ok {
 			toInsert[n] = f
@@ -532,7 +529,6 @@ func (l *ListLong) Remove(i int) {
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return
 }
 
 // Len returns the length of the list
@@ -615,7 +611,7 @@ func (ListFloat) TagType() TagID {
 // Set sets the data at the given position. It does not append
 func (l ListFloat) Set(i int, d Data) error {
 	if m, ok := d.(Float); ok {
-		if i <= 0 || i >= int(len(l)) {
+		if i <= 0 || i >= len(l) {
 			return ErrBadRange
 		}
 		l[i] = m
@@ -650,7 +646,7 @@ func (l *ListFloat) Insert(i int, d ...Data) error {
 	if i >= len(*l) {
 		return l.Append(d...)
 	}
-	toInsert := make(ListFloat, len(d), len(d)+len(*l)-int(i))
+	toInsert := make(ListFloat, len(d), len(d)+len(*l)-i)
 	for n, e := range d {
 		if f, ok := e.(Float); ok {
 			toInsert[n] = f
@@ -669,7 +665,6 @@ func (l *ListFloat) Remove(i int) {
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return
 }
 
 // Len returns the length of the list
@@ -752,7 +747,7 @@ func (ListDouble) TagType() TagID {
 // Set sets the data at the given position. It does not append
 func (l ListDouble) Set(i int, d Data) error {
 	if m, ok := d.(Double); ok {
-		if i <= 0 || i >= int(len(l)) {
+		if i <= 0 || i >= len(l) {
 			return ErrBadRange
 		}
 		l[i] = m
@@ -787,7 +782,7 @@ func (l *ListDouble) Insert(i int, d ...Data) error {
 	if i >= len(*l) {
 		return l.Append(d...)
 	}
-	toInsert := make(ListDouble, len(d), len(d)+len(*l)-int(i))
+	toInsert := make(ListDouble, len(d), len(d)+len(*l)-i)
 	for n, e := range d {
 		if f, ok := e.(Double); ok {
 			toInsert[n] = f
@@ -806,7 +801,6 @@ func (l *ListDouble) Remove(i int) {
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return
 }
 
 // Len returns the length of the list
@@ -889,7 +883,7 @@ func (ListCompound) TagType() TagID {
 // Set sets the data at the given position. It does not append
 func (l ListCompound) Set(i int, d Data) error {
 	if m, ok := d.(Compound); ok {
-		if i <= 0 || i >= int(len(l)) {
+		if i <= 0 || i >= len(l) {
 			return ErrBadRange
 		}
 		l[i] = m
@@ -924,7 +918,7 @@ func (l *ListCompound) Insert(i int, d ...Data) error {
 	if i >= len(*l) {
 		return l.Append(d...)
 	}
-	toInsert := make(ListCompound, len(d), len(d)+len(*l)-int(i))
+	toInsert := make(ListCompound, len(d), len(d)+len(*l)-i)
 	for n, e := range d {
 		if f, ok := e.(Compound); ok {
 			toInsert[n] = f
@@ -944,7 +938,6 @@ func (l *ListCompound) Remove(i int) {
 	copy((*l)[i:], (*l)[i+1:])
 	(*l)[i] = nil
 	*l = (*l)[:len(*l)-1]
-	return
 }
 
 // Len returns the length of the list
@@ -1027,7 +1020,7 @@ func (ListIntArray) TagType() TagID {
 // Set sets the data at the given position. It does not append
 func (l ListIntArray) Set(i int, d Data) error {
 	if m, ok := d.(IntArray); ok {
-		if i <= 0 || i >= int(len(l)) {
+		if i <= 0 || i >= len(l) {
 			return ErrBadRange
 		}
 		l[i] = m
@@ -1062,7 +1055,7 @@ func (l *ListIntArray) Insert(i int, d ...Data) error {
 	if i >= len(*l) {
 		return l.Append(d...)
 	}
-	toInsert := make(ListIntArray, len(d), len(d)+len(*l)-int(i))
+	toInsert := make(ListIntArray, len(d), len(d)+len(*l)-i)
 	for n, e := range d {
 		if f, ok := e.(IntArray); ok {
 			toInsert[n] = f
@@ -1081,7 +1074,6 @@ func (l *ListIntArray) Remove(i int) {
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return
 }
 
 // Len returns the length of the list
@@ -1164,7 +1156,7 @@ func (ListBool) TagType() TagID {
 // Set sets the data at the given position. It does not append
 func (l ListBool) Set(i int, d Data) error {
 	if m, ok := d.(Bool); ok {
-		if i <= 0 || i >= int(len(l)) {
+		if i <= 0 || i >= len(l) {
 			return ErrBadRange
 		}
 		l[i] = m
@@ -1199,7 +1191,7 @@ func (l *ListBool) Insert(i int, d ...Data) error {
 	if i >= len(*l) {
 		return l.Append(d...)
 	}
-	toInsert := make(ListBool, len(d), len(d)+len(*l)-int(i))
+	toInsert := make(ListBool, len(d), len(d)+len(*l)-i)
 	for n, e := range d {
 		if f, ok := e.(Bool); ok {
 			toInsert[n] = f
@@ -1218,7 +1210,6 @@ func (l *ListBool) Remove(i int) {
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return
 }
 
 // Len returns the length of the list
@@ -1301,7 +1292,7 @@ func (ListUint8) TagType() TagID {
 // Set sets the data at the given position. It does not append
 func (l ListUint8) Set(i int, d Data) error {
 	if m, ok := d.(Uint8); ok {
-		if i <= 0 || i >= int(len(l)) {
+		if i <= 0 || i >= len(l) {
 			return ErrBadRange
 		}
 		l[i] = m
@@ -1336,7 +1327,7 @@ func (l *ListUint8) Insert(i int, d ...Data) error {
 	if i >= len(*l) {
 		return l.Append(d...)
 	}
-	toInsert := make(ListUint8, len(d), len(d)+len(*l)-int(i))
+	toInsert := make(ListUint8, len(d), len(d)+len(*l)-i)
 	for n, e := range d {
 		if f, ok := e.(Uint8); ok {
 			toInsert[n] = f
@@ -1355,7 +1346,6 @@ func (l *ListUint8) Remove(i int) {
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return
 }
 
 // Len returns the length of the list
@@ -1438,7 +1428,7 @@ func (ListUint16) TagType() TagID {
 // Set sets the data at the given position. It does not append
 func (l ListUint16) Set(i int, d Data) error {
 	if m, ok := d.(Uint16); ok {
-		if i <= 0 || i >= int(len(l)) {
+		if i <= 0 || i >= len(l) {
 			return ErrBadRange
 		}
 		l[i] = m
@@ -1473,7 +1463,7 @@ func (l *ListUint16) Insert(i int, d ...Data) error {
 	if i >= len(*l) {
 		return l.Append(d...)
 	}
-	toInsert := make(ListUint16, len(d), len(d)+len(*l)-int(i))
+	toInsert := make(ListUint16, len(d), len(d)+len(*l)-i)
 	for n, e := range d {
 		if f, ok := e.(Uint16); ok {
 			toInsert[n] = f
@@ -1492,7 +1482,6 @@ func (l *ListUint16) Remove(i int) {
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return
 }
 
 // Len returns the length of the list
@@ -1575,7 +1564,7 @@ func (ListUint32) TagType() TagID {
 // Set sets the data at the given position. It does not append
 func (l ListUint32) Set(i int, d Data) error {
 	if m, ok := d.(Uint32); ok {
-		if i <= 0 || i >= int(len(l)) {
+		if i <= 0 || i >= len(l) {
 			return ErrBadRange
 		}
 		l[i] = m
@@ -1610,7 +1599,7 @@ func (l *ListUint32) Insert(i int, d ...Data) error {
 	if i >= len(*l) {
 		return l.Append(d...)
 	}
-	toInsert := make(ListUint32, len(d), len(d)+len(*l)-int(i))
+	toInsert := make(ListUint32, len(d), len(d)+len(*l)-i)
 	for n, e := range d {
 		if f, ok := e.(Uint32); ok {
 			toInsert[n] = f
@@ -1629,7 +1618,6 @@ func (l *ListUint32) Remove(i int) {
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return
 }
 
 // Len returns the length of the list
@@ -1712,7 +1700,7 @@ func (ListUint64) TagType() TagID {
 // Set sets the data at the given position. It does not append
 func (l ListUint64) Set(i int, d Data) error {
 	if m, ok := d.(Uint64); ok {
-		if i <= 0 || i >= int(len(l)) {
+		if i <= 0 || i >= len(l) {
 			return ErrBadRange
 		}
 		l[i] = m
@@ -1747,7 +1735,7 @@ func (l *ListUint64) Insert(i int, d ...Data) error {
 	if i >= len(*l) {
 		return l.Append(d...)
 	}
-	toInsert := make(ListUint64, len(d), len(d)+len(*l)-int(i))
+	toInsert := make(ListUint64, len(d), len(d)+len(*l)-i)
 	for n, e := range d {
 		if f, ok := e.(Uint64); ok {
 			toInsert[n] = f
@@ -1766,7 +1754,6 @@ func (l *ListUint64) Remove(i int) {
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return
 }
 
 // Len returns the length of the list
@@ -1849,7 +1836,7 @@ func (ListComplex64) TagType() TagID {
 // Set sets the data at the given position. It does not append
 func (l ListComplex64) Set(i int, d Data) error {
 	if m, ok := d.(Complex64); ok {
-		if i <= 0 || i >= int(len(l)) {
+		if i <= 0 || i >= len(l) {
 			return ErrBadRange
 		}
 		l[i] = m
@@ -1884,7 +1871,7 @@ func (l *ListComplex64) Insert(i int, d ...Data) error {
 	if i >= len(*l) {
 		return l.Append(d...)
 	}
-	toInsert := make(ListComplex64, len(d), len(d)+len(*l)-int(i))
+	toInsert := make(ListComplex64, len(d), len(d)+len(*l)-i)
 	for n, e := range d {
 		if f, ok := e.(Complex64); ok {
 			toInsert[n] = f
@@ -1903,7 +1890,6 @@ func (l *ListComplex64) Remove(i int) {
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return
 }
 
 // Len returns the length of the list
@@ -1986,7 +1972,7 @@ func (ListComplex128) TagType() TagID {
 // Set sets the data at the given position. It does not append
 func (l ListComplex128) Set(i int, d Data) error {
 	if m, ok := d.(Complex128); ok {
-		if i <= 0 || i >= int(len(l)) {
+		if i <= 0 || i >= len(l) {
 			return ErrBadRange
 		}
 		l[i] = m
@@ -2021,7 +2007,7 @@ func (l *ListComplex128) Insert(i int, d ...Data) error {
 	if i >= len(*l) {
 		return l.Append(d...)
 	}
-	toInsert := make(ListComplex128, len(d), len(d)+len(*l)-int(i))
+	toInsert := make(ListComplex128, len(d), len(d)+len(*l)-i)
 	for n, e := range d {
 		if f, ok := e.(Complex128); ok {
 			toInsert[n] = f
@@ -2040,7 +2026,6 @@ func (l *ListComplex128) Remove(i int) {
 	}
 	copy((*l)[i:], (*l)[i+1:])
 	*l = (*l)[:len(*l)-1]
-	return
 }
 
 // Len returns the length of the list
