@@ -99,7 +99,3 @@ func TestSetBlock(t *testing.T) {
 func b2i(b byte) int8 {
 	return int8(b)
 }
-
-func i2b(b int8) byte {
-	return byte(b)
-}
