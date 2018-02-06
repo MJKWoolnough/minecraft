@@ -60,18 +60,19 @@ func BlockColor(b minecraft.Block) color.Color {
 	return color.Transparent
 }
 
-type option func(*Image)
+// Option represents a optional parameter for a map type
+type Option func(*Image)
 
 // FixedY is an options to fix the Y-coord of the blocks to be read. By default
 // the highest, non-transparent block is usedd.
-func FixedY(y int32) option {
+func FixedY(y int32) Option {
 	return func(i *Image) {
 		i.y = y
 	}
 }
 
 // Scale sets the scale the map is to be rendered at.
-func Scale(s uint8) option {
+func Scale(s uint8) Option {
 	return func(i *Image) {
 		i.scale = s
 	}
@@ -79,14 +80,14 @@ func Scale(s uint8) option {
 
 // ColorFunc is an option for NewMap that specifies what colour blocks are
 // painted as.
-func ColorFunc(c func(minecraft.Block) color.Color) option {
+func ColorFunc(c func(minecraft.Block) color.Color) Option {
 	return func(i *Image) {
 		i.colour = c
 	}
 }
 
 // NewMap creates an image from a Minecraft level.
-func NewMap(l *minecraft.Level, bounds image.Rectangle, options ...option) Image {
+func NewMap(l *minecraft.Level, bounds image.Rectangle, options ...Option) Image {
 	i := Image{
 		level:  l,
 		bounds: bounds,
