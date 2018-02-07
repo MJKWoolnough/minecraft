@@ -69,26 +69,19 @@ func Decode(r io.Reader) (image.Image, error) {
 	}, nil
 }
 
-type config struct {
-	Data struct {
-		Width  int16 `nbt:"width"`
-		Height int16 `nbt:"height"`
-	} `nbt:"data"`
-}
-
 // Config reader the configuration for an uncompressed Minecraft map.
 //
 // Minecraft maps are gzip compressed, so the reader given to this func should
 // be wrapped in gzip.NewReader.
 func Config(r io.Reader) (image.Config, error) {
-	var c config
-	_, err := nbt.RDecode(r, &c)
+	d, err := readData(r)
 	if err != nil {
 		return image.Config{}, err
 	}
+	rect := getDimensions(d)
 	return image.Config{
 		ColorModel: palette,
-		Width:      int(c.Data.Width),
-		Height:     int(c.Data.Height),
+		Width:      int(rect.Max.X),
+		Height:     int(rect.Max.Y),
 	}, nil
 }
