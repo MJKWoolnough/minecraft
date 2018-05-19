@@ -141,11 +141,7 @@ func (e Encoder) encodeByteArray(ba ByteArray) error {
 
 // EncodeString will write a String Data
 func (e Encoder) encodeString(s String) error {
-	_, err := e.w.WriteUint16(uint16(len(s)))
-	if err != nil {
-		return err
-	}
-	_, err = e.w.Write([]byte(s))
+	_, err := e.w.WriteString16(string(s))
 	return err
 }
 

@@ -39,8 +39,7 @@ func (d Decoder) Decode() (Tag, error) {
 	}
 	n, err := d.decodeString()
 	if err != nil {
-		err = ReadError{"name", err}
-		return Tag{}, err
+		return Tag{}, ReadError{"name", err}
 	}
 	data, err := d.decodeData(tagID)
 	if err != nil {
@@ -155,16 +154,8 @@ func (d Decoder) decodeByteArray() (ByteArray, error) {
 
 // DecodeString will read a String Data
 func (d Decoder) decodeString() (String, error) {
-	l, _, err := d.r.ReadUint16()
-	if err != nil {
-		return "", err
-	}
-	data := make([]byte, l)
-	_, err = io.ReadFull(d.r, data)
-	if err != nil {
-		return "", err
-	}
-	return String(data), nil
+	str, _, err := d.r.ReadString16()
+	return String(str), err
 }
 
 // DecodeList will read a List Data
