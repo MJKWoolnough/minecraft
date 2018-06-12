@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/MJKWoolnough/minecraft/nbt"
+	"vimagination.zapto.org/minecraft/nbt"
 )
 
 var (

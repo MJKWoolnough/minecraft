@@ -3,7 +3,7 @@ package minecraft
 import (
 	"testing"
 
-	"github.com/MJKWoolnough/minecraft/nbt"
+	"vimagination.zapto.org/minecraft/nbt"
 )
 
 func TestNew(t *testing.T) {

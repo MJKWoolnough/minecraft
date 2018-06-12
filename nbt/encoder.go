@@ -1,9 +1,9 @@
-package nbt
+package nbt // import "vimagination.zapto.org/minecraft/nbt"
 
 import (
 	"io"
 
-	"github.com/MJKWoolnough/byteio"
+	"vimagination.zapto.org/byteio"
 )
 
 // Encoder is a type used to encode NBT streams

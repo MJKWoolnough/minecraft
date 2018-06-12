@@ -3,7 +3,7 @@ package minecraft_test
 import (
 	"fmt"
 
-	"github.com/MJKWoolnough/minecraft"
+	"vimagination.zapto.org/minecraft"
 )
 
 func Example() {

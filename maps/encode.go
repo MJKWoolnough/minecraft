@@ -5,7 +5,7 @@ import (
 	"image"
 	"io"
 
-	"github.com/MJKWoolnough/minecraft/nbt"
+	"vimagination.zapto.org/minecraft/nbt"
 )
 
 // Encode writes an image an as uncompressed Minecraft map.

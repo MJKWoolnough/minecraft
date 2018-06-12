@@ -4,7 +4,7 @@ import (
 	"image"
 	"image/color"
 
-	"github.com/MJKWoolnough/minecraft"
+	"vimagination.zapto.org/minecraft"
 )
 
 // Image represents a Minecraft Map

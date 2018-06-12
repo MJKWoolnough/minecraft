@@ -1,10 +1,10 @@
-package maps
+package maps // import "vimagination.zapto.org/minecraft/maps"
 
 import (
 	"image"
 	"io"
 
-	"github.com/MJKWoolnough/minecraft/nbt"
+	"vimagination.zapto.org/minecraft/nbt"
 )
 
 func init() {

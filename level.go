@@ -4,8 +4,8 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/MJKWoolnough/boolmap"
-	"github.com/MJKWoolnough/minecraft/nbt"
+	"vimagination.zapto.org/boolmap"
+	"vimagination.zapto.org/minecraft/nbt"
 )
 
 var (

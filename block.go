@@ -3,7 +3,7 @@ package minecraft
 import (
 	"strconv"
 
-	"github.com/MJKWoolnough/minecraft/nbt"
+	"vimagination.zapto.org/minecraft/nbt"
 )
 
 // Tick is a type that represents a scheduled tick

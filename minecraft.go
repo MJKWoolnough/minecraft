@@ -1,5 +1,5 @@
 // Package minecraft is a level viewer/editor for the popular creative game minecraft
-package minecraft
+package minecraft // import "vimagination.zapto.org/minecraft"
 
 // TransparentBlockList is a slice of the block ids that are transparent.
 type TransparentBlockList []uint16

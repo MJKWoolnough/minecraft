@@ -12,9 +12,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/MJKWoolnough/byteio"
-	"github.com/MJKWoolnough/memio"
-	"github.com/MJKWoolnough/minecraft/nbt"
+	"vimagination.zapto.org/byteio"
+	"vimagination.zapto.org/memio"
+	"vimagination.zapto.org/minecraft/nbt"
 )
 
 var filename *regexp.Regexp

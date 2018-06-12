@@ -1,7 +1,7 @@
 package minecraft
 
 import (
-	"github.com/MJKWoolnough/minecraft/nbt"
+	"vimagination.zapto.org/minecraft/nbt"
 )
 
 func yzx(x, y, z int32) uint32 {

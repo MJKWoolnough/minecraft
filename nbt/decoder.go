@@ -3,7 +3,7 @@ package nbt
 import (
 	"io"
 
-	"github.com/MJKWoolnough/byteio"
+	"vimagination.zapto.org/byteio"
 )
 
 // Decoder is a type used to decode NBT streams

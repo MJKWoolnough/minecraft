@@ -1,8 +1,9 @@
 package nbt
 
 import (
-	"errors"
 	"strconv"
+
+	"vimagination.zapto.org/errors"
 )
 
 // ReadError is an error returned when a read error occurs
@@ -47,4 +48,4 @@ func (w WrongTag) Error() string {
 
 // ErrBadRange is an error that occurs when trying to set an item on a list which
 // is outside of the current limits of the list.
-var ErrBadRange = errors.New("given index was out-of-range")
+const ErrBadRange errors.Error = "given index was out-of-range"
