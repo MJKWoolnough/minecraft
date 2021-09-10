@@ -3,7 +3,6 @@ package minecraft
 import (
 	"encoding/binary"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
@@ -167,11 +166,7 @@ func TestMemPath(t *testing.T) {
 }
 
 func TestFilePath(t *testing.T) {
-	tempDir, err := ioutil.TempDir("", "minecraft-path-test")
-	if err != nil {
-		t.Error(err.Error())
-		return
-	}
+	tempDir := t.TempDir()
 	f, err := NewFilePath(tempDir)
 	if err != nil {
 		t.Error(err.Error())
@@ -254,14 +249,11 @@ func TestFilePath(t *testing.T) {
 func TestFilePathLock(t *testing.T) {
 
 	var (
-		tempDir string
-		err     error
-		f, g    *FilePath
+		err  error
+		f, g *FilePath
 	)
-
-	if tempDir, err = ioutil.TempDir("", "minecraft-path-lock-test"); err != nil {
-		t.Error(err.Error())
-	} else if f, err = NewFilePath(tempDir); err != nil {
+	tempDir := t.TempDir()
+	if f, err = NewFilePath(tempDir); err != nil {
 		t.Error(err.Error())
 	}
 	<-time.After(time.Millisecond * 2)
