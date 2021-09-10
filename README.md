@@ -1,6 +1,6 @@
 # minecraft
 --
-    import "github.com/MJKWoolnough/minecraft"
+    import "vimagination.zapto.org/minecraft"
 
 Package minecraft is a level viewer/editor for the popular creative game
 ### minecraft
@@ -61,7 +61,7 @@ Compression convenience constants
 ```go
 var (
 	// ErrOOB is an error returned when sanity checking section data
-	ErrOOB = errors.New("Received Out-of-bounds error")
+	ErrOOB = errors.New("received out-of-bounds error")
 	// ErrNoLock is an error returns by path types to indicate that the lock on the
 	// minecraft level has been locked and needs reinstating to continue
 	ErrNoLock = errors.New("lost lock on files")
