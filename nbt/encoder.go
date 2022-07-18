@@ -85,7 +85,7 @@ func (e Encoder) encodeData(d Data) error {
 		err = e.encodeComplex128(d)
 	default:
 		if l, ok := d.(List); ok {
-			e.encodeList(l)
+			err = e.encodeList(l)
 		} else {
 			err = UnknownTag{d.Type()}
 		}

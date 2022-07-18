@@ -47,7 +47,7 @@ type FilePath struct {
 // NewFilePath constructs a new directory based path to read from.
 func NewFilePath(dirname string) (*FilePath, error) {
 	dirname = path.Clean(dirname)
-	if err := os.MkdirAll(dirname, 0755); err != nil {
+	if err := os.MkdirAll(dirname, 0o755); err != nil {
 		return nil, err
 	}
 	p := &FilePath{dirname: dirname}
@@ -72,7 +72,8 @@ func (s *stickyEndianSeeker) Seek(offset int64, whence int) (int64, error) {
 // dimension that chunks are loaded from.
 //
 // Example. Dimension -1 == The Nether
-//          Dimension  1 == The End
+//
+//	Dimension  1 == The End
 func NewFilePathDimension(dirname string, dimension int) (*FilePath, error) {
 	fp, err := NewFilePath(dirname)
 	if dimension != 0 {
@@ -218,10 +219,10 @@ func (s sia) Swap(i, j int) {
 }
 
 func (p *FilePath) setChunks(x, z int32, chunks []rc) error {
-	if err := os.MkdirAll(path.Join(p.dirname, p.dimension, "region"), 0755); err != nil {
+	if err := os.MkdirAll(path.Join(p.dirname, p.dimension, "region"), 0o755); err != nil {
 		return err
 	}
-	f, err := os.OpenFile(p.getRegionPath(x, z), os.O_RDWR|os.O_CREATE, 0666)
+	f, err := os.OpenFile(p.getRegionPath(x, z), os.O_RDWR|os.O_CREATE, 0o666)
 	if err != nil {
 		return err
 	}
@@ -316,7 +317,7 @@ func (p *FilePath) RemoveChunk(x, z int32) error {
 	regionX := x >> 5
 	chunkZ := z & 31
 	regionZ := z >> 5
-	f, err := os.OpenFile(p.getRegionPath(regionX, regionZ), os.O_WRONLY, 0666)
+	f, err := os.OpenFile(p.getRegionPath(regionX, regionZ), os.O_WRONLY, 0o666)
 	if os.IsNotExist(err) {
 		return nil
 	} else if err != nil {
@@ -355,7 +356,7 @@ func (p *FilePath) WriteLevelDat(data nbt.Tag) error {
 	if !p.HasLock() {
 		return ErrNoLock
 	}
-	f, err := os.OpenFile(path.Join(p.dirname, "level.dat"), os.O_WRONLY|os.O_CREATE, 0666)
+	f, err := os.OpenFile(path.Join(p.dirname, "level.dat"), os.O_WRONLY|os.O_CREATE, 0o666)
 	if err != nil {
 		return nil
 	}
@@ -450,7 +451,7 @@ func (p *FilePath) Defrag(x, z int32) error {
 	if !p.HasLock() {
 		return ErrNoLock
 	}
-	f, err := os.OpenFile(p.getRegionPath(x, z), os.O_RDWR|os.O_CREATE, 0666)
+	f, err := os.OpenFile(p.getRegionPath(x, z), os.O_RDWR|os.O_CREATE, 0o666)
 	if err != nil {
 		return err
 	}
