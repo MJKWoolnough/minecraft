@@ -18,12 +18,18 @@ func readData(r io.Reader) (nbt.Compound, error) {
 	}
 
 	if t.TagID() != nbt.TagCompound {
-		return nil, nbt.WrongTag{nbt.TagCompound, t.TagID()}
+		return nil, nbt.WrongTag{
+			Expecting: nbt.TagCompound,
+			Got:       t.TagID(),
+		}
 	}
 
 	d := t.Data().(nbt.Compound).Get("data")
 	if d.TagID() != nbt.TagCompound {
-		return nil, nbt.WrongTag{nbt.TagCompound, d.TagID()}
+		return nil, nbt.WrongTag{
+			Expecting: nbt.TagCompound,
+			Got:       d.TagID(),
+		}
 	}
 	return d.Data().(nbt.Compound), nil
 }
@@ -56,7 +62,10 @@ func Decode(r io.Reader) (image.Image, error) {
 
 	c := d.Get("colors")
 	if c.TagID() != nbt.TagByteArray {
-		return nil, nbt.WrongTag{nbt.TagByteArray, c.TagID()}
+		return nil, nbt.WrongTag{
+			Expecting: nbt.TagByteArray,
+			Got:       c.TagID(),
+		}
 	}
 
 	rect := getDimensions(d)
