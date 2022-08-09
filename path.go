@@ -4,7 +4,6 @@ import (
 	"compress/gzip"
 	"compress/zlib"
 	"io"
-	"io/ioutil"
 	"os"
 	"path"
 	"regexp"
@@ -369,7 +368,7 @@ func (p *FilePath) WriteLevelDat(data nbt.Tag) error {
 
 // GetRegions returns a list of region x,z coords of all generated regions.
 func (p *FilePath) GetRegions() [][2]int32 {
-	files, _ := ioutil.ReadDir(path.Join(p.dirname, p.dimension, "region"))
+	files, _ := os.ReadDir(path.Join(p.dirname, p.dimension, "region"))
 	var toRet [][2]int32
 	for _, file := range files {
 		if !file.IsDir() {
