@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-// ReadError is an error returned when a read error occurs
+// ReadError is an error returned when a read error occurs.
 type ReadError struct {
 	Where string
 	Err   error
@@ -15,7 +15,7 @@ func (r ReadError) Error() string {
 	return "encountered an error while trying to read a " + r.Where + ": " + r.Err.Error()
 }
 
-// WriteError is an error returned when a write error occurs
+// WriteError is an error returned when a write error occurs.
 type WriteError struct {
 	Where string
 	Err   error

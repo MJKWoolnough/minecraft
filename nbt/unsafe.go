@@ -1,3 +1,4 @@
+//go:build !js
 // +build !js
 
 package nbt
@@ -13,5 +14,6 @@ func byteArrayToByteSlice(s ByteArray) []byte {
 
 func (b ByteArray) readFrom(r io.Reader) error {
 	_, err := io.ReadFull(r, byteArrayToByteSlice(b))
+
 	return err
 }
