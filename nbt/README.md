@@ -27,14 +27,14 @@ Encode will encode a single tag to the writer using the default settings
 type Bool bool
 ```
 
-Bool is an implementation of the Data interface
+Bool is an implementation of the Data interface.
 
 #### func (Bool) Copy
 
 ```go
 func (b Bool) Copy() Data
 ```
-Copy simply returns a copy the the data
+Copy simply returns a copy the the data.
 
 #### func (Bool) Equal
 
@@ -42,7 +42,7 @@ Copy simply returns a copy the the data
 func (b Bool) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (Bool) String
 
@@ -55,7 +55,7 @@ func (b Bool) String() string
 ```go
 func (Bool) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type Byte
 
@@ -92,7 +92,7 @@ func (b Byte) String() string
 ```go
 func (Byte) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ByteArray
 
@@ -100,7 +100,7 @@ Type returns the TagID of the data
 type ByteArray []int8
 ```
 
-ByteArray is an implementation of the Data interface
+ByteArray is an implementation of the Data interface.
 
 #### func (ByteArray) Bytes
 
@@ -115,7 +115,7 @@ May uss unsafe, so the underlying array may be the same.
 ```go
 func (b ByteArray) Copy() Data
 ```
-Copy simply returns a copy the the data
+Copy simply returns a copy the the data.
 
 #### func (ByteArray) Equal
 
@@ -123,7 +123,7 @@ Copy simply returns a copy the the data
 func (b ByteArray) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (ByteArray) String
 
@@ -136,7 +136,7 @@ func (b ByteArray) String() string
 ```go
 func (ByteArray) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type Complex128
 
@@ -144,14 +144,14 @@ Type returns the TagID of the data
 type Complex128 complex128
 ```
 
-Complex128 is an implementation of the Data interface
+Complex128 is an implementation of the Data interface.
 
 #### func (Complex128) Copy
 
 ```go
 func (c Complex128) Copy() Data
 ```
-Copy simply returns a copy the the data
+Copy simply returns a copy the the data.
 
 #### func (Complex128) Equal
 
@@ -159,7 +159,7 @@ Copy simply returns a copy the the data
 func (c Complex128) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (Complex128) String
 
@@ -172,7 +172,7 @@ func (c Complex128) String() string
 ```go
 func (Complex128) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type Complex64
 
@@ -180,14 +180,14 @@ Type returns the TagID of the data
 type Complex64 complex64
 ```
 
-Complex64 is an implementation of the Data interface
+Complex64 is an implementation of the Data interface.
 
 #### func (Complex64) Copy
 
 ```go
 func (c Complex64) Copy() Data
 ```
-Copy simply returns a copy the the data
+Copy simply returns a copy the the data.
 
 #### func (Complex64) Equal
 
@@ -195,7 +195,7 @@ Copy simply returns a copy the the data
 func (c Complex64) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (Complex64) String
 
@@ -208,7 +208,7 @@ func (c Complex64) String() string
 ```go
 func (Complex64) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type Compound
 
@@ -216,14 +216,14 @@ Type returns the TagID of the data
 type Compound []Tag
 ```
 
-Compound is an implementation of the Data interface
+Compound is an implementation of the Data interface.
 
 #### func (Compound) Copy
 
 ```go
 func (c Compound) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (Compound) Equal
 
@@ -231,21 +231,21 @@ Copy simply returns a deep-copy the the data
 func (c Compound) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (Compound) Get
 
 ```go
 func (c Compound) Get(name string) Tag
 ```
-Get returns the tag for the given name
+Get returns the tag for the given name.
 
 #### func (*Compound) Remove
 
 ```go
 func (c *Compound) Remove(name string)
 ```
-Remove removes the tag corresponding to the given name
+Remove removes the tag corresponding to the given name.
 
 #### func (*Compound) Set
 
@@ -253,7 +253,7 @@ Remove removes the tag corresponding to the given name
 func (c *Compound) Set(tag Tag)
 ```
 Set adds the given tag to the compound, or, if the tags name is already present,
-overrides the old data
+overrides the old data.
 
 #### func (Compound) String
 
@@ -266,7 +266,7 @@ func (c Compound) String() string
 ```go
 func (Compound) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type Data
 
@@ -279,7 +279,7 @@ type Data interface {
 }
 ```
 
-Data is an interface representing the many different types that a tag can be
+Data is an interface representing the many different types that a tag can be.
 
 #### type Decoder
 
@@ -288,28 +288,28 @@ type Decoder struct {
 }
 ```
 
-Decoder is a type used to decode NBT streams
+Decoder is a type used to decode NBT streams.
 
 #### func  NewDecoder
 
 ```go
 func NewDecoder(r io.Reader) Decoder
 ```
-NewDecoder returns a Decoder using Big Endian
+NewDecoder returns a Decoder using Big Endian.
 
 #### func  NewDecoderEndian
 
 ```go
 func NewDecoderEndian(e byteio.EndianReader) Decoder
 ```
-NewDecoderEndian allows you to specify your own Endian Reader
+NewDecoderEndian allows you to specify your own Endian Reader.
 
 #### func (Decoder) Decode
 
 ```go
 func (d Decoder) Decode() (Tag, error)
 ```
-Decode will read a whole tag out of the decoding stream
+Decode will read a whole tag out of the decoding stream.
 
 #### type Double
 
@@ -317,14 +317,14 @@ Decode will read a whole tag out of the decoding stream
 type Double float64
 ```
 
-Double is an implementation of the Data interface
+Double is an implementation of the Data interface.
 
 #### func (Double) Copy
 
 ```go
 func (d Double) Copy() Data
 ```
-Copy simply returns a copy the the data
+Copy simply returns a copy the the data.
 
 #### func (Double) Equal
 
@@ -332,7 +332,7 @@ Copy simply returns a copy the the data
 func (d Double) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (Double) String
 
@@ -345,7 +345,7 @@ func (d Double) String() string
 ```go
 func (Double) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type Encoder
 
@@ -383,14 +383,14 @@ Encode will encode a whole tag to the encoding stream
 type Float float32
 ```
 
-Float is an implementation of the Data interface
+Float is an implementation of the Data interface.
 
 #### func (Float) Copy
 
 ```go
 func (f Float) Copy() Data
 ```
-Copy simply returns a copy the the data
+Copy simply returns a copy the the data.
 
 #### func (Float) Equal
 
@@ -398,7 +398,7 @@ Copy simply returns a copy the the data
 func (f Float) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (Float) String
 
@@ -411,7 +411,7 @@ func (f Float) String() string
 ```go
 func (Float) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type Int
 
@@ -419,14 +419,14 @@ Type returns the TagID of the data
 type Int int32
 ```
 
-Int is an implementation of the Data interface
+Int is an implementation of the Data interface.
 
 #### func (Int) Copy
 
 ```go
 func (i Int) Copy() Data
 ```
-Copy simply returns a copy the the data
+Copy simply returns a copy the the data.
 
 #### func (Int) Equal
 
@@ -434,7 +434,7 @@ Copy simply returns a copy the the data
 func (i Int) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (Int) String
 
@@ -447,7 +447,7 @@ func (i Int) String() string
 ```go
 func (Int) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type IntArray
 
@@ -455,14 +455,14 @@ Type returns the TagID of the data
 type IntArray []int32
 ```
 
-IntArray is an implementation of the Data interface
+IntArray is an implementation of the Data interface.
 
 #### func (IntArray) Copy
 
 ```go
 func (i IntArray) Copy() Data
 ```
-Copy simply returns a copy the the data
+Copy simply returns a copy the the data.
 
 #### func (IntArray) Equal
 
@@ -470,7 +470,7 @@ Copy simply returns a copy the the data
 func (i IntArray) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (IntArray) String
 
@@ -483,7 +483,7 @@ func (i IntArray) String() string
 ```go
 func (IntArray) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type List
 
@@ -500,14 +500,14 @@ type List interface {
 }
 ```
 
-List interface descibes the methods for the lists of different data types
+List interface descibes the methods for the lists of different data types.
 
 #### func  NewEmptyList
 
 ```go
 func NewEmptyList(tagType TagID) List
 ```
-NewEmptyList returns a new empty List Data type, set to the type given
+NewEmptyList returns a new empty List Data type, set to the type given.
 
 #### func  NewList
 
@@ -515,7 +515,7 @@ NewEmptyList returns a new empty List Data type, set to the type given
 func NewList(data []Data) List
 ```
 NewList returns a new List Data type, or nil if the given data is not of all the
-same Data type
+same Data type.
 
 #### type ListBool
 
@@ -523,7 +523,7 @@ same Data type
 type ListBool []Bool
 ```
 
-ListBool satisfies the List interface for a list of Bools
+ListBool satisfies the List interface for a list of Bools.
 
 #### func (*ListBool) Append
 
@@ -537,7 +537,7 @@ Append adds data to the list
 ```go
 func (l ListBool) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (ListBool) Equal
 
@@ -552,35 +552,35 @@ for equality
 ```go
 func (l ListBool) Get(i int) Data
 ```
-Get returns the data at the given positon
+Get returns the data at the given positon.
 
 #### func (*ListBool) Insert
 
 ```go
 func (l *ListBool) Insert(i int, d ...Data) error
 ```
-Insert will add the given data at the specified position, moving other up
+Insert will add the given data at the specified position, moving other up.
 
 #### func (ListBool) Len
 
 ```go
 func (l ListBool) Len() int
 ```
-Len returns the length of the list
+Len returns the length of the list.
 
 #### func (*ListBool) Remove
 
 ```go
 func (l *ListBool) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down
+Remove deletes the specified position and shifts remaing data down.
 
 #### func (ListBool) Set
 
 ```go
 func (l ListBool) Set(i int, d Data) error
 ```
-Set sets the data at the given position. It does not append
+Set sets the data at the given position. It does not append.
 
 #### func (ListBool) String
 
@@ -593,14 +593,14 @@ func (l ListBool) String() string
 ```go
 func (ListBool) TagType() TagID
 ```
-TagType returns the TagID of the type of tag this list contains
+TagType returns the TagID of the type of tag this list contains.
 
 #### func (ListBool) Type
 
 ```go
 func (ListBool) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ListByte
 
@@ -608,7 +608,7 @@ Type returns the TagID of the data
 type ListByte []Byte
 ```
 
-ListByte satisfies the List interface for a list of Bytes
+ListByte satisfies the List interface for a list of Bytes.
 
 #### func (*ListByte) Append
 
@@ -622,7 +622,7 @@ Append adds data to the list
 ```go
 func (l ListByte) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (ListByte) Equal
 
@@ -637,35 +637,35 @@ for equality
 ```go
 func (l ListByte) Get(i int) Data
 ```
-Get returns the data at the given positon
+Get returns the data at the given positon.
 
 #### func (*ListByte) Insert
 
 ```go
 func (l *ListByte) Insert(i int, d ...Data) error
 ```
-Insert will add the given data at the specified position, moving other up
+Insert will add the given data at the specified position, moving other up.
 
 #### func (ListByte) Len
 
 ```go
 func (l ListByte) Len() int
 ```
-Len returns the length of the list
+Len returns the length of the list.
 
 #### func (*ListByte) Remove
 
 ```go
 func (l *ListByte) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down
+Remove deletes the specified position and shifts remaing data down.
 
 #### func (ListByte) Set
 
 ```go
 func (l ListByte) Set(i int, d Data) error
 ```
-Set sets the data at the given position. It does not append
+Set sets the data at the given position. It does not append.
 
 #### func (ListByte) String
 
@@ -678,14 +678,14 @@ func (l ListByte) String() string
 ```go
 func (ListByte) TagType() TagID
 ```
-TagType returns the TagID of the type of tag this list contains
+TagType returns the TagID of the type of tag this list contains.
 
 #### func (ListByte) Type
 
 ```go
 func (ListByte) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ListComplex128
 
@@ -693,7 +693,7 @@ Type returns the TagID of the data
 type ListComplex128 []Complex128
 ```
 
-ListComplex128 satisfies the List interface for a list of Complex128s
+ListComplex128 satisfies the List interface for a list of Complex128s.
 
 #### func (*ListComplex128) Append
 
@@ -707,7 +707,7 @@ Append adds data to the list
 ```go
 func (l ListComplex128) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (ListComplex128) Equal
 
@@ -722,35 +722,35 @@ for equality
 ```go
 func (l ListComplex128) Get(i int) Data
 ```
-Get returns the data at the given positon
+Get returns the data at the given positon.
 
 #### func (*ListComplex128) Insert
 
 ```go
 func (l *ListComplex128) Insert(i int, d ...Data) error
 ```
-Insert will add the given data at the specified position, moving other up
+Insert will add the given data at the specified position, moving other up.
 
 #### func (ListComplex128) Len
 
 ```go
 func (l ListComplex128) Len() int
 ```
-Len returns the length of the list
+Len returns the length of the list.
 
 #### func (*ListComplex128) Remove
 
 ```go
 func (l *ListComplex128) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down
+Remove deletes the specified position and shifts remaing data down.
 
 #### func (ListComplex128) Set
 
 ```go
 func (l ListComplex128) Set(i int, d Data) error
 ```
-Set sets the data at the given position. It does not append
+Set sets the data at the given position. It does not append.
 
 #### func (ListComplex128) String
 
@@ -763,14 +763,14 @@ func (l ListComplex128) String() string
 ```go
 func (ListComplex128) TagType() TagID
 ```
-TagType returns the TagID of the type of tag this list contains
+TagType returns the TagID of the type of tag this list contains.
 
 #### func (ListComplex128) Type
 
 ```go
 func (ListComplex128) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ListComplex64
 
@@ -778,7 +778,7 @@ Type returns the TagID of the data
 type ListComplex64 []Complex64
 ```
 
-ListComplex64 satisfies the List interface for a list of Complex64s
+ListComplex64 satisfies the List interface for a list of Complex64s.
 
 #### func (*ListComplex64) Append
 
@@ -792,7 +792,7 @@ Append adds data to the list
 ```go
 func (l ListComplex64) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (ListComplex64) Equal
 
@@ -807,35 +807,35 @@ for equality
 ```go
 func (l ListComplex64) Get(i int) Data
 ```
-Get returns the data at the given positon
+Get returns the data at the given positon.
 
 #### func (*ListComplex64) Insert
 
 ```go
 func (l *ListComplex64) Insert(i int, d ...Data) error
 ```
-Insert will add the given data at the specified position, moving other up
+Insert will add the given data at the specified position, moving other up.
 
 #### func (ListComplex64) Len
 
 ```go
 func (l ListComplex64) Len() int
 ```
-Len returns the length of the list
+Len returns the length of the list.
 
 #### func (*ListComplex64) Remove
 
 ```go
 func (l *ListComplex64) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down
+Remove deletes the specified position and shifts remaing data down.
 
 #### func (ListComplex64) Set
 
 ```go
 func (l ListComplex64) Set(i int, d Data) error
 ```
-Set sets the data at the given position. It does not append
+Set sets the data at the given position. It does not append.
 
 #### func (ListComplex64) String
 
@@ -848,14 +848,14 @@ func (l ListComplex64) String() string
 ```go
 func (ListComplex64) TagType() TagID
 ```
-TagType returns the TagID of the type of tag this list contains
+TagType returns the TagID of the type of tag this list contains.
 
 #### func (ListComplex64) Type
 
 ```go
 func (ListComplex64) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ListCompound
 
@@ -863,7 +863,7 @@ Type returns the TagID of the data
 type ListCompound []Compound
 ```
 
-ListCompound satisfies the List interface for a list of Compounds
+ListCompound satisfies the List interface for a list of Compounds.
 
 #### func (*ListCompound) Append
 
@@ -877,7 +877,7 @@ Append adds data to the list
 ```go
 func (l ListCompound) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (ListCompound) Equal
 
@@ -892,35 +892,35 @@ for equality
 ```go
 func (l ListCompound) Get(i int) Data
 ```
-Get returns the data at the given positon
+Get returns the data at the given positon.
 
 #### func (*ListCompound) Insert
 
 ```go
 func (l *ListCompound) Insert(i int, d ...Data) error
 ```
-Insert will add the given data at the specified position, moving other up
+Insert will add the given data at the specified position, moving other up.
 
 #### func (ListCompound) Len
 
 ```go
 func (l ListCompound) Len() int
 ```
-Len returns the length of the list
+Len returns the length of the list.
 
 #### func (*ListCompound) Remove
 
 ```go
 func (l *ListCompound) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down
+Remove deletes the specified position and shifts remaing data down.
 
 #### func (ListCompound) Set
 
 ```go
 func (l ListCompound) Set(i int, d Data) error
 ```
-Set sets the data at the given position. It does not append
+Set sets the data at the given position. It does not append.
 
 #### func (ListCompound) String
 
@@ -933,14 +933,14 @@ func (l ListCompound) String() string
 ```go
 func (ListCompound) TagType() TagID
 ```
-TagType returns the TagID of the type of tag this list contains
+TagType returns the TagID of the type of tag this list contains.
 
 #### func (ListCompound) Type
 
 ```go
 func (ListCompound) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ListData
 
@@ -949,21 +949,21 @@ type ListData struct {
 }
 ```
 
-ListData is an implementation of the Data interface
+ListData is an implementation of the Data interface.
 
 #### func (*ListData) Append
 
 ```go
 func (l *ListData) Append(data ...Data) error
 ```
-Append adds data to the list
+Append adds data to the list.
 
 #### func (*ListData) Copy
 
 ```go
 func (l *ListData) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (*ListData) Equal
 
@@ -971,14 +971,14 @@ Copy simply returns a deep-copy the the data
 func (l *ListData) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (*ListData) Get
 
 ```go
 func (l *ListData) Get(i int) Data
 ```
-Get returns the data at the given positon
+Get returns the data at the given positon.
 
 #### func (*ListData) Insert
 
@@ -993,133 +993,133 @@ up.
 ```go
 func (l *ListData) Len() int
 ```
-Len returns the length of the list
+Len returns the length of the list.
 
 #### func (ListData) ListBool
 
 ```go
 func (l ListData) ListBool() ListBool
 ```
-ListBool returns the list as a specifically typed List
+ListBool returns the list as a specifically typed List.
 
 #### func (ListData) ListByte
 
 ```go
 func (l ListData) ListByte() ListByte
 ```
-ListByte returns the list as a specifically typed List
+ListByte returns the list as a specifically typed List.
 
 #### func (ListData) ListComplex128
 
 ```go
 func (l ListData) ListComplex128() ListComplex128
 ```
-ListComplex128 returns the list as a specifically typed List
+ListComplex128 returns the list as a specifically typed List.
 
 #### func (ListData) ListComplex64
 
 ```go
 func (l ListData) ListComplex64() ListComplex64
 ```
-ListComplex64 returns the list as a specifically typed List
+ListComplex64 returns the list as a specifically typed List.
 
 #### func (ListData) ListCompound
 
 ```go
 func (l ListData) ListCompound() ListCompound
 ```
-ListCompound returns the list as a specifically typed List
+ListCompound returns the list as a specifically typed List.
 
 #### func (ListData) ListDouble
 
 ```go
 func (l ListData) ListDouble() ListDouble
 ```
-ListDouble returns the list as a specifically typed List
+ListDouble returns the list as a specifically typed List.
 
 #### func (ListData) ListEnd
 
 ```go
 func (l ListData) ListEnd() ListEnd
 ```
-ListEnd returns the list as a specifically typed List
+ListEnd returns the list as a specifically typed List.
 
 #### func (ListData) ListFloat
 
 ```go
 func (l ListData) ListFloat() ListFloat
 ```
-ListFloat returns the list as a specifically typed List
+ListFloat returns the list as a specifically typed List.
 
 #### func (ListData) ListInt
 
 ```go
 func (l ListData) ListInt() ListInt
 ```
-ListInt returns the list as a specifically typed List
+ListInt returns the list as a specifically typed List.
 
 #### func (ListData) ListIntArray
 
 ```go
 func (l ListData) ListIntArray() ListIntArray
 ```
-ListIntArray returns the list as a specifically typed List
+ListIntArray returns the list as a specifically typed List.
 
 #### func (ListData) ListLong
 
 ```go
 func (l ListData) ListLong() ListLong
 ```
-ListLong returns the list as a specifically typed List
+ListLong returns the list as a specifically typed List.
 
 #### func (ListData) ListShort
 
 ```go
 func (l ListData) ListShort() ListShort
 ```
-ListShort returns the list as a specifically typed List
+ListShort returns the list as a specifically typed List.
 
 #### func (ListData) ListUint16
 
 ```go
 func (l ListData) ListUint16() ListUint16
 ```
-ListUint16 returns the list as a specifically typed List
+ListUint16 returns the list as a specifically typed List.
 
 #### func (ListData) ListUint32
 
 ```go
 func (l ListData) ListUint32() ListUint32
 ```
-ListUint32 returns the list as a specifically typed List
+ListUint32 returns the list as a specifically typed List.
 
 #### func (ListData) ListUint64
 
 ```go
 func (l ListData) ListUint64() ListUint64
 ```
-ListUint64 returns the list as a specifically typed List
+ListUint64 returns the list as a specifically typed List.
 
 #### func (ListData) ListUint8
 
 ```go
 func (l ListData) ListUint8() ListUint8
 ```
-ListUint8 returns the list as a specifically typed List
+ListUint8 returns the list as a specifically typed List.
 
 #### func (*ListData) Remove
 
 ```go
 func (l *ListData) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down
+Remove deletes the specified position and shifts remaing data down.
 
 #### func (*ListData) Set
 
 ```go
 func (l *ListData) Set(i int, data Data) error
 ```
-Set sets the data at the given position. It does not append
+Set sets the data at the given position. It does not append.
 
 #### func (*ListData) String
 
@@ -1132,14 +1132,14 @@ func (l *ListData) String() string
 ```go
 func (l *ListData) TagType() TagID
 ```
-TagType returns the TagID of the type of tag this list contains
+TagType returns the TagID of the type of tag this list contains.
 
 #### func (ListData) Type
 
 ```go
 func (ListData) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ListDouble
 
@@ -1147,7 +1147,7 @@ Type returns the TagID of the data
 type ListDouble []Double
 ```
 
-ListDouble satisfies the List interface for a list of Doubles
+ListDouble satisfies the List interface for a list of Doubles.
 
 #### func (*ListDouble) Append
 
@@ -1161,7 +1161,7 @@ Append adds data to the list
 ```go
 func (l ListDouble) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (ListDouble) Equal
 
@@ -1176,35 +1176,35 @@ for equality
 ```go
 func (l ListDouble) Get(i int) Data
 ```
-Get returns the data at the given positon
+Get returns the data at the given positon.
 
 #### func (*ListDouble) Insert
 
 ```go
 func (l *ListDouble) Insert(i int, d ...Data) error
 ```
-Insert will add the given data at the specified position, moving other up
+Insert will add the given data at the specified position, moving other up.
 
 #### func (ListDouble) Len
 
 ```go
 func (l ListDouble) Len() int
 ```
-Len returns the length of the list
+Len returns the length of the list.
 
 #### func (*ListDouble) Remove
 
 ```go
 func (l *ListDouble) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down
+Remove deletes the specified position and shifts remaing data down.
 
 #### func (ListDouble) Set
 
 ```go
 func (l ListDouble) Set(i int, d Data) error
 ```
-Set sets the data at the given position. It does not append
+Set sets the data at the given position. It does not append.
 
 #### func (ListDouble) String
 
@@ -1217,14 +1217,14 @@ func (l ListDouble) String() string
 ```go
 func (ListDouble) TagType() TagID
 ```
-TagType returns the TagID of the type of tag this list contains
+TagType returns the TagID of the type of tag this list contains.
 
 #### func (ListDouble) Type
 
 ```go
 func (ListDouble) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ListEnd
 
@@ -1232,21 +1232,21 @@ Type returns the TagID of the data
 type ListEnd uint32
 ```
 
-ListEnd satisfies the List interface for a list of Ends
+ListEnd satisfies the List interface for a list of Ends.
 
 #### func (*ListEnd) Append
 
 ```go
 func (l *ListEnd) Append(d ...Data) error
 ```
-Append adds to the list
+Append adds to the list.
 
 #### func (ListEnd) Copy
 
 ```go
 func (l ListEnd) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (ListEnd) Equal
 
@@ -1254,42 +1254,42 @@ Copy simply returns a deep-copy the the data
 func (l ListEnd) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (ListEnd) Get
 
 ```go
 func (ListEnd) Get(_ int) Data
 ```
-Get returns an end{}
+Get returns an end{}.
 
 #### func (*ListEnd) Insert
 
 ```go
 func (l *ListEnd) Insert(_ int, d ...Data) error
 ```
-Insert adds to the list
+Insert adds to the list.
 
 #### func (ListEnd) Len
 
 ```go
 func (l ListEnd) Len() int
 ```
-Len returns the length of the List
+Len returns the length of the List.
 
 #### func (*ListEnd) Remove
 
 ```go
 func (l *ListEnd) Remove(i int)
 ```
-Remove removes from the list
+Remove removes from the list.
 
 #### func (ListEnd) Set
 
 ```go
 func (l ListEnd) Set(_ int, d Data) error
 ```
-Set does nothing as it's not applicable for ListEnd
+Set does nothing as it's not applicable for ListEnd.
 
 #### func (ListEnd) String
 
@@ -1302,14 +1302,14 @@ func (l ListEnd) String() string
 ```go
 func (ListEnd) TagType() TagID
 ```
-TagType returns the TagID of the type of tag this list contains
+TagType returns the TagID of the type of tag this list contains.
 
 #### func (ListEnd) Type
 
 ```go
 func (ListEnd) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ListFloat
 
@@ -1317,7 +1317,7 @@ Type returns the TagID of the data
 type ListFloat []Float
 ```
 
-ListFloat satisfies the List interface for a list of Floats
+ListFloat satisfies the List interface for a list of Floats.
 
 #### func (*ListFloat) Append
 
@@ -1331,7 +1331,7 @@ Append adds data to the list
 ```go
 func (l ListFloat) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (ListFloat) Equal
 
@@ -1346,35 +1346,35 @@ for equality
 ```go
 func (l ListFloat) Get(i int) Data
 ```
-Get returns the data at the given positon
+Get returns the data at the given positon.
 
 #### func (*ListFloat) Insert
 
 ```go
 func (l *ListFloat) Insert(i int, d ...Data) error
 ```
-Insert will add the given data at the specified position, moving other up
+Insert will add the given data at the specified position, moving other up.
 
 #### func (ListFloat) Len
 
 ```go
 func (l ListFloat) Len() int
 ```
-Len returns the length of the list
+Len returns the length of the list.
 
 #### func (*ListFloat) Remove
 
 ```go
 func (l *ListFloat) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down
+Remove deletes the specified position and shifts remaing data down.
 
 #### func (ListFloat) Set
 
 ```go
 func (l ListFloat) Set(i int, d Data) error
 ```
-Set sets the data at the given position. It does not append
+Set sets the data at the given position. It does not append.
 
 #### func (ListFloat) String
 
@@ -1387,14 +1387,14 @@ func (l ListFloat) String() string
 ```go
 func (ListFloat) TagType() TagID
 ```
-TagType returns the TagID of the type of tag this list contains
+TagType returns the TagID of the type of tag this list contains.
 
 #### func (ListFloat) Type
 
 ```go
 func (ListFloat) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ListInt
 
@@ -1402,7 +1402,7 @@ Type returns the TagID of the data
 type ListInt []Int
 ```
 
-ListInt satisfies the List interface for a list of Ints
+ListInt satisfies the List interface for a list of Ints.
 
 #### func (*ListInt) Append
 
@@ -1416,7 +1416,7 @@ Append adds data to the list
 ```go
 func (l ListInt) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (ListInt) Equal
 
@@ -1431,35 +1431,35 @@ for equality
 ```go
 func (l ListInt) Get(i int) Data
 ```
-Get returns the data at the given positon
+Get returns the data at the given positon.
 
 #### func (*ListInt) Insert
 
 ```go
 func (l *ListInt) Insert(i int, d ...Data) error
 ```
-Insert will add the given data at the specified position, moving other up
+Insert will add the given data at the specified position, moving other up.
 
 #### func (ListInt) Len
 
 ```go
 func (l ListInt) Len() int
 ```
-Len returns the length of the list
+Len returns the length of the list.
 
 #### func (*ListInt) Remove
 
 ```go
 func (l *ListInt) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down
+Remove deletes the specified position and shifts remaing data down.
 
 #### func (ListInt) Set
 
 ```go
 func (l ListInt) Set(i int, d Data) error
 ```
-Set sets the data at the given position. It does not append
+Set sets the data at the given position. It does not append.
 
 #### func (ListInt) String
 
@@ -1472,14 +1472,14 @@ func (l ListInt) String() string
 ```go
 func (ListInt) TagType() TagID
 ```
-TagType returns the TagID of the type of tag this list contains
+TagType returns the TagID of the type of tag this list contains.
 
 #### func (ListInt) Type
 
 ```go
 func (ListInt) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ListIntArray
 
@@ -1487,7 +1487,7 @@ Type returns the TagID of the data
 type ListIntArray []IntArray
 ```
 
-ListIntArray satisfies the List interface for a list of IntArrays
+ListIntArray satisfies the List interface for a list of IntArrays.
 
 #### func (*ListIntArray) Append
 
@@ -1501,7 +1501,7 @@ Append adds data to the list
 ```go
 func (l ListIntArray) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (ListIntArray) Equal
 
@@ -1516,35 +1516,35 @@ for equality
 ```go
 func (l ListIntArray) Get(i int) Data
 ```
-Get returns the data at the given positon
+Get returns the data at the given positon.
 
 #### func (*ListIntArray) Insert
 
 ```go
 func (l *ListIntArray) Insert(i int, d ...Data) error
 ```
-Insert will add the given data at the specified position, moving other up
+Insert will add the given data at the specified position, moving other up.
 
 #### func (ListIntArray) Len
 
 ```go
 func (l ListIntArray) Len() int
 ```
-Len returns the length of the list
+Len returns the length of the list.
 
 #### func (*ListIntArray) Remove
 
 ```go
 func (l *ListIntArray) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down
+Remove deletes the specified position and shifts remaing data down.
 
 #### func (ListIntArray) Set
 
 ```go
 func (l ListIntArray) Set(i int, d Data) error
 ```
-Set sets the data at the given position. It does not append
+Set sets the data at the given position. It does not append.
 
 #### func (ListIntArray) String
 
@@ -1557,14 +1557,14 @@ func (l ListIntArray) String() string
 ```go
 func (ListIntArray) TagType() TagID
 ```
-TagType returns the TagID of the type of tag this list contains
+TagType returns the TagID of the type of tag this list contains.
 
 #### func (ListIntArray) Type
 
 ```go
 func (ListIntArray) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ListLong
 
@@ -1572,7 +1572,7 @@ Type returns the TagID of the data
 type ListLong []Long
 ```
 
-ListLong satisfies the List interface for a list of Longs
+ListLong satisfies the List interface for a list of Longs.
 
 #### func (*ListLong) Append
 
@@ -1586,7 +1586,7 @@ Append adds data to the list
 ```go
 func (l ListLong) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (ListLong) Equal
 
@@ -1601,35 +1601,35 @@ for equality
 ```go
 func (l ListLong) Get(i int) Data
 ```
-Get returns the data at the given positon
+Get returns the data at the given positon.
 
 #### func (*ListLong) Insert
 
 ```go
 func (l *ListLong) Insert(i int, d ...Data) error
 ```
-Insert will add the given data at the specified position, moving other up
+Insert will add the given data at the specified position, moving other up.
 
 #### func (ListLong) Len
 
 ```go
 func (l ListLong) Len() int
 ```
-Len returns the length of the list
+Len returns the length of the list.
 
 #### func (*ListLong) Remove
 
 ```go
 func (l *ListLong) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down
+Remove deletes the specified position and shifts remaing data down.
 
 #### func (ListLong) Set
 
 ```go
 func (l ListLong) Set(i int, d Data) error
 ```
-Set sets the data at the given position. It does not append
+Set sets the data at the given position. It does not append.
 
 #### func (ListLong) String
 
@@ -1642,14 +1642,14 @@ func (l ListLong) String() string
 ```go
 func (ListLong) TagType() TagID
 ```
-TagType returns the TagID of the type of tag this list contains
+TagType returns the TagID of the type of tag this list contains.
 
 #### func (ListLong) Type
 
 ```go
 func (ListLong) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ListShort
 
@@ -1657,7 +1657,7 @@ Type returns the TagID of the data
 type ListShort []Short
 ```
 
-ListShort satisfies the List interface for a list of Shorts
+ListShort satisfies the List interface for a list of Shorts.
 
 #### func (*ListShort) Append
 
@@ -1671,7 +1671,7 @@ Append adds data to the list
 ```go
 func (l ListShort) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (ListShort) Equal
 
@@ -1686,35 +1686,35 @@ for equality
 ```go
 func (l ListShort) Get(i int) Data
 ```
-Get returns the data at the given positon
+Get returns the data at the given positon.
 
 #### func (*ListShort) Insert
 
 ```go
 func (l *ListShort) Insert(i int, d ...Data) error
 ```
-Insert will add the given data at the specified position, moving other up
+Insert will add the given data at the specified position, moving other up.
 
 #### func (ListShort) Len
 
 ```go
 func (l ListShort) Len() int
 ```
-Len returns the length of the list
+Len returns the length of the list.
 
 #### func (*ListShort) Remove
 
 ```go
 func (l *ListShort) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down
+Remove deletes the specified position and shifts remaing data down.
 
 #### func (ListShort) Set
 
 ```go
 func (l ListShort) Set(i int, d Data) error
 ```
-Set sets the data at the given position. It does not append
+Set sets the data at the given position. It does not append.
 
 #### func (ListShort) String
 
@@ -1727,14 +1727,14 @@ func (l ListShort) String() string
 ```go
 func (ListShort) TagType() TagID
 ```
-TagType returns the TagID of the type of tag this list contains
+TagType returns the TagID of the type of tag this list contains.
 
 #### func (ListShort) Type
 
 ```go
 func (ListShort) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ListUint16
 
@@ -1742,7 +1742,7 @@ Type returns the TagID of the data
 type ListUint16 []Uint16
 ```
 
-ListUint16 satisfies the List interface for a list of Uint16s
+ListUint16 satisfies the List interface for a list of Uint16s.
 
 #### func (*ListUint16) Append
 
@@ -1756,7 +1756,7 @@ Append adds data to the list
 ```go
 func (l ListUint16) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (ListUint16) Equal
 
@@ -1771,35 +1771,35 @@ for equality
 ```go
 func (l ListUint16) Get(i int) Data
 ```
-Get returns the data at the given positon
+Get returns the data at the given positon.
 
 #### func (*ListUint16) Insert
 
 ```go
 func (l *ListUint16) Insert(i int, d ...Data) error
 ```
-Insert will add the given data at the specified position, moving other up
+Insert will add the given data at the specified position, moving other up.
 
 #### func (ListUint16) Len
 
 ```go
 func (l ListUint16) Len() int
 ```
-Len returns the length of the list
+Len returns the length of the list.
 
 #### func (*ListUint16) Remove
 
 ```go
 func (l *ListUint16) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down
+Remove deletes the specified position and shifts remaing data down.
 
 #### func (ListUint16) Set
 
 ```go
 func (l ListUint16) Set(i int, d Data) error
 ```
-Set sets the data at the given position. It does not append
+Set sets the data at the given position. It does not append.
 
 #### func (ListUint16) String
 
@@ -1812,14 +1812,14 @@ func (l ListUint16) String() string
 ```go
 func (ListUint16) TagType() TagID
 ```
-TagType returns the TagID of the type of tag this list contains
+TagType returns the TagID of the type of tag this list contains.
 
 #### func (ListUint16) Type
 
 ```go
 func (ListUint16) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ListUint32
 
@@ -1827,7 +1827,7 @@ Type returns the TagID of the data
 type ListUint32 []Uint32
 ```
 
-ListUint32 satisfies the List interface for a list of Uint32s
+ListUint32 satisfies the List interface for a list of Uint32s.
 
 #### func (*ListUint32) Append
 
@@ -1841,7 +1841,7 @@ Append adds data to the list
 ```go
 func (l ListUint32) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (ListUint32) Equal
 
@@ -1856,35 +1856,35 @@ for equality
 ```go
 func (l ListUint32) Get(i int) Data
 ```
-Get returns the data at the given positon
+Get returns the data at the given positon.
 
 #### func (*ListUint32) Insert
 
 ```go
 func (l *ListUint32) Insert(i int, d ...Data) error
 ```
-Insert will add the given data at the specified position, moving other up
+Insert will add the given data at the specified position, moving other up.
 
 #### func (ListUint32) Len
 
 ```go
 func (l ListUint32) Len() int
 ```
-Len returns the length of the list
+Len returns the length of the list.
 
 #### func (*ListUint32) Remove
 
 ```go
 func (l *ListUint32) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down
+Remove deletes the specified position and shifts remaing data down.
 
 #### func (ListUint32) Set
 
 ```go
 func (l ListUint32) Set(i int, d Data) error
 ```
-Set sets the data at the given position. It does not append
+Set sets the data at the given position. It does not append.
 
 #### func (ListUint32) String
 
@@ -1897,14 +1897,14 @@ func (l ListUint32) String() string
 ```go
 func (ListUint32) TagType() TagID
 ```
-TagType returns the TagID of the type of tag this list contains
+TagType returns the TagID of the type of tag this list contains.
 
 #### func (ListUint32) Type
 
 ```go
 func (ListUint32) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ListUint64
 
@@ -1912,7 +1912,7 @@ Type returns the TagID of the data
 type ListUint64 []Uint64
 ```
 
-ListUint64 satisfies the List interface for a list of Uint64s
+ListUint64 satisfies the List interface for a list of Uint64s.
 
 #### func (*ListUint64) Append
 
@@ -1926,7 +1926,7 @@ Append adds data to the list
 ```go
 func (l ListUint64) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (ListUint64) Equal
 
@@ -1941,35 +1941,35 @@ for equality
 ```go
 func (l ListUint64) Get(i int) Data
 ```
-Get returns the data at the given positon
+Get returns the data at the given positon.
 
 #### func (*ListUint64) Insert
 
 ```go
 func (l *ListUint64) Insert(i int, d ...Data) error
 ```
-Insert will add the given data at the specified position, moving other up
+Insert will add the given data at the specified position, moving other up.
 
 #### func (ListUint64) Len
 
 ```go
 func (l ListUint64) Len() int
 ```
-Len returns the length of the list
+Len returns the length of the list.
 
 #### func (*ListUint64) Remove
 
 ```go
 func (l *ListUint64) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down
+Remove deletes the specified position and shifts remaing data down.
 
 #### func (ListUint64) Set
 
 ```go
 func (l ListUint64) Set(i int, d Data) error
 ```
-Set sets the data at the given position. It does not append
+Set sets the data at the given position. It does not append.
 
 #### func (ListUint64) String
 
@@ -1982,14 +1982,14 @@ func (l ListUint64) String() string
 ```go
 func (ListUint64) TagType() TagID
 ```
-TagType returns the TagID of the type of tag this list contains
+TagType returns the TagID of the type of tag this list contains.
 
 #### func (ListUint64) Type
 
 ```go
 func (ListUint64) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ListUint8
 
@@ -1997,7 +1997,7 @@ Type returns the TagID of the data
 type ListUint8 []Uint8
 ```
 
-ListUint8 satisfies the List interface for a list of Uint8s
+ListUint8 satisfies the List interface for a list of Uint8s.
 
 #### func (*ListUint8) Append
 
@@ -2011,7 +2011,7 @@ Append adds data to the list
 ```go
 func (l ListUint8) Copy() Data
 ```
-Copy simply returns a deep-copy the the data
+Copy simply returns a deep-copy the the data.
 
 #### func (ListUint8) Equal
 
@@ -2026,35 +2026,35 @@ for equality
 ```go
 func (l ListUint8) Get(i int) Data
 ```
-Get returns the data at the given positon
+Get returns the data at the given positon.
 
 #### func (*ListUint8) Insert
 
 ```go
 func (l *ListUint8) Insert(i int, d ...Data) error
 ```
-Insert will add the given data at the specified position, moving other up
+Insert will add the given data at the specified position, moving other up.
 
 #### func (ListUint8) Len
 
 ```go
 func (l ListUint8) Len() int
 ```
-Len returns the length of the list
+Len returns the length of the list.
 
 #### func (*ListUint8) Remove
 
 ```go
 func (l *ListUint8) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down
+Remove deletes the specified position and shifts remaing data down.
 
 #### func (ListUint8) Set
 
 ```go
 func (l ListUint8) Set(i int, d Data) error
 ```
-Set sets the data at the given position. It does not append
+Set sets the data at the given position. It does not append.
 
 #### func (ListUint8) String
 
@@ -2067,14 +2067,14 @@ func (l ListUint8) String() string
 ```go
 func (ListUint8) TagType() TagID
 ```
-TagType returns the TagID of the type of tag this list contains
+TagType returns the TagID of the type of tag this list contains.
 
 #### func (ListUint8) Type
 
 ```go
 func (ListUint8) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type Long
 
@@ -2082,14 +2082,14 @@ Type returns the TagID of the data
 type Long int64
 ```
 
-Long is an implementation of the Data interface
+Long is an implementation of the Data interface.
 
 #### func (Long) Copy
 
 ```go
 func (l Long) Copy() Data
 ```
-Copy simply returns a copy the the data
+Copy simply returns a copy the the data.
 
 #### func (Long) Equal
 
@@ -2097,7 +2097,7 @@ Copy simply returns a copy the the data
 func (l Long) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (Long) String
 
@@ -2110,7 +2110,7 @@ func (l Long) String() string
 ```go
 func (Long) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type ReadError
 
@@ -2121,7 +2121,7 @@ type ReadError struct {
 }
 ```
 
-ReadError is an error returned when a read error occurs
+ReadError is an error returned when a read error occurs.
 
 #### func (ReadError) Error
 
@@ -2135,14 +2135,14 @@ func (r ReadError) Error() string
 type Short int16
 ```
 
-Short is an implementation of the Data interface
+Short is an implementation of the Data interface.
 
 #### func (Short) Copy
 
 ```go
 func (s Short) Copy() Data
 ```
-Copy simply returns a copy the the data
+Copy simply returns a copy the the data.
 
 #### func (Short) Equal
 
@@ -2150,7 +2150,7 @@ Copy simply returns a copy the the data
 func (s Short) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (Short) String
 
@@ -2163,7 +2163,7 @@ func (s Short) String() string
 ```go
 func (Short) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type String
 
@@ -2171,14 +2171,14 @@ Type returns the TagID of the data
 type String string
 ```
 
-String is an implementation of the Data interface
+String is an implementation of the Data interface.
 
 #### func (String) Copy
 
 ```go
 func (s String) Copy() Data
 ```
-Copy simply returns a copy the the data
+Copy simply returns a copy the the data.
 
 #### func (String) Equal
 
@@ -2186,7 +2186,7 @@ Copy simply returns a copy the the data
 func (s String) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (String) String
 
@@ -2199,7 +2199,7 @@ func (s String) String() string
 ```go
 func (String) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type Tag
 
@@ -2208,14 +2208,14 @@ type Tag struct {
 }
 ```
 
-Tag is the main NBT type, a combination of a name and a Data type
+Tag is the main NBT type, a combination of a name and a Data type.
 
 #### func  Decode
 
 ```go
 func Decode(r io.Reader) (Tag, error)
 ```
-Decode will eencode a single tag from the reader using the default settings
+Decode will eencode a single tag from the reader using the default settings.
 
 #### func  NewTag
 
@@ -2229,14 +2229,14 @@ NewTag constructs a new tag with the given name and data.
 ```go
 func (t Tag) Copy() Tag
 ```
-Copy simply returns a deep-copy the the tag
+Copy simply returns a deep-copy the the tag.
 
 #### func (Tag) Data
 
 ```go
 func (t Tag) Data() Data
 ```
-Data returns the tags data type
+Data returns the tags data type.
 
 #### func (Tag) Equal
 
@@ -2244,28 +2244,28 @@ Data returns the tags data type
 func (t Tag) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (Tag) Name
 
 ```go
 func (t Tag) Name() string
 ```
-Name returns the tags' name
+Name returns the tags' name.
 
 #### func (Tag) String
 
 ```go
 func (t Tag) String() string
 ```
-String returns a textual representation of the tag
+String returns a textual representation of the tag.
 
 #### func (Tag) TagID
 
 ```go
 func (t Tag) TagID() TagID
 ```
-TagID returns the type of the data
+TagID returns the type of the data.
 
 #### type TagID
 
@@ -2273,7 +2273,7 @@ TagID returns the type of the data
 type TagID uint8
 ```
 
-TagID represents the type of nbt tag
+TagID represents the type of nbt tag.
 
 ```go
 const (
@@ -2312,14 +2312,14 @@ func (t TagID) String() string
 type Uint16 uint16
 ```
 
-Uint16 is an implementation of the Data interface
+Uint16 is an implementation of the Data interface.
 
 #### func (Uint16) Copy
 
 ```go
 func (u Uint16) Copy() Data
 ```
-Copy simply returns a copy the the data
+Copy simply returns a copy the the data.
 
 #### func (Uint16) Equal
 
@@ -2327,7 +2327,7 @@ Copy simply returns a copy the the data
 func (u Uint16) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (Uint16) String
 
@@ -2340,7 +2340,7 @@ func (u Uint16) String() string
 ```go
 func (Uint16) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type Uint32
 
@@ -2348,14 +2348,14 @@ Type returns the TagID of the data
 type Uint32 uint32
 ```
 
-Uint32 is an implementation of the Data interface
+Uint32 is an implementation of the Data interface.
 
 #### func (Uint32) Copy
 
 ```go
 func (u Uint32) Copy() Data
 ```
-Copy simply returns a copy the the data
+Copy simply returns a copy the the data.
 
 #### func (Uint32) Equal
 
@@ -2363,7 +2363,7 @@ Copy simply returns a copy the the data
 func (u Uint32) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (Uint32) String
 
@@ -2376,7 +2376,7 @@ func (u Uint32) String() string
 ```go
 func (Uint32) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type Uint64
 
@@ -2384,14 +2384,14 @@ Type returns the TagID of the data
 type Uint64 uint64
 ```
 
-Uint64 is an implementation of the Data interface
+Uint64 is an implementation of the Data interface.
 
 #### func (Uint64) Copy
 
 ```go
 func (u Uint64) Copy() Data
 ```
-Copy simply returns a copy the the data
+Copy simply returns a copy the the data.
 
 #### func (Uint64) Equal
 
@@ -2399,7 +2399,7 @@ Copy simply returns a copy the the data
 func (u Uint64) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (Uint64) String
 
@@ -2412,7 +2412,7 @@ func (u Uint64) String() string
 ```go
 func (Uint64) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type Uint8
 
@@ -2420,14 +2420,14 @@ Type returns the TagID of the data
 type Uint8 uint8
 ```
 
-Uint8 is an implementation of the Data interface
+Uint8 is an implementation of the Data interface.
 
 #### func (Uint8) Copy
 
 ```go
 func (u Uint8) Copy() Data
 ```
-Copy simply returns a copy the the data
+Copy simply returns a copy the the data.
 
 #### func (Uint8) Equal
 
@@ -2435,7 +2435,7 @@ Copy simply returns a copy the the data
 func (u Uint8) Equal(e interface{}) bool
 ```
 Equal satisfies the equaler.Equaler interface, allowing for types to be checked
-for equality
+for equality.
 
 #### func (Uint8) String
 
@@ -2448,7 +2448,7 @@ func (u Uint8) String() string
 ```go
 func (Uint8) Type() TagID
 ```
-Type returns the TagID of the data
+Type returns the TagID of the data.
 
 #### type UnknownTag
 
@@ -2476,7 +2476,7 @@ type WriteError struct {
 }
 ```
 
-WriteError is an error returned when a write error occurs
+WriteError is an error returned when a write error occurs.
 
 #### func (WriteError) Error
 
