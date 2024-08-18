@@ -10,14 +10,14 @@ var (
 	ErrInvalidDimensions = errors.New("cannot encode an image with the given dimensions")
 )
 ```
-Errors
+Errors.
 
 #### func  BlockColor
 
 ```go
 func BlockColor(b minecraft.Block) color.Color
 ```
-BlockColor is the standard block-to-colour func
+BlockColor is the standard block-to-colour func.
 
 #### func  Config
 
@@ -47,7 +47,7 @@ func Encode(w io.Writer, i image.Image) error
 Encode writes an image an as uncompressed Minecraft map.
 
 As Minecraft expects the map to be gzip compressed, the Writer sohuld be the
-wrapped in gzip.NewWriter
+wrapped in gzip.NewWriter.
 
 #### type Encoder
 
@@ -58,7 +58,7 @@ type Encoder struct {
 }
 ```
 
-Encoder lets you specify options for the Minecraft map
+Encoder lets you specify options for the Minecraft map.
 
 #### func (*Encoder) Encode
 
@@ -68,7 +68,7 @@ func (e *Encoder) Encode(w io.Writer, im image.Image) error
 Encode writes an image an as uncompressed Minecraft map.
 
 As Minecraft expects the map to be gzip compressed, the Writer sohuld be the
-wrapped in gzip.NewWriter
+wrapped in gzip.NewWriter.
 
 #### type Image
 
@@ -77,7 +77,7 @@ type Image struct {
 }
 ```
 
-Image represents a Minecraft Map
+Image represents a Minecraft Map.
 
 #### func  NewMap
 
@@ -91,21 +91,21 @@ NewMap creates an image from a Minecraft level.
 ```go
 func (i Image) At(x, z int) color.Color
 ```
-At returns the colour at the specified coords
+At returns the colour at the specified coords.
 
 #### func (Image) Bounds
 
 ```go
 func (i Image) Bounds() image.Rectangle
 ```
-Bounds returns the dimensions of the map
+Bounds returns the dimensions of the map.
 
 #### func (Image) ColorModel
 
 ```go
 func (Image) ColorModel() color.Model
 ```
-ColorModel returns the palette for the map
+ColorModel returns the palette for the map.
 
 #### type Option
 
@@ -113,7 +113,7 @@ ColorModel returns the palette for the map
 type Option func(*Image)
 ```
 
-Option represents a optional parameter for a map type
+Option represents a optional parameter for a map type.
 
 #### func  ColorFunc
 
@@ -129,7 +129,7 @@ as.
 func FixedY(y int32) Option
 ```
 FixedY is an options to fix the Y-coord of the blocks to be read. By default the
-highest, non-transparent block is usedd.
+highest, non-transparent block is used.
 
 #### func  Scale
 
