@@ -1,6 +1,6 @@
 package minecraft
 
-// Biome constants
+// Biome constants.
 const (
 	Ocean                Biome = 0
 	Plains               Biome = 1
@@ -66,16 +66,17 @@ const (
 	AutoBiome            Biome = 255
 )
 
-// Biome is a convenience type for biomes
+// Biome is a convenience type for biomes.
 type Biome uint8
 
-// Equal is an implementation of the equaler.Equaler interface
+// Equal is an implementation of the equaler.Equaler interface.
 func (b Biome) Equal(e interface{}) bool {
 	if c, ok := e.(*Biome); ok {
 		return b == *c
 	} else if c, ok := e.(Biome); ok {
 		return b == c
 	}
+
 	return false
 }
 
@@ -206,14 +207,19 @@ func (b Biome) String() string {
 	case AutoBiome:
 		return "Auto"
 	}
+
 	place := 0
+
 	for n := b; n > 0; n /= 10 {
 		place++
 	}
+
 	digits := make([]byte, place)
+
 	for n := b; n > 0; n /= 10 {
 		place--
 		digits[place] = '0' + byte(n%10)
 	}
+
 	return "Unrecognised Biome ID - " + string(digits)
 }
