@@ -31,19 +31,21 @@ func readData(r io.Reader) (nbt.Compound, error) {
 			Got:       d.TagID(),
 		}
 	}
+
 	return d.Data().(nbt.Compound), nil
 }
 
 func getDimensions(d nbt.Compound) image.Rectangle {
 	var width, height int
-	w := d.Get("width")
-	if w.TagID() == nbt.TagShort {
+
+	if w := d.Get("width"); w.TagID() == nbt.TagShort {
 		width = int(w.Data().(nbt.Short))
 	}
-	h := d.Get("height")
-	if h.TagID() == nbt.TagShort {
+
+	if h := d.Get("height"); h.TagID() == nbt.TagShort {
 		height = int(h.Data().(nbt.Short))
 	}
+
 	return image.Rectangle{
 		image.Point{0, 0},
 		image.Point{width, height},
@@ -87,7 +89,9 @@ func Config(r io.Reader) (image.Config, error) {
 	if err != nil {
 		return image.Config{}, err
 	}
+
 	rect := getDimensions(d)
+
 	return image.Config{
 		ColorModel: palette,
 		Width:      int(rect.Max.X),

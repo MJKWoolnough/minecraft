@@ -11,16 +11,17 @@ import (
 // Encode writes an image an as uncompressed Minecraft map.
 //
 // As Minecraft expects the map to be gzip compressed, the Writer sohuld be the
-// wrapped in gzip.NewWriter
+// wrapped in gzip.NewWriter.
 func Encode(w io.Writer, i image.Image) error {
 	e := Encoder{
 		Dimension: -128,
 		Scale:     3,
 	}
+
 	return e.Encode(w, i)
 }
 
-// Encoder lets you specify options for the Minecraft map
+// Encoder lets you specify options for the Minecraft map.
 type Encoder struct {
 	Scale, Dimension int8
 	CenterX, CenterZ int32
@@ -29,15 +30,16 @@ type Encoder struct {
 // Encode writes an image an as uncompressed Minecraft map.
 //
 // As Minecraft expects the map to be gzip compressed, the Writer sohuld be the
-// wrapped in gzip.NewWriter
+// wrapped in gzip.NewWriter.
 func (e *Encoder) Encode(w io.Writer, im image.Image) error {
-	width := im.Bounds().Dx()
-	height := im.Bounds().Dy()
+	width, height := im.Bounds().Dx(), im.Bounds().Dy()
+
 	if width > 0xffff || height > 0xffff || width < 0 || height < 0 {
 		return ErrInvalidDimensions
 	}
 
 	colours := make(nbt.ByteArray, 0, width*height)
+
 	for j := im.Bounds().Min.Y; j < im.Bounds().Max.Y; j++ {
 		for i := im.Bounds().Min.X; i < im.Bounds().Max.X; i++ {
 			colours = append(colours, int8(palette.Index(im.At(i, j))))
@@ -57,7 +59,7 @@ func (e *Encoder) Encode(w io.Writer, im image.Image) error {
 	}))
 }
 
-// Errors
+// Errors.
 var (
 	ErrInvalidDimensions = errors.New("cannot encode an image with the given dimensions")
 )
