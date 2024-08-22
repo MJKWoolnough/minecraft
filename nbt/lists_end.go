@@ -13,7 +13,7 @@ func (l ListEnd) Equal(e interface{}) bool {
 	return ok && m.TagType() == TagEnd && ListEnd(m.Len()) == l
 }
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (l ListEnd) Copy() Data {
 	return &l
 }

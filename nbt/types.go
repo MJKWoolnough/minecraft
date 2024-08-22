@@ -75,7 +75,7 @@ func NewTag(name string, d Data) Tag {
 	}
 }
 
-// Copy simply returns a deep-copy the the tag.
+// Copy simply returns a deep-copy of the tag.
 func (t Tag) Copy() Tag {
 	return Tag{
 		t.name,
@@ -148,7 +148,7 @@ func (end) String() string {
 // the spec.
 type Byte int8
 
-// Copy simply returns a copy the the data
+// Copy simply returns a copy of the data
 func (b Byte) Copy() Data {
 	return b
 }
@@ -175,7 +175,7 @@ func (Byte) Type() TagID {
 // Short is an implementation of the Data interface.
 type Short int16
 
-// Copy simply returns a copy the the data.
+// Copy simply returns a copy of the data.
 func (s Short) Copy() Data {
 	return s
 }
@@ -202,7 +202,7 @@ func (Short) Type() TagID {
 // Int is an implementation of the Data interface.
 type Int int32
 
-// Copy simply returns a copy the the data.
+// Copy simply returns a copy of the data.
 func (i Int) Copy() Data {
 	return i
 }
@@ -229,7 +229,7 @@ func (Int) Type() TagID {
 // Long is an implementation of the Data interface.
 type Long int64
 
-// Copy simply returns a copy the the data.
+// Copy simply returns a copy of the data.
 func (l Long) Copy() Data {
 	return l
 }
@@ -256,7 +256,7 @@ func (Long) Type() TagID {
 // Float is an implementation of the Data interface.
 type Float float32
 
-// Copy simply returns a copy the the data.
+// Copy simply returns a copy of the data.
 func (f Float) Copy() Data {
 	return f
 }
@@ -283,7 +283,7 @@ func (Float) Type() TagID {
 // Double is an implementation of the Data interface.
 type Double float64
 
-// Copy simply returns a copy the the data.
+// Copy simply returns a copy of the data.
 func (d Double) Copy() Data {
 	return d
 }
@@ -310,7 +310,7 @@ func (Double) Type() TagID {
 // ByteArray is an implementation of the Data interface.
 type ByteArray []int8
 
-// Copy simply returns a copy the the data.
+// Copy simply returns a copy of the data.
 func (b ByteArray) Copy() Data {
 	c := make(ByteArray, len(b))
 
@@ -363,7 +363,7 @@ func (b ByteArray) Bytes() []byte {
 // String is an implementation of the Data interface.
 type String string
 
-// Copy simply returns a copy the the data.
+// Copy simply returns a copy of the data.
 func (s String) Copy() Data {
 	return s
 }
@@ -498,7 +498,7 @@ func (l *ListData) TagType() TagID {
 	return l.tagType
 }
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (l *ListData) Copy() Data {
 	c := new(ListData)
 	c.tagType = l.tagType
@@ -554,7 +554,7 @@ func (l *ListData) Set(i int, data Data) error {
 	return nil
 }
 
-// Get returns the data at the given positon.
+// Get returns the data at the given position.
 func (l *ListData) Get(i int) Data {
 	if i >= 0 && i < len(l.data) {
 		return l.data[i]
@@ -586,7 +586,7 @@ func (l *ListData) Insert(i int, data ...Data) error {
 	return nil
 }
 
-// Remove deletes the specified position and shifts remaing data down.
+// Remove deletes the specified position and shifts remaining data down.
 func (l *ListData) Remove(i int) {
 	if i >= 0 && i < len(l.data) {
 		copy(l.data[i:], l.data[i+1:])
@@ -619,7 +619,7 @@ func (ListData) Type() TagID {
 // Compound is an implementation of the Data interface.
 type Compound []Tag
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (c Compound) Copy() Data {
 	d := make(Compound, len(c))
 
@@ -711,7 +711,7 @@ func (Compound) Type() TagID {
 // IntArray is an implementation of the Data interface.
 type IntArray []int32
 
-// Copy simply returns a copy the the data.
+// Copy simply returns a copy of the data.
 func (i IntArray) Copy() Data {
 	c := make(IntArray, len(i))
 
@@ -760,7 +760,7 @@ func (IntArray) Type() TagID {
 // Bool is an implementation of the Data interface.
 type Bool bool
 
-// Copy simply returns a copy the the data.
+// Copy simply returns a copy of the data.
 func (b Bool) Copy() Data {
 	return b
 }
@@ -790,7 +790,7 @@ func (Bool) Type() TagID {
 // Uint8 is an implementation of the Data interface.
 type Uint8 uint8
 
-// Copy simply returns a copy the the data.
+// Copy simply returns a copy of the data.
 func (u Uint8) Copy() Data {
 	return u
 }
@@ -817,7 +817,7 @@ func (Uint8) Type() TagID {
 // Uint16 is an implementation of the Data interface.
 type Uint16 uint16
 
-// Copy simply returns a copy the the data.
+// Copy simply returns a copy of the data.
 func (u Uint16) Copy() Data {
 	return u
 }
@@ -844,7 +844,7 @@ func (Uint16) Type() TagID {
 // Uint32 is an implementation of the Data interface.
 type Uint32 uint32
 
-// Copy simply returns a copy the the data.
+// Copy simply returns a copy of the data.
 func (u Uint32) Copy() Data {
 	return u
 }
@@ -871,7 +871,7 @@ func (Uint32) Type() TagID {
 // Uint64 is an implementation of the Data interface.
 type Uint64 uint64
 
-// Copy simply returns a copy the the data.
+// Copy simply returns a copy of the data.
 func (u Uint64) Copy() Data {
 	return u
 }
@@ -898,7 +898,7 @@ func (Uint64) Type() TagID {
 // Complex64 is an implementation of the Data interface.
 type Complex64 complex64
 
-// Copy simply returns a copy the the data.
+// Copy simply returns a copy of the data.
 func (c Complex64) Copy() Data {
 	return c
 }
@@ -939,7 +939,7 @@ func (Complex64) Type() TagID {
 // Complex128 is an implementation of the Data interface.
 type Complex128 complex128
 
-// Copy simply returns a copy the the data.
+// Copy simply returns a copy of the data.
 func (c Complex128) Copy() Data {
 	return c
 }

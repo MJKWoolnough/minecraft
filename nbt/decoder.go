@@ -21,7 +21,7 @@ func NewDecoderEndian(e byteio.EndianReader) Decoder {
 	return Decoder{r: e}
 }
 
-// Decode will eencode a single tag from the reader using the default settings.
+// Decode will encode a single tag from the reader using the default settings.
 func Decode(r io.Reader) (Tag, error) {
 	return NewDecoder(r).Decode()
 }
