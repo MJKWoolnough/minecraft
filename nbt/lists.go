@@ -42,7 +42,7 @@ func (l ListByte) Equal(e interface{}) bool {
 	return false
 }
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (l ListByte) Copy() Data {
 	m := make(ListByte, len(l))
 	for n, e := range l {
@@ -87,7 +87,7 @@ func (l ListByte) Set(i int, d Data) error {
 	return nil
 }
 
-// Get returns the data at the given positon.
+// Get returns the data at the given position.
 func (l ListByte) Get(i int) Data {
 	return l[i]
 }
@@ -131,7 +131,7 @@ func (l *ListByte) Insert(i int, d ...Data) error {
 	return nil
 }
 
-// Remove deletes the specified position and shifts remaing data down.
+// Remove deletes the specified position and shifts remaining data down.
 func (l *ListByte) Remove(i int) {
 	if i >= len(*l) {
 		return
@@ -201,7 +201,7 @@ func (l ListShort) Equal(e interface{}) bool {
 	return false
 }
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (l ListShort) Copy() Data {
 	m := make(ListShort, len(l))
 	for n, e := range l {
@@ -246,7 +246,7 @@ func (l ListShort) Set(i int, d Data) error {
 	return nil
 }
 
-// Get returns the data at the given positon.
+// Get returns the data at the given position.
 func (l ListShort) Get(i int) Data {
 	return l[i]
 }
@@ -290,7 +290,7 @@ func (l *ListShort) Insert(i int, d ...Data) error {
 	return nil
 }
 
-// Remove deletes the specified position and shifts remaing data down.
+// Remove deletes the specified position and shifts remaining data down.
 func (l *ListShort) Remove(i int) {
 	if i >= len(*l) {
 		return
@@ -360,7 +360,7 @@ func (l ListInt) Equal(e interface{}) bool {
 	return false
 }
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (l ListInt) Copy() Data {
 	m := make(ListInt, len(l))
 	for n, e := range l {
@@ -405,7 +405,7 @@ func (l ListInt) Set(i int, d Data) error {
 	return nil
 }
 
-// Get returns the data at the given positon.
+// Get returns the data at the given position.
 func (l ListInt) Get(i int) Data {
 	return l[i]
 }
@@ -449,7 +449,7 @@ func (l *ListInt) Insert(i int, d ...Data) error {
 	return nil
 }
 
-// Remove deletes the specified position and shifts remaing data down.
+// Remove deletes the specified position and shifts remaining data down.
 func (l *ListInt) Remove(i int) {
 	if i >= len(*l) {
 		return
@@ -519,7 +519,7 @@ func (l ListLong) Equal(e interface{}) bool {
 	return false
 }
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (l ListLong) Copy() Data {
 	m := make(ListLong, len(l))
 	for n, e := range l {
@@ -564,7 +564,7 @@ func (l ListLong) Set(i int, d Data) error {
 	return nil
 }
 
-// Get returns the data at the given positon.
+// Get returns the data at the given position.
 func (l ListLong) Get(i int) Data {
 	return l[i]
 }
@@ -608,7 +608,7 @@ func (l *ListLong) Insert(i int, d ...Data) error {
 	return nil
 }
 
-// Remove deletes the specified position and shifts remaing data down.
+// Remove deletes the specified position and shifts remaining data down.
 func (l *ListLong) Remove(i int) {
 	if i >= len(*l) {
 		return
@@ -678,7 +678,7 @@ func (l ListFloat) Equal(e interface{}) bool {
 	return false
 }
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (l ListFloat) Copy() Data {
 	m := make(ListFloat, len(l))
 	for n, e := range l {
@@ -723,7 +723,7 @@ func (l ListFloat) Set(i int, d Data) error {
 	return nil
 }
 
-// Get returns the data at the given positon.
+// Get returns the data at the given position.
 func (l ListFloat) Get(i int) Data {
 	return l[i]
 }
@@ -767,7 +767,7 @@ func (l *ListFloat) Insert(i int, d ...Data) error {
 	return nil
 }
 
-// Remove deletes the specified position and shifts remaing data down.
+// Remove deletes the specified position and shifts remaining data down.
 func (l *ListFloat) Remove(i int) {
 	if i >= len(*l) {
 		return
@@ -837,7 +837,7 @@ func (l ListDouble) Equal(e interface{}) bool {
 	return false
 }
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (l ListDouble) Copy() Data {
 	m := make(ListDouble, len(l))
 	for n, e := range l {
@@ -882,7 +882,7 @@ func (l ListDouble) Set(i int, d Data) error {
 	return nil
 }
 
-// Get returns the data at the given positon.
+// Get returns the data at the given position.
 func (l ListDouble) Get(i int) Data {
 	return l[i]
 }
@@ -926,7 +926,7 @@ func (l *ListDouble) Insert(i int, d ...Data) error {
 	return nil
 }
 
-// Remove deletes the specified position and shifts remaing data down.
+// Remove deletes the specified position and shifts remaining data down.
 func (l *ListDouble) Remove(i int) {
 	if i >= len(*l) {
 		return
@@ -996,7 +996,7 @@ func (l ListCompound) Equal(e interface{}) bool {
 	return false
 }
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (l ListCompound) Copy() Data {
 	m := make(ListCompound, len(l))
 	for n, e := range l {
@@ -1041,7 +1041,7 @@ func (l ListCompound) Set(i int, d Data) error {
 	return nil
 }
 
-// Get returns the data at the given positon.
+// Get returns the data at the given position.
 func (l ListCompound) Get(i int) Data {
 	return l[i]
 }
@@ -1085,7 +1085,7 @@ func (l *ListCompound) Insert(i int, d ...Data) error {
 	return nil
 }
 
-// Remove deletes the specified position and shifts remaing data down.
+// Remove deletes the specified position and shifts remaining data down.
 func (l *ListCompound) Remove(i int) {
 	if i >= len(*l) {
 		return
@@ -1156,7 +1156,7 @@ func (l ListIntArray) Equal(e interface{}) bool {
 	return false
 }
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (l ListIntArray) Copy() Data {
 	m := make(ListIntArray, len(l))
 	for n, e := range l {
@@ -1201,7 +1201,7 @@ func (l ListIntArray) Set(i int, d Data) error {
 	return nil
 }
 
-// Get returns the data at the given positon.
+// Get returns the data at the given position.
 func (l ListIntArray) Get(i int) Data {
 	return l[i]
 }
@@ -1245,7 +1245,7 @@ func (l *ListIntArray) Insert(i int, d ...Data) error {
 	return nil
 }
 
-// Remove deletes the specified position and shifts remaing data down.
+// Remove deletes the specified position and shifts remaining data down.
 func (l *ListIntArray) Remove(i int) {
 	if i >= len(*l) {
 		return
@@ -1315,7 +1315,7 @@ func (l ListBool) Equal(e interface{}) bool {
 	return false
 }
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (l ListBool) Copy() Data {
 	m := make(ListBool, len(l))
 	for n, e := range l {
@@ -1360,7 +1360,7 @@ func (l ListBool) Set(i int, d Data) error {
 	return nil
 }
 
-// Get returns the data at the given positon.
+// Get returns the data at the given position.
 func (l ListBool) Get(i int) Data {
 	return l[i]
 }
@@ -1404,7 +1404,7 @@ func (l *ListBool) Insert(i int, d ...Data) error {
 	return nil
 }
 
-// Remove deletes the specified position and shifts remaing data down.
+// Remove deletes the specified position and shifts remaining data down.
 func (l *ListBool) Remove(i int) {
 	if i >= len(*l) {
 		return
@@ -1474,7 +1474,7 @@ func (l ListUint8) Equal(e interface{}) bool {
 	return false
 }
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (l ListUint8) Copy() Data {
 	m := make(ListUint8, len(l))
 	for n, e := range l {
@@ -1519,7 +1519,7 @@ func (l ListUint8) Set(i int, d Data) error {
 	return nil
 }
 
-// Get returns the data at the given positon.
+// Get returns the data at the given position.
 func (l ListUint8) Get(i int) Data {
 	return l[i]
 }
@@ -1563,7 +1563,7 @@ func (l *ListUint8) Insert(i int, d ...Data) error {
 	return nil
 }
 
-// Remove deletes the specified position and shifts remaing data down.
+// Remove deletes the specified position and shifts remaining data down.
 func (l *ListUint8) Remove(i int) {
 	if i >= len(*l) {
 		return
@@ -1633,7 +1633,7 @@ func (l ListUint16) Equal(e interface{}) bool {
 	return false
 }
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (l ListUint16) Copy() Data {
 	m := make(ListUint16, len(l))
 	for n, e := range l {
@@ -1678,7 +1678,7 @@ func (l ListUint16) Set(i int, d Data) error {
 	return nil
 }
 
-// Get returns the data at the given positon.
+// Get returns the data at the given position.
 func (l ListUint16) Get(i int) Data {
 	return l[i]
 }
@@ -1722,7 +1722,7 @@ func (l *ListUint16) Insert(i int, d ...Data) error {
 	return nil
 }
 
-// Remove deletes the specified position and shifts remaing data down.
+// Remove deletes the specified position and shifts remaining data down.
 func (l *ListUint16) Remove(i int) {
 	if i >= len(*l) {
 		return
@@ -1792,7 +1792,7 @@ func (l ListUint32) Equal(e interface{}) bool {
 	return false
 }
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (l ListUint32) Copy() Data {
 	m := make(ListUint32, len(l))
 	for n, e := range l {
@@ -1837,7 +1837,7 @@ func (l ListUint32) Set(i int, d Data) error {
 	return nil
 }
 
-// Get returns the data at the given positon.
+// Get returns the data at the given position.
 func (l ListUint32) Get(i int) Data {
 	return l[i]
 }
@@ -1881,7 +1881,7 @@ func (l *ListUint32) Insert(i int, d ...Data) error {
 	return nil
 }
 
-// Remove deletes the specified position and shifts remaing data down.
+// Remove deletes the specified position and shifts remaining data down.
 func (l *ListUint32) Remove(i int) {
 	if i >= len(*l) {
 		return
@@ -1951,7 +1951,7 @@ func (l ListUint64) Equal(e interface{}) bool {
 	return false
 }
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (l ListUint64) Copy() Data {
 	m := make(ListUint64, len(l))
 	for n, e := range l {
@@ -1996,7 +1996,7 @@ func (l ListUint64) Set(i int, d Data) error {
 	return nil
 }
 
-// Get returns the data at the given positon.
+// Get returns the data at the given position.
 func (l ListUint64) Get(i int) Data {
 	return l[i]
 }
@@ -2040,7 +2040,7 @@ func (l *ListUint64) Insert(i int, d ...Data) error {
 	return nil
 }
 
-// Remove deletes the specified position and shifts remaing data down.
+// Remove deletes the specified position and shifts remaining data down.
 func (l *ListUint64) Remove(i int) {
 	if i >= len(*l) {
 		return
@@ -2110,7 +2110,7 @@ func (l ListComplex64) Equal(e interface{}) bool {
 	return false
 }
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (l ListComplex64) Copy() Data {
 	m := make(ListComplex64, len(l))
 	for n, e := range l {
@@ -2155,7 +2155,7 @@ func (l ListComplex64) Set(i int, d Data) error {
 	return nil
 }
 
-// Get returns the data at the given positon.
+// Get returns the data at the given position.
 func (l ListComplex64) Get(i int) Data {
 	return l[i]
 }
@@ -2199,7 +2199,7 @@ func (l *ListComplex64) Insert(i int, d ...Data) error {
 	return nil
 }
 
-// Remove deletes the specified position and shifts remaing data down.
+// Remove deletes the specified position and shifts remaining data down.
 func (l *ListComplex64) Remove(i int) {
 	if i >= len(*l) {
 		return
@@ -2269,7 +2269,7 @@ func (l ListComplex128) Equal(e interface{}) bool {
 	return false
 }
 
-// Copy simply returns a deep-copy the the data.
+// Copy simply returns a deep-copy of the data.
 func (l ListComplex128) Copy() Data {
 	m := make(ListComplex128, len(l))
 	for n, e := range l {
@@ -2314,7 +2314,7 @@ func (l ListComplex128) Set(i int, d Data) error {
 	return nil
 }
 
-// Get returns the data at the given positon.
+// Get returns the data at the given position.
 func (l ListComplex128) Get(i int) Data {
 	return l[i]
 }
@@ -2358,7 +2358,7 @@ func (l *ListComplex128) Insert(i int, d ...Data) error {
 	return nil
 }
 
-// Remove deletes the specified position and shifts remaing data down.
+// Remove deletes the specified position and shifts remaining data down.
 func (l *ListComplex128) Remove(i int) {
 	if i >= len(*l) {
 		return
