@@ -54,7 +54,7 @@ types=( Byte Short Int Long Float Double Compound IntArray Bool Uint8 Uint16 Uin
 
 		echo;
 
-		echo "// Copy simply returns a deep-copy the the data.";
+		echo "// Copy simply returns a deep-copy of the data.";
 		echo "func (l List$type) Copy() Data {";
 		echo "	m := make(List$type, len(l))";
 		echo "	for n, e := range l {";
@@ -109,7 +109,7 @@ types=( Byte Short Int Long Float Double Compound IntArray Bool Uint8 Uint16 Uin
 
 		echo;
 
-		echo "// Get returns the data at the given positon.";
+		echo "// Get returns the data at the given position.";
 		echo "func (l List$type) Get(i int) Data {";
 		echo "	return l[i]";
 		echo "}";
@@ -159,7 +159,7 @@ types=( Byte Short Int Long Float Double Compound IntArray Bool Uint8 Uint16 Uin
 
 		echo;
 
-		echo "// Remove deletes the specified position and shifts remaing data down."
+		echo "// Remove deletes the specified position and shifts remaining data down."
 		echo "func (l *List$type) Remove(i int) {";
 		echo "	if i >= len(*l) {";
 		echo "		return";
