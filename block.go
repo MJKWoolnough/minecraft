@@ -110,7 +110,7 @@ func (b Block) IsLiquid() bool {
 	return b.ID == 8 || b.ID == 9 || b.ID == 10 || b.ID == 11
 }
 
-// HasMetadata returns true the the block contains extended metadata.
+// HasMetadata returns true if the block contains extended metadata.
 func (b Block) HasMetadata() bool {
 	return len(b.metadata) > 0
 }

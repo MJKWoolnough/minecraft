@@ -64,7 +64,7 @@ func (l LightBlockList) Remove(blockID uint16) bool {
 
 var (
 	// TransparentBlocks is a slice of the block ids that are transparent.
-	// This is used in lighting calculations and is user overrideable for custom
+	// This is used in lighting calculations and is user overridable for custom
 	// blocks.
 	TransparentBlocks = TransparentBlockList{0, 6, 18, 20, 26, 27, 28, 29, 30, 31, 33, 34, 37, 38, 39, 40, 50, 51, 52, 54, 55, 59, 63, 64, 65, 66, 69, 70, 71, 75, 76, 77, 78, 79, 81, 83, 85, 90, 92, 93, 94, 96, 102, 106, 107, 117, 118, 119, 120, 750}
 	// LightBlocks is a map of block ids to the amount of light they give off.

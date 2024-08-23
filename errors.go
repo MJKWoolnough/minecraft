@@ -24,7 +24,7 @@ func (m MissingTagError) Error() string {
 	return "minecraft: missing " + strconv.Quote(m.TagName) + " tag"
 }
 
-// WrongTypeError is an error returned when a nbt tag has an unexpected type.
+// WrongTypeError is an error returned when an nbt tag has an unexpected type.
 type WrongTypeError struct {
 	TagName        string
 	Expecting, Got nbt.TagID
@@ -45,7 +45,7 @@ func (u UnexpectedValue) Error() string {
 }
 
 // UnknownCompression is an error returned by path types when it encounters a
-// compression scheme it is not prepared to handle or an unkown compression
+// compression scheme it is not prepared to handle or an unknown compression
 // scheme.
 type UnknownCompression struct {
 	Code byte

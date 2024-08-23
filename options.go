@@ -192,7 +192,7 @@ func (l *Level) KeepInventory(d bool) {
 	l.setGameRule("keepInventory", d)
 }
 
-// LogAdminCommands enables/disables the logging of admin commmands to the log.
+// LogAdminCommands enables/disables the logging of admin commands to the log.
 func (l *Level) LogAdminCommands(d bool) {
 	l.setGameRule("logAdminCommands", d)
 }
