@@ -34,7 +34,7 @@ Bool is an implementation of the Data interface.
 ```go
 func (b Bool) Copy() Data
 ```
-Copy simply returns a copy the the data.
+Copy simply returns a copy of the data.
 
 #### func (Bool) Equal
 
@@ -71,7 +71,7 @@ integer, it is still called a byte to match the spec.
 ```go
 func (b Byte) Copy() Data
 ```
-Copy simply returns a copy the the data
+Copy simply returns a copy of the data
 
 #### func (Byte) Equal
 
@@ -115,7 +115,7 @@ May uss unsafe, so the underlying array may be the same.
 ```go
 func (b ByteArray) Copy() Data
 ```
-Copy simply returns a copy the the data.
+Copy simply returns a copy of the data.
 
 #### func (ByteArray) Equal
 
@@ -151,7 +151,7 @@ Complex128 is an implementation of the Data interface.
 ```go
 func (c Complex128) Copy() Data
 ```
-Copy simply returns a copy the the data.
+Copy simply returns a copy of the data.
 
 #### func (Complex128) Equal
 
@@ -187,7 +187,7 @@ Complex64 is an implementation of the Data interface.
 ```go
 func (c Complex64) Copy() Data
 ```
-Copy simply returns a copy the the data.
+Copy simply returns a copy of the data.
 
 #### func (Complex64) Equal
 
@@ -223,7 +223,7 @@ Compound is an implementation of the Data interface.
 ```go
 func (c Compound) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (Compound) Equal
 
@@ -324,7 +324,7 @@ Double is an implementation of the Data interface.
 ```go
 func (d Double) Copy() Data
 ```
-Copy simply returns a copy the the data.
+Copy simply returns a copy of the data.
 
 #### func (Double) Equal
 
@@ -390,7 +390,7 @@ Float is an implementation of the Data interface.
 ```go
 func (f Float) Copy() Data
 ```
-Copy simply returns a copy the the data.
+Copy simply returns a copy of the data.
 
 #### func (Float) Equal
 
@@ -426,7 +426,7 @@ Int is an implementation of the Data interface.
 ```go
 func (i Int) Copy() Data
 ```
-Copy simply returns a copy the the data.
+Copy simply returns a copy of the data.
 
 #### func (Int) Equal
 
@@ -462,7 +462,7 @@ IntArray is an implementation of the Data interface.
 ```go
 func (i IntArray) Copy() Data
 ```
-Copy simply returns a copy the the data.
+Copy simply returns a copy of the data.
 
 #### func (IntArray) Equal
 
@@ -537,7 +537,7 @@ Append adds data to the list
 ```go
 func (l ListBool) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (ListBool) Equal
 
@@ -552,7 +552,7 @@ for equality
 ```go
 func (l ListBool) Get(i int) Data
 ```
-Get returns the data at the given positon.
+Get returns the data at the given position.
 
 #### func (*ListBool) Insert
 
@@ -573,7 +573,7 @@ Len returns the length of the list.
 ```go
 func (l *ListBool) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down.
+Remove deletes the specified position and shifts remaining data down.
 
 #### func (ListBool) Set
 
@@ -622,7 +622,7 @@ Append adds data to the list
 ```go
 func (l ListByte) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (ListByte) Equal
 
@@ -637,7 +637,7 @@ for equality
 ```go
 func (l ListByte) Get(i int) Data
 ```
-Get returns the data at the given positon.
+Get returns the data at the given position.
 
 #### func (*ListByte) Insert
 
@@ -658,7 +658,7 @@ Len returns the length of the list.
 ```go
 func (l *ListByte) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down.
+Remove deletes the specified position and shifts remaining data down.
 
 #### func (ListByte) Set
 
@@ -707,7 +707,7 @@ Append adds data to the list
 ```go
 func (l ListComplex128) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (ListComplex128) Equal
 
@@ -722,7 +722,7 @@ for equality
 ```go
 func (l ListComplex128) Get(i int) Data
 ```
-Get returns the data at the given positon.
+Get returns the data at the given position.
 
 #### func (*ListComplex128) Insert
 
@@ -743,7 +743,7 @@ Len returns the length of the list.
 ```go
 func (l *ListComplex128) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down.
+Remove deletes the specified position and shifts remaining data down.
 
 #### func (ListComplex128) Set
 
@@ -792,7 +792,7 @@ Append adds data to the list
 ```go
 func (l ListComplex64) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (ListComplex64) Equal
 
@@ -807,7 +807,7 @@ for equality
 ```go
 func (l ListComplex64) Get(i int) Data
 ```
-Get returns the data at the given positon.
+Get returns the data at the given position.
 
 #### func (*ListComplex64) Insert
 
@@ -828,7 +828,7 @@ Len returns the length of the list.
 ```go
 func (l *ListComplex64) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down.
+Remove deletes the specified position and shifts remaining data down.
 
 #### func (ListComplex64) Set
 
@@ -877,7 +877,7 @@ Append adds data to the list
 ```go
 func (l ListCompound) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (ListCompound) Equal
 
@@ -892,7 +892,7 @@ for equality
 ```go
 func (l ListCompound) Get(i int) Data
 ```
-Get returns the data at the given positon.
+Get returns the data at the given position.
 
 #### func (*ListCompound) Insert
 
@@ -913,7 +913,7 @@ Len returns the length of the list.
 ```go
 func (l *ListCompound) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down.
+Remove deletes the specified position and shifts remaining data down.
 
 #### func (ListCompound) Set
 
@@ -963,7 +963,7 @@ Append adds data to the list.
 ```go
 func (l *ListData) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (*ListData) Equal
 
@@ -978,7 +978,7 @@ for equality.
 ```go
 func (l *ListData) Get(i int) Data
 ```
-Get returns the data at the given positon.
+Get returns the data at the given position.
 
 #### func (*ListData) Insert
 
@@ -1112,7 +1112,7 @@ ListUint8 returns the list as a specifically typed List.
 ```go
 func (l *ListData) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down.
+Remove deletes the specified position and shifts remaining data down.
 
 #### func (*ListData) Set
 
@@ -1161,7 +1161,7 @@ Append adds data to the list
 ```go
 func (l ListDouble) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (ListDouble) Equal
 
@@ -1176,7 +1176,7 @@ for equality
 ```go
 func (l ListDouble) Get(i int) Data
 ```
-Get returns the data at the given positon.
+Get returns the data at the given position.
 
 #### func (*ListDouble) Insert
 
@@ -1197,7 +1197,7 @@ Len returns the length of the list.
 ```go
 func (l *ListDouble) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down.
+Remove deletes the specified position and shifts remaining data down.
 
 #### func (ListDouble) Set
 
@@ -1246,7 +1246,7 @@ Append adds to the list.
 ```go
 func (l ListEnd) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (ListEnd) Equal
 
@@ -1331,7 +1331,7 @@ Append adds data to the list
 ```go
 func (l ListFloat) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (ListFloat) Equal
 
@@ -1346,7 +1346,7 @@ for equality
 ```go
 func (l ListFloat) Get(i int) Data
 ```
-Get returns the data at the given positon.
+Get returns the data at the given position.
 
 #### func (*ListFloat) Insert
 
@@ -1367,7 +1367,7 @@ Len returns the length of the list.
 ```go
 func (l *ListFloat) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down.
+Remove deletes the specified position and shifts remaining data down.
 
 #### func (ListFloat) Set
 
@@ -1416,7 +1416,7 @@ Append adds data to the list
 ```go
 func (l ListInt) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (ListInt) Equal
 
@@ -1431,7 +1431,7 @@ for equality
 ```go
 func (l ListInt) Get(i int) Data
 ```
-Get returns the data at the given positon.
+Get returns the data at the given position.
 
 #### func (*ListInt) Insert
 
@@ -1452,7 +1452,7 @@ Len returns the length of the list.
 ```go
 func (l *ListInt) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down.
+Remove deletes the specified position and shifts remaining data down.
 
 #### func (ListInt) Set
 
@@ -1501,7 +1501,7 @@ Append adds data to the list
 ```go
 func (l ListIntArray) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (ListIntArray) Equal
 
@@ -1516,7 +1516,7 @@ for equality
 ```go
 func (l ListIntArray) Get(i int) Data
 ```
-Get returns the data at the given positon.
+Get returns the data at the given position.
 
 #### func (*ListIntArray) Insert
 
@@ -1537,7 +1537,7 @@ Len returns the length of the list.
 ```go
 func (l *ListIntArray) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down.
+Remove deletes the specified position and shifts remaining data down.
 
 #### func (ListIntArray) Set
 
@@ -1586,7 +1586,7 @@ Append adds data to the list
 ```go
 func (l ListLong) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (ListLong) Equal
 
@@ -1601,7 +1601,7 @@ for equality
 ```go
 func (l ListLong) Get(i int) Data
 ```
-Get returns the data at the given positon.
+Get returns the data at the given position.
 
 #### func (*ListLong) Insert
 
@@ -1622,7 +1622,7 @@ Len returns the length of the list.
 ```go
 func (l *ListLong) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down.
+Remove deletes the specified position and shifts remaining data down.
 
 #### func (ListLong) Set
 
@@ -1671,7 +1671,7 @@ Append adds data to the list
 ```go
 func (l ListShort) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (ListShort) Equal
 
@@ -1686,7 +1686,7 @@ for equality
 ```go
 func (l ListShort) Get(i int) Data
 ```
-Get returns the data at the given positon.
+Get returns the data at the given position.
 
 #### func (*ListShort) Insert
 
@@ -1707,7 +1707,7 @@ Len returns the length of the list.
 ```go
 func (l *ListShort) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down.
+Remove deletes the specified position and shifts remaining data down.
 
 #### func (ListShort) Set
 
@@ -1756,7 +1756,7 @@ Append adds data to the list
 ```go
 func (l ListUint16) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (ListUint16) Equal
 
@@ -1771,7 +1771,7 @@ for equality
 ```go
 func (l ListUint16) Get(i int) Data
 ```
-Get returns the data at the given positon.
+Get returns the data at the given position.
 
 #### func (*ListUint16) Insert
 
@@ -1792,7 +1792,7 @@ Len returns the length of the list.
 ```go
 func (l *ListUint16) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down.
+Remove deletes the specified position and shifts remaining data down.
 
 #### func (ListUint16) Set
 
@@ -1841,7 +1841,7 @@ Append adds data to the list
 ```go
 func (l ListUint32) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (ListUint32) Equal
 
@@ -1856,7 +1856,7 @@ for equality
 ```go
 func (l ListUint32) Get(i int) Data
 ```
-Get returns the data at the given positon.
+Get returns the data at the given position.
 
 #### func (*ListUint32) Insert
 
@@ -1877,7 +1877,7 @@ Len returns the length of the list.
 ```go
 func (l *ListUint32) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down.
+Remove deletes the specified position and shifts remaining data down.
 
 #### func (ListUint32) Set
 
@@ -1926,7 +1926,7 @@ Append adds data to the list
 ```go
 func (l ListUint64) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (ListUint64) Equal
 
@@ -1941,7 +1941,7 @@ for equality
 ```go
 func (l ListUint64) Get(i int) Data
 ```
-Get returns the data at the given positon.
+Get returns the data at the given position.
 
 #### func (*ListUint64) Insert
 
@@ -1962,7 +1962,7 @@ Len returns the length of the list.
 ```go
 func (l *ListUint64) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down.
+Remove deletes the specified position and shifts remaining data down.
 
 #### func (ListUint64) Set
 
@@ -2011,7 +2011,7 @@ Append adds data to the list
 ```go
 func (l ListUint8) Copy() Data
 ```
-Copy simply returns a deep-copy the the data.
+Copy simply returns a deep-copy of the data.
 
 #### func (ListUint8) Equal
 
@@ -2026,7 +2026,7 @@ for equality
 ```go
 func (l ListUint8) Get(i int) Data
 ```
-Get returns the data at the given positon.
+Get returns the data at the given position.
 
 #### func (*ListUint8) Insert
 
@@ -2047,7 +2047,7 @@ Len returns the length of the list.
 ```go
 func (l *ListUint8) Remove(i int)
 ```
-Remove deletes the specified position and shifts remaing data down.
+Remove deletes the specified position and shifts remaining data down.
 
 #### func (ListUint8) Set
 
@@ -2089,7 +2089,7 @@ Long is an implementation of the Data interface.
 ```go
 func (l Long) Copy() Data
 ```
-Copy simply returns a copy the the data.
+Copy simply returns a copy of the data.
 
 #### func (Long) Equal
 
@@ -2142,7 +2142,7 @@ Short is an implementation of the Data interface.
 ```go
 func (s Short) Copy() Data
 ```
-Copy simply returns a copy the the data.
+Copy simply returns a copy of the data.
 
 #### func (Short) Equal
 
@@ -2178,7 +2178,7 @@ String is an implementation of the Data interface.
 ```go
 func (s String) Copy() Data
 ```
-Copy simply returns a copy the the data.
+Copy simply returns a copy of the data.
 
 #### func (String) Equal
 
@@ -2215,7 +2215,7 @@ Tag is the main NBT type, a combination of a name and a Data type.
 ```go
 func Decode(r io.Reader) (Tag, error)
 ```
-Decode will eencode a single tag from the reader using the default settings.
+Decode will encode a single tag from the reader using the default settings.
 
 #### func  NewTag
 
@@ -2229,7 +2229,7 @@ NewTag constructs a new tag with the given name and data.
 ```go
 func (t Tag) Copy() Tag
 ```
-Copy simply returns a deep-copy the the tag.
+Copy simply returns a deep-copy of the tag.
 
 #### func (Tag) Data
 
@@ -2319,7 +2319,7 @@ Uint16 is an implementation of the Data interface.
 ```go
 func (u Uint16) Copy() Data
 ```
-Copy simply returns a copy the the data.
+Copy simply returns a copy of the data.
 
 #### func (Uint16) Equal
 
@@ -2355,7 +2355,7 @@ Uint32 is an implementation of the Data interface.
 ```go
 func (u Uint32) Copy() Data
 ```
-Copy simply returns a copy the the data.
+Copy simply returns a copy of the data.
 
 #### func (Uint32) Equal
 
@@ -2391,7 +2391,7 @@ Uint64 is an implementation of the Data interface.
 ```go
 func (u Uint64) Copy() Data
 ```
-Copy simply returns a copy the the data.
+Copy simply returns a copy of the data.
 
 #### func (Uint64) Equal
 
@@ -2427,7 +2427,7 @@ Uint8 is an implementation of the Data interface.
 ```go
 func (u Uint8) Copy() Data
 ```
-Copy simply returns a copy the the data.
+Copy simply returns a copy of the data.
 
 #### func (Uint8) Equal
 
