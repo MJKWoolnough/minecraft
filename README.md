@@ -71,7 +71,7 @@ var (
 ```go
 var (
 	// TransparentBlocks is a slice of the block ids that are transparent.
-	// This is used in lighting calculations and is user overrideable for custom
+	// This is used in lighting calculations and is user overridable for custom
 	// blocks.
 	TransparentBlocks = TransparentBlockList{0, 6, 18, 20, 26, 27, 28, 29, 30, 31, 33, 34, 37, 38, 39, 40, 50, 51, 52, 54, 55, 59, 63, 64, 65, 66, 69, 70, 71, 75, 76, 77, 78, 79, 81, 83, 85, 90, 92, 93, 94, 96, 102, 106, 107, 117, 118, 119, 120, 750}
 	// LightBlocks is a map of block ids to the amount of light they give off.
@@ -241,7 +241,7 @@ GetTicks returns all of the scheduled ticks for a block.
 ```go
 func (b Block) HasMetadata() bool
 ```
-HasMetadata returns true the the block contains extended metadata.
+HasMetadata returns true if the block contains extended metadata.
 
 #### func (Block) HasTicks
 
@@ -612,7 +612,7 @@ LevelName sets the name of the minecraft level.
 ```go
 func (l *Level) LogAdminCommands(d bool)
 ```
-LogAdminCommands enables/disables the logging of admin commmands to the log.
+LogAdminCommands enables/disables the logging of admin commands to the log.
 
 #### func (*Level) MapFeatures
 
@@ -918,7 +918,8 @@ type UnknownCompression struct {
 ```
 
 UnknownCompression is an error returned by path types when it encounters a
-compression scheme it is not prepared to handle or an unkown compression scheme.
+compression scheme it is not prepared to handle or an unknown compression
+scheme.
 
 #### func (UnknownCompression) Error
 
@@ -935,7 +936,7 @@ type WrongTypeError struct {
 }
 ```
 
-WrongTypeError is an error returned when a nbt tag has an unexpected type.
+WrongTypeError is an error returned when an nbt tag has an unexpected type.
 
 #### func (WrongTypeError) Error
 
