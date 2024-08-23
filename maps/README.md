@@ -46,7 +46,7 @@ func Encode(w io.Writer, i image.Image) error
 ```
 Encode writes an image an as uncompressed Minecraft map.
 
-As Minecraft expects the map to be gzip compressed, the Writer sohuld be the
+As Minecraft expects the map to be gzip compressed, the Writer should be the
 wrapped in gzip.NewWriter.
 
 #### type Encoder
@@ -67,7 +67,7 @@ func (e *Encoder) Encode(w io.Writer, im image.Image) error
 ```
 Encode writes an image an as uncompressed Minecraft map.
 
-As Minecraft expects the map to be gzip compressed, the Writer sohuld be the
+As Minecraft expects the map to be gzip compressed, the Writer should be the
 wrapped in gzip.NewWriter.
 
 #### type Image
