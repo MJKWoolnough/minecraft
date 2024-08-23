@@ -10,7 +10,7 @@ import (
 
 // Encode writes an image an as uncompressed Minecraft map.
 //
-// As Minecraft expects the map to be gzip compressed, the Writer sohuld be the
+// As Minecraft expects the map to be gzip compressed, the Writer should be the
 // wrapped in gzip.NewWriter.
 func Encode(w io.Writer, i image.Image) error {
 	e := Encoder{
@@ -29,7 +29,7 @@ type Encoder struct {
 
 // Encode writes an image an as uncompressed Minecraft map.
 //
-// As Minecraft expects the map to be gzip compressed, the Writer sohuld be the
+// As Minecraft expects the map to be gzip compressed, the Writer should be the
 // wrapped in gzip.NewWriter.
 func (e *Encoder) Encode(w io.Writer, im image.Image) error {
 	width, height := im.Bounds().Dx(), im.Bounds().Dy()
