@@ -11,7 +11,7 @@ types=( Byte Short Int Long Float Double Compound IntArray Bool Uint8 Uint16 Uin
 
 	for type in ${types[@]}; do
 		echo;
-		
+
 		echo "// List$type satisfies the List interface for a list of ${type}s.";
 		echo "type List$type []$type";
 
@@ -32,7 +32,7 @@ types=( Byte Short Int Long Float Double Compound IntArray Bool Uint8 Uint16 Uin
 		echo "	if ok {";
 		echo "		if len(l) == len(m) {";
 		echo "			for n, t := range m {";
-		echo "				if !t.Equal(l[n]) {"
+		echo "				if !t.Equal(l[n]) {";
 		echo "					return false";
 		echo "				}";
 		echo "			}";
@@ -84,7 +84,7 @@ types=( Byte Short Int Long Float Double Compound IntArray Bool Uint8 Uint16 Uin
 		echo "}";
 
 		echo;
-		
+
 		echo "// TagType returns the TagID of the type of tag this list contains.";
 		echo "func (List$type) TagType() TagID {";
 		echo "	return Tag$type";
@@ -122,7 +122,7 @@ types=( Byte Short Int Long Float Double Compound IntArray Bool Uint8 Uint16 Uin
 		echo;
 		echo "	for n, e := range d {";
 		echo "		if f, ok := e.($type); ok {";
-		echo "			toAppend[n] = f";	
+		echo "			toAppend[n] = f";
 		echo "		} else {";
 		echo "			return &WrongTag{Tag$type, e.Type()}";
 		echo "		}";
@@ -146,7 +146,7 @@ types=( Byte Short Int Long Float Double Compound IntArray Bool Uint8 Uint16 Uin
 		echo;
 		echo "	for n, e := range d {";
 		echo "		if f, ok := e.($type); ok {";
-		echo "			toInsert[n] = f";	
+		echo "			toInsert[n] = f";
 		echo "		} else {";
 		echo "			return &WrongTag{Tag$type, e.Type()}";
 		echo "		}";
@@ -159,7 +159,7 @@ types=( Byte Short Int Long Float Double Compound IntArray Bool Uint8 Uint16 Uin
 
 		echo;
 
-		echo "// Remove deletes the specified position and shifts remaining data down."
+		echo "// Remove deletes the specified position and shifts remaining data down.";
 		echo "func (l *List$type) Remove(i int) {";
 		echo "	if i >= len(*l) {";
 		echo "		return";
@@ -176,7 +176,7 @@ types=( Byte Short Int Long Float Double Compound IntArray Bool Uint8 Uint16 Uin
 
 		echo;
 
-		echo "// Len returns the length of the list."
+		echo "// Len returns the length of the list.";
 		echo "func (l List$type) Len() int {";
 		echo "	return len(l)";
 		echo "}";
@@ -198,5 +198,4 @@ types=( Byte Short Int Long Float Double Compound IntArray Bool Uint8 Uint16 Uin
 		echo "	return s";
 		echo "}";
 	done;
-
-} > "lists.go"
+} > "lists.go";
