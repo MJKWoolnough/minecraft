@@ -13,23 +13,23 @@ import (
 
 func testPathChunkSetGet(t *testing.T, path Path) {
 	toPlace := []nbt.Compound{
-		nbt.Compound{
-			addPos(0, 0, 3),  //0[4]
-			addPos(1, 0, 2),  //0[4],1[3]
-			addPos(2, 0, 1),  //0[4],1[3],2[2]
-			addPos(3, 0, 0),  //0[4],1[3],2[2],3[1]
-			addPos(20, 0, 2), //0[4],1[3],2[2],3[1],20[3]
-			addPos(0, 20, 1), //0[4],1[3],2[2],3[1],20[3],640[2]
+		{
+			addPos(0, 0, 3),  // 0[4]
+			addPos(1, 0, 2),  // 0[4],1[3]
+			addPos(2, 0, 1),  // 0[4],1[3],2[2]
+			addPos(3, 0, 0),  // 0[4],1[3],2[2],3[1]
+			addPos(20, 0, 2), // 0[4],1[3],2[2],3[1],20[3]
+			addPos(0, 20, 1), // 0[4],1[3],2[2],3[1],20[3],640[2]
 			addPos(-1, 0, 0),
 			addPos(0, -1, 0),
 			addPos(-1, -1, 1),
 			addPos(-3, -3, 1),
 		},
-		nbt.Compound{
-			addPos(0, 0, 1), //0[2],[2],1[3],2[2],3[1],20[3],640[2]
-			addPos(1, 0, 2), //0[2],[2],1[3],2[2],3[1],20[3],640[2]
-			addPos(3, 0, 1), //0[2],3[2],1[3],2[2],[1],20[3],640[2]
-			addPos(4, 0, 0), //0[2],3[2],1[3],2[2],4[1],(!)20[3],(!)640[2] | (2 + 0) << 8 | 2, (2 + 2) << 8 | 2,(2 + 4) << 8 | 3,(2 + 7) << 8 | 2, (2 + 9) << 8 | 1
+		{
+			addPos(0, 0, 1), // 0[2],[2],1[3],2[2],3[1],20[3],640[2]
+			addPos(1, 0, 2), // 0[2],[2],1[3],2[2],3[1],20[3],640[2]
+			addPos(3, 0, 1), // 0[2],3[2],1[3],2[2],[1],20[3],640[2]
+			addPos(4, 0, 0), // 0[2],3[2],1[3],2[2],4[1],(!)20[3],(!)640[2] | (2 + 0) << 8 | 2, (2 + 2) << 8 | 2,(2 + 4) << 8 | 3,(2 + 7) << 8 | 2, (2 + 9) << 8 | 1
 			addPos(-1, 0, 1),
 			addPos(0, -2, 1),
 			addPos(-1, -1, 0),
@@ -180,7 +180,7 @@ func TestFilePath(t *testing.T) {
 	testPathRegionsGet(t, f)
 	testPathChunkRemove(t, f)
 
-	//Check Files
+	// Check Files
 	file, err := os.Open(path.Join(tempDir, "region", "r.0.0.mca"))
 	if err != nil {
 		t.Error(err.Error())
@@ -190,11 +190,11 @@ func TestFilePath(t *testing.T) {
 		t.Error(err.Error())
 	}
 	file.Close()
-	should[0] = (2+0)<<8 | 1 //pos 0 + offset(2), size 1
-	should[1] = (2+4)<<8 | 3 //pos 4 + offset(2), size 3
-	should[2] = (2+7)<<8 | 1 //pos 7 + offset(2), size 1
-	should[3] = (2+8)<<8 | 1 //pos 8 + offset(2), size 1
-	should[4] = (2+1)<<8 | 1 //pos 1 + offset(2), size 1
+	should[0] = (2+0)<<8 | 1 // pos 0 + offset(2), size 1
+	should[1] = (2+4)<<8 | 3 // pos 4 + offset(2), size 3
+	should[2] = (2+7)<<8 | 1 // pos 7 + offset(2), size 1
+	should[3] = (2+8)<<8 | 1 // pos 8 + offset(2), size 1
+	should[4] = (2+1)<<8 | 1 // pos 1 + offset(2), size 1
 
 	for i := 0; i < 1024; i++ {
 		if should[i] != positions[i] {
@@ -202,7 +202,7 @@ func TestFilePath(t *testing.T) {
 		}
 	}
 
-	//Check Defrag
+	// Check Defrag
 
 	err = f.Defrag(0, 0)
 	if err != nil {
@@ -219,11 +219,11 @@ func TestFilePath(t *testing.T) {
 	}
 	file.Close()
 
-	should[0] = (2+0)<<8 | 1 //pos 0 + offset(2), size 1
-	should[1] = (2+1)<<8 | 3 //pos 1 + offset(2), size 3
-	should[2] = (2+4)<<8 | 1 //pos 4 + offset(2), size 1
-	should[3] = (2+5)<<8 | 1 //pos 5 + offset(2), size 1
-	should[4] = (2+6)<<8 | 1 //pos 6 + offset(2), size 1
+	should[0] = (2+0)<<8 | 1 // pos 0 + offset(2), size 1
+	should[1] = (2+1)<<8 | 3 // pos 1 + offset(2), size 3
+	should[2] = (2+4)<<8 | 1 // pos 4 + offset(2), size 1
+	should[3] = (2+5)<<8 | 1 // pos 5 + offset(2), size 1
+	should[4] = (2+6)<<8 | 1 // pos 6 + offset(2), size 1
 
 	for i := 0; i < 1024; i++ {
 		if should[i] != positions[i] {
@@ -247,7 +247,6 @@ func TestFilePath(t *testing.T) {
 }
 
 func TestFilePathLock(t *testing.T) {
-
 	var (
 		err  error
 		f, g *FilePath
