@@ -70,7 +70,7 @@ const (
 type Biome uint8
 
 // Equal is an implementation of the equaler.Equaler interface.
-func (b Biome) Equal(e interface{}) bool {
+func (b Biome) Equal(e any) bool {
 	if c, ok := e.(*Biome); ok {
 		return b == *c
 	} else if c, ok := e.(Biome); ok {

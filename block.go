@@ -2,6 +2,7 @@ package minecraft
 
 import (
 	"strconv"
+	"strings"
 
 	"vimagination.zapto.org/minecraft/nbt"
 )
@@ -21,7 +22,7 @@ type Block struct {
 }
 
 // Equal is an implementation of the equaler.Equaler interface.
-func (b Block) Equal(e interface{}) bool {
+func (b Block) Equal(e any) bool {
 	c, ok := e.(Block)
 	if !ok {
 		d, ok := e.(*Block)
@@ -173,15 +174,16 @@ func (b *Block) SetTicks(t []Tick) {
 }
 
 func (b Block) String() string {
-	toRet := "Block ID: " + strconv.FormatUint(uint64(b.ID), 10) + "\nData: " + strconv.FormatUint(uint64(b.Data), 10) + "\n"
+	var toRet strings.Builder
+	toRet.WriteString("Block ID: " + strconv.FormatUint(uint64(b.ID), 10) + "\nData: " + strconv.FormatUint(uint64(b.Data), 10) + "\n")
 
 	if b.metadata != nil && len(b.metadata) != 0 {
-		toRet += "Metadata: " + b.metadata.String()
+		toRet.WriteString("Metadata: " + b.metadata.String())
 	}
 
 	for n, tick := range b.ticks {
-		toRet += "	Tick: " + strconv.FormatInt(int64(n+1), 10) + ", i: " + strconv.FormatInt(int64(tick.I), 10) + ", t: " + strconv.FormatInt(int64(tick.T), 10) + ", p: " + strconv.FormatInt(int64(tick.I), 10)
+		toRet.WriteString("	Tick: " + strconv.FormatInt(int64(n+1), 10) + ", i: " + strconv.FormatInt(int64(tick.I), 10) + ", t: " + strconv.FormatInt(int64(tick.T), 10) + ", p: " + strconv.FormatInt(int64(tick.I), 10))
 	}
 
-	return toRet
+	return toRet.String()
 }
